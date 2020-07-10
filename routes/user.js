@@ -20,6 +20,9 @@ const { errorObjects } = require("../utils/errorObjects");
 const config = require("config");
 const stripe = require("stripe")(config.get(stringConstants.STRIPE_TEST_KEY));
 
+// Dev remove in production
+const Joi = require("@hapi/joi");
+
 /**
  * Register user with full name, email and password
  */
@@ -161,15 +164,18 @@ router.post("/add-update-profile-picture", auth, async (req, res) => {
     // Save the profile to user document and return user document
     // Before that check if profile picture already exists and replace if it does
     if (user.profilePicture) {
+      const absolutePath = path.join(
+        __dirname,
+        "../public/",
+        `${user.profilePicture}`
+      );
       try {
-        await fsPromises.unlink(
-          path.join(__dirname, "../public/", `${user.profilePicture}`)
-        );
+        await fsPromises.unlink(absolutePath);
       } catch (err) {
         SimpleLogger.error(err);
         await new PendingDeletion({
           deletionType: stringConstants.deletionType.FILE,
-          data: user.profilePicture,
+          data: absolutePath,
         }).save();
       }
     }
@@ -356,6 +362,35 @@ router.get("/user-details", auth, async (req, res) => {
       { user: userDetails },
       stringConstants.FETCH_SUCESSFUL
     )
+  );
+});
+
+/**
+ * Delete user route only for dev purposes will be removed
+ * in productions
+ * TODO: Remove route in production
+ */
+router.delete("/delete-user", async (req, res) => {
+  const schema = Joi.object({
+    emails: Joi.array().items(Joi.string().email()).required(),
+  });
+
+  const { error } = schema.validate(req.body);
+  if (error)
+    return res.send(createResObject(false, {}, error.details[0].message));
+  if (req.body.emails.length < 1)
+    return res.send(createResObject(false, {}, "email array cannot be empty"));
+  const emails = req.body.emails;
+  const userArray = [];
+  for (const email of emails) {
+    const user = await User.findOne({ email });
+    if (user) {
+      await user.remove();
+      userArray.push(user);
+    }
+  }
+  return res.send(
+    createResObject(true, {}, `${userArray.length} user deleted`)
   );
 });
 module.exports = router;

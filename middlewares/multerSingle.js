@@ -14,7 +14,7 @@ const profilePicStorage = multer.diskStorage({
     const dateTime = Date.now();
     const extension = path.extname(file.originalname).toLowerCase();
     const rand = getRandomIntInclusive(100, 999);
-    const fileName = `${dateTime}${rand}profile_pic${extension}`;
+    const fileName = `${dateTime}${rand}_profile_pic${extension}`;
     cb(null, fileName);
   },
 });
@@ -30,7 +30,7 @@ const cardFrontStorage = multer.diskStorage({
     const dateTime = Date.now();
     const extension = path.extname(file.originalname).toLowerCase();
     const rand = getRandomIntInclusive(100, 999);
-    const fileName = `${dateTime}${rand}card_front${extension}`;
+    const fileName = `${dateTime}${rand}_card_front${extension}`;
     cb(null, fileName);
   },
 });
@@ -46,7 +46,7 @@ const cardBackStorage = multer.diskStorage({
     const dateTime = Date.now();
     const extension = path.extname(file.originalname).toLowerCase();
     const rand = getRandomIntInclusive(100, 999);
-    const fileName = `${dateTime}${rand}card_back${extension}`;
+    const fileName = `${dateTime}${rand}_card_back${extension}`;
     cb(null, fileName);
   },
 });
@@ -63,7 +63,7 @@ const cardVideoStorage = multer.diskStorage({
     const dateTime = Date.now();
     const extension = path.extname(file.originalname).toLowerCase();
     const rand = getRandomIntInclusive(100, 999);
-    const fileName = `${dateTime}${rand}card_video${extension}`;
+    const fileName = `${dateTime}${rand}_card_video${extension}`;
     cb(null, fileName);
   },
 });
