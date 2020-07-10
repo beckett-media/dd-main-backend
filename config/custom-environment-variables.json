@@ -1,0 +1,8 @@
+{
+  "dbConnectionString": "DB_CONNECTION_STRING",
+  "snapGradeJwtPrivateKey": "SNAP_GRADE_JWT_PRIVATE_KEY",
+  "snapGradeJwtRefreshKey": "SNAP_GRADE_JWT_REFRESH_KEY",
+  "snapGradeJwtAppKey": "SNAP_GRADE_JWT_APP_KEY",
+  "stripeTestKey": "SNAP_GRADE_STRIPE_TEST_KEY",
+  "googleApplicationCredentials": "GOOGLE_APPLICATION_CREDENTIALS"
+}

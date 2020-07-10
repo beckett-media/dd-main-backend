@@ -1,0 +1,124 @@
+const mongoose = require("mongoose");
+const jwt = require("jsonwebtoken");
+const config = require("config");
+const moment = require("moment");
+const { stringConstants } = require("../utils/constants");
+
+const userSchema = new mongoose.Schema(
+  {
+    fullName: {
+      type: String,
+      required: true,
+      minlength: 2,
+      maxlength: 255,
+      trim: true,
+    },
+    email: {
+      type: String,
+      required: true,
+      minlength: 5,
+      maxlength: 255,
+      trim: true,
+      lowercase: true,
+      unique: true,
+    },
+    password: {
+      type: String,
+      required: true,
+      minlength: 6,
+      maxlength: 1024,
+    },
+    profilePicture: {
+      type: String,
+    },
+    username: {
+      type: String,
+      minlength: 5,
+      maxlength: 255,
+      lowercase: true,
+    },
+    role: {
+      type: String,
+      enum: [stringConstants.role.ADMIN, stringConstants.role.USER],
+      default: stringConstants.role.USER,
+    },
+    deviceToken: {
+      type: String,
+    },
+    refreshToken: {
+      type: String,
+    },
+    stripeId: {
+      type: String,
+    },
+    appleId: {
+      type: String,
+    },
+    setupCompleted: {
+      type: Boolean,
+      default: false,
+    },
+    settings: {
+      notifications: {
+        type: Boolean,
+        default: true,
+      },
+    },
+    metadata: {
+      signupType: {
+        type: String,
+        enum: [
+          stringConstants.signUpType.EBAY,
+          stringConstants.signUpType.APPLE,
+          stringConstants.signUpType.MOBILE_APP,
+        ],
+        default: stringConstants.signUpType.MOBILE_APP,
+      },
+    },
+  },
+  { timestamps: true }
+);
+
+userSchema.methods.generateAuthToken = function () {
+  const token = jwt.sign(
+    { _id: this._id, role: this.role },
+    config.get(stringConstants.JWT_PRIATE_KEY),
+    { expiresIn: "30m" }
+  );
+
+  return {
+    token,
+    expiry: moment.utc(moment(Date.now()).add(30, "minutes")).format(),
+  };
+};
+
+userSchema.methods.generateRefreshToken = function () {
+  const refreshToken = jwt.sign(
+    { _id: this._id },
+    config.get(stringConstants.JWT_REFRESH_KEY),
+    { expiresIn: "30d" }
+  );
+  return {
+    token: refreshToken,
+    expiry: moment.utc(moment(Date.now()).add(30, "days")).format(),
+  };
+};
+
+userSchema.methods.getUserDetails = function () {
+  return {
+    id: this._id,
+    fullName: this.fullName,
+    email: this.email,
+    profilePicture: this.profilePicture,
+    username: this.username,
+    role: this.role,
+    settings: this.settings,
+  };
+};
+
+const User = mongoose.model(
+  stringConstants.collectionNames.USER_COLLECTION,
+  userSchema
+);
+
+module.exports.User = User;
