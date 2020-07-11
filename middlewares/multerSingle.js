@@ -1,6 +1,7 @@
 const multer = require("multer");
 const path = require("path");
 const { getRandomIntInclusive } = require("../utils/utilFunctions");
+const { stringConstants } = require("../utils/constants");
 
 /**
  * Storage for user profile picture
@@ -74,8 +75,13 @@ module.exports.uploadProfilePic = multer({
   storage: profilePicStorage,
   fileFilter: function (req, file, cb) {
     const ext = path.extname(file.originalname).toLowerCase();
-    if (ext != ".png" && ext !== ".jpg" && ext !== ".gif" && ext !== ".jpeg") {
-      return cb(new Error("Not a valid file type"), false);
+    if (
+      ext !== stringConstants.iType.PNG &&
+      ext !== stringConstants.iType.JPG &&
+      ext !== stringConstants.iType.GIF &&
+      ext !== stringConstants.iType.JPEG
+    ) {
+      return cb(new Error(stringConstants.NOT_A_VALID_FILE_TYPE), false);
     }
     cb(null, true);
   },
@@ -87,8 +93,13 @@ module.exports.uploadCardFront = multer({
   storage: cardFrontStorage,
   fileFilter: function (req, file, cb) {
     const ext = path.extname(file.originalname).toLowerCase();
-    if (ext != ".png" && ext !== ".jpg" && ext !== ".gif" && ext !== ".jpeg") {
-      return cb(new Error("Not a valid file type"), false);
+    if (
+      ext !== stringConstants.iType.PNG &&
+      ext !== stringConstants.iType.JPG &&
+      ext !== stringConstants.iType.GIF &&
+      ext !== stringConstants.iType.JPEG
+    ) {
+      return cb(new Error(stringConstants.NOT_A_VALID_FILE_TYPE), false);
     }
     cb(null, true);
   },
@@ -100,8 +111,13 @@ module.exports.uploadCardBack = multer({
   storage: cardBackStorage,
   fileFilter: function (req, file, cb) {
     const ext = path.extname(file.originalname).toLowerCase();
-    if (ext !== ".png" && ext !== ".jpg" && ext !== ".gif" && ext !== ".jpeg") {
-      return cb(new Error("Not a valid file type"), false);
+    if (
+      ext !== stringConstants.iType.PNG &&
+      ext !== stringConstants.iType.JPG &&
+      ext !== stringConstants.iType.GIF &&
+      ext !== stringConstants.iType.JPEG
+    ) {
+      return cb(new Error(stringConstants.NOT_A_VALID_FILE_TYPE), false);
     }
     cb(null, true);
   },
@@ -114,13 +130,13 @@ module.exports.uploadCardVideo = multer({
   fileFilter: function (req, file, cb) {
     const ext = path.extname(file.originalname).toLowerCase();
     if (
-      ext !== ".3gp" &&
-      ext !== ".mp4" &&
-      ext !== ".ts" &&
-      ext !== ".webm" &&
-      ext !== ".mkv"
+      ext !== stringConstants.vType.THREEGP &&
+      ext !== stringConstants.vType.MPFOUR &&
+      ext !== stringConstants.vType.TS &&
+      ext !== stringConstants.vType.WEBM &&
+      ext !== stringConstants.vType.MKV
     ) {
-      return cb(new Error("Not a valid file type"), false);
+      return cb(new Error(stringConstants.NOT_A_VALID_FILE_TYPE), false);
     }
     cb(null, true);
   },

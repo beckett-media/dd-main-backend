@@ -98,23 +98,28 @@ router.post("/register-user", valRegisterRequest, async (req, res) => {
  * Post or update the already existing profile picture
  */
 
-router.post("/add-update-profile-picture", auth, async (req, res) => {
+router.post("/add-update-profile-picture", auth, async (req, res, next) => {
   let user = await User.findById(req.user._id);
 
   uploadProfilePic(req, res, async function (err) {
     // Check if error, log error and send error response
     if (err) {
       SimpleLogger.error(err);
-      return res
-        .status(400)
-        .send(
-          createResObject(
-            false,
-            {},
-            stringConstants.UNSUSPECTED_ERROR,
-            errorObjects.UNSUSPECTED_ERROR(stringConstants.UNSUSPECTED_ERROR)
-          )
-        );
+      // If file type error return relavent message
+      if (err.message === stringConstants.NOT_A_VALID_FILE_TYPE) {
+        return res
+          .status(415)
+          .send(
+            createResObject(
+              false,
+              {},
+              stringConstants.FILE_TYPE_NOT_ACCEPTED,
+              errorObjects.FILE_TYPE_NOT_ACCEPTED
+            )
+          );
+      }
+      // Otherwise return 500
+      return next(err);
     }
     // Check file exists
     if (!req.file)

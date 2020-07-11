@@ -86,6 +86,8 @@ module.exports.stringConstants = {
   APPLE_ID_DOES_NOT_MATCH_EMAIL:
     "User Identifier does not match the given email",
 
+  NOT_A_VALID_FILE_TYPE: "Not a valid file type",
+
   collectionNames: {
     USER_COLLECTION: "User",
     PENDING_DELETION: "PendingDeletion",
@@ -113,5 +115,20 @@ module.exports.stringConstants = {
     EBAY: "ebay",
     APPLE: "apple",
     MOBILE_APP: "mobile app",
+  },
+  // Image type
+  iType: {
+    PNG: ".png",
+    JPG: ".jpg",
+    GIF: ".gif",
+    JPEG: ".jpeg",
+  },
+  // Video type
+  vType: {
+    THREEGP: ".3gp",
+    MPFOUR: ".mp4",
+    TS: ".ts",
+    WEBM: ".webm",
+    MKV: ".mkv",
   },
 };

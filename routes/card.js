@@ -20,7 +20,7 @@ const { valObjectIdInUrl } = require("../middlewares/validation");
 /**
  * Step 1: Create a new card and upload card front
  */
-router("/add-front", auth, async (req, res) => {
+router("/add-front", auth, async (req, res, next) => {
   const user = await User.findById(req.user._id);
   if (!user)
     return res
@@ -37,16 +37,21 @@ router("/add-front", auth, async (req, res) => {
   uploadCardFront(req, res, async function (err) {
     if (err) {
       SimpleLogger.error(err);
-      return res
-        .status(400)
-        .send(
-          createResObject(
-            false,
-            {},
-            stringConstants.UNSUSPECTED_ERROR,
-            errorObjects.UNSUSPECTED_ERROR(stringConstants.UNSUSPECTED_ERROR)
-          )
-        );
+      // If file type error return relavent message
+      if (err.message === stringConstants.NOT_A_VALID_FILE_TYPE) {
+        return res
+          .status(415)
+          .send(
+            createResObject(
+              false,
+              {},
+              stringConstants.FILE_TYPE_NOT_ACCEPTED,
+              errorObjects.FILE_TYPE_NOT_ACCEPTED
+            )
+          );
+      }
+      // Otherwise return unsuspected error
+      return next(err);
     }
 
     // Check file exists
@@ -140,16 +145,21 @@ router.post("/add-back/:cardId", [auth, valObjectIdInUrl], async (req, res) => {
   uploadCardBack(req, res, async function (err) {
     if (err) {
       SimpleLogger.error(err);
-      return res
-        .status(400)
-        .send(
-          createResObject(
-            false,
-            {},
-            stringConstants.UNSUSPECTED_ERROR,
-            errorObjects.UNSUSPECTED_ERROR(err.message)
-          )
-        );
+      // If file type error return relavent message
+      if (err.message === stringConstants.NOT_A_VALID_FILE_TYPE) {
+        return res
+          .status(415)
+          .send(
+            createResObject(
+              false,
+              {},
+              stringConstants.FILE_TYPE_NOT_ACCEPTED,
+              errorObjects.FILE_TYPE_NOT_ACCEPTED
+            )
+          );
+      }
+      // Otherwise return unsuspected error
+      return next(err);
     }
 
     // Check file exists
@@ -240,16 +250,21 @@ router.post(
     uploadCardVideo(req, res, async function (err) {
       if (err) {
         SimpleLogger.error(err);
-        return res
-          .status(400)
-          .send(
-            createResObject(
-              false,
-              {},
-              stringConstants.UNSUSPECTED_ERROR,
-              errorObjects.UNSUSPECTED_ERROR(err.message)
-            )
-          );
+        // If file type error return relavent message
+        if (err.message === stringConstants.NOT_A_VALID_FILE_TYPE) {
+          return res
+            .status(415)
+            .send(
+              createResObject(
+                false,
+                {},
+                stringConstants.FILE_TYPE_NOT_ACCEPTED,
+                errorObjects.FILE_TYPE_NOT_ACCEPTED
+              )
+            );
+        }
+        // Otherwise return unsuspected error
+        return next(err);
       }
 
       if (!req.file) {
