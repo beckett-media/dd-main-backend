@@ -3,6 +3,8 @@ const request = require("supertest");
 const chai = require("chai");
 const expect = chai.expect;
 const config = require("config");
+const rimraf = require("rimraf");
+const path = require("path");
 let server;
 
 /**
@@ -16,7 +18,10 @@ describe("INTEG: EndPoint: /authenticate/sign-in-user", function () {
   // Close the server after test
   afterEach(async function () {
     await server.close();
-    await User.remove({});
+    const users = await User.find({});
+    for (const user of users) {
+      await user.remove();
+    }
   });
 
   /**
@@ -56,6 +61,7 @@ describe("INTEG: EndPoint: /authenticate/sign-in-user", function () {
       email = "test1@test.com";
       password = "test_password";
     });
+
     /**
      * Register the user and then sign in with the
      * credentials. It should successfully sign the

@@ -142,6 +142,15 @@ module.exports.errorObjects = {
     errorMessage: stringConstants.APPLE_ID_DOES_NOT_MATCH_EMAIL,
   },
 
+  NOT_AUTHORIZED_TO_PERFORM_THE_ACTION: {
+    errorCode: 120,
+    errorSubCode: getKey(
+      stringConstants,
+      stringConstants.NOT_AUTHORIZED_TO_PERFORM_THE_ACTION
+    ),
+    errorMessage: stringConstants.NOT_AUTHORIZED_TO_PERFORM_THE_ACTION,
+  },
+
   REQUEST_VALIDATION_ERROR: (errorMessage) => {
     return {
       errorCode: 301,

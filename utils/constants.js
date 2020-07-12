@@ -88,16 +88,25 @@ module.exports.stringConstants = {
 
   NOT_A_VALID_FILE_TYPE: "Not a valid file type",
 
+  NOT_AUTHORIZED_TO_PERFORM_THE_ACTION: "Not authorized to perform the action",
+
+  DELETED_SUCCESSFULLY: "Resource deleted successfully",
+
+  USER_ID_NOT_FOUND_IN_REQUEST: "User ID not found in req.user",
+
   collectionNames: {
     USER_COLLECTION: "User",
-    PENDING_DELETION: "PendingDeletion",
+    PENDING_DELETION: "Pending_Deletion",
     CARD_COLLECTION: "Card",
+    TRANSACTION_COLLECTION: "Transaction",
+    TRANSACTION_LOG_COLLECTION: "Transaction_log",
   },
 
   deletionType: {
     USER: "User",
     FILE: "File",
     CARD: "Card",
+    DIR: "Directory",
   },
 
   role: {
@@ -106,9 +115,10 @@ module.exports.stringConstants = {
   },
 
   cardState: {
-    PENDING: "pending",
+    PENDING: "pending", // Pending payment
     SUBMITTED: "submitted",
-    GRADED: "graded",
+    PAID: "paid", // Payment made
+    GRADED: "graded", // Has been greaded
   },
 
   signUpType: {

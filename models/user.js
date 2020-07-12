@@ -4,6 +4,9 @@ const config = require("config");
 const moment = require("moment");
 const fsPromises = require("fs").promises;
 const path = require("path");
+const SimpleLogger = require("../utils/simpleLogger");
+const rimraf = require("rimraf");
+const { Card } = require("./card");
 const { stringConstants } = require("../utils/constants");
 
 const userSchema = new mongoose.Schema(
@@ -87,22 +90,22 @@ const userSchema = new mongoose.Schema(
  * deletion thus not calling next with error
  */
 userSchema.pre("remove", async function (next) {
-  // TODO: Delete cards for user
-  if (this.profilePicture) {
-    const absolutePath = path.join(
-      __dirname,
-      "../public/",
-      `${this.profilePicture}`
-    );
-    try {
-      await fsPromises.unlink(absolutePath);
-    } catch (error) {
-      SimpleLogger.error(err);
-      await new PendingDeletion({
-        deletionType: stringConstants.deletionType.FILE,
-        data: absolutePath,
-      }).save();
-    }
+  // Remove all user cards
+  const cards = await Card.find({ user: this._id });
+  for (const card of cards) {
+    await card.remove();
+  }
+
+  // Remove user public folder
+  const absolutePath = path.join(__dirname, `../public/${this._id}`);
+  try {
+    rimraf.sync(absolutePath);
+  } catch (error) {
+    SimpleLogger.error(error);
+    await new PendingDeletion({
+      deletionType: stringConstants.deletionType.DIR,
+      data: absolutePath,
+    }).save();
   }
   next();
 });

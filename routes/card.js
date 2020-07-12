@@ -10,18 +10,24 @@ const { Card } = require("../models/card");
 const { PendingDeletion } = require("../models/pendingDeletion");
 const { stringConstants } = require("../utils/constants");
 const { errorObjects } = require("../utils/errorObjects");
+const { createResObject } = require("../utils/utilFunctions");
 const {
   uploadCardFront,
   uploadCardBack,
   uploadCardVideo,
 } = require("../middlewares/multerSingle");
-const { valObjectIdInUrl } = require("../middlewares/validation");
+const {
+  valObjectIdInUrl,
+  valUpdateCardData,
+  valPageSizeNumber,
+} = require("../middlewares/validation");
 
 /**
  * Step 1: Create a new card and upload card front
  */
-router("/add-front", auth, async (req, res, next) => {
-  const user = await User.findById(req.user._id);
+router.post("/add-front", auth, async (req, res, next) => {
+  const userId = req.user._id;
+  const user = await User.findById(userId);
   if (!user)
     return res
       .status(404)
@@ -33,6 +39,13 @@ router("/add-front", auth, async (req, res, next) => {
           errorObjects.USER_ID_DOEST_NOT_EXISTS
         )
       );
+  // Create a new card
+  let card = new Card({
+    user: userId,
+  });
+  const cardId = card._id;
+
+  req.cardId = cardId;
 
   uploadCardFront(req, res, async function (err) {
     if (err) {
@@ -68,19 +81,19 @@ router("/add-front", auth, async (req, res, next) => {
         );
     // Check file size if corrupt delete the uploaded file
     if (req.file.size <= 0) {
+      const cardDestination = path.join(
+        __dirname,
+        "../public/",
+        `${userId}/cards/${cardId}/`,
+        `${req.file.filename}`
+      );
       try {
-        await fsPromises.unlink(
-          path.join(__dirname, "../public/card_fronts/", `${req.file.filename}`)
-        );
+        await fsPromises.unlink(cardDestination);
       } catch (err) {
         SimpleLogger.error(err);
         await new PendingDeletion({
           deletionType: stringConstants.deletionType.FILE,
-          data: path.join(
-            __dirname,
-            "../public/card_fronts/",
-            `${req.file.filename}`
-          ),
+          data: cardDestination,
         }).save();
       }
       return res
@@ -95,30 +108,44 @@ router("/add-front", auth, async (req, res, next) => {
         );
     }
 
-    let card = new Card({
-      front: path.join("card_fronts/", `${req.file.filename}`),
-      user: user._id,
-    });
-
+    card.front = path.join(`${userId}/cards/${cardId}/`, req.file.filename);
     card = await card.save();
-    card = _.pick(card, ["_id", "front", "user"]);
+    card = card.getCardDetails();
 
     return res.send(
       createResObject(true, { card }, stringConstants.UPDATE_SUCCESSFUL)
     );
   });
 });
-
 /**
- * Step 2: Add back of the card picture to an existing card
- * requires the card id in request
+ * Since user can go back and update the picture
+ * Route to update the front. Since we don't know
+ * thee add of the card in add card front
+ * separte route is used for updating front
  */
-router.post("/add-back/:cardId", [auth, valObjectIdInUrl], async (req, res) => {
-  let card = await Card.findById(req.params.cardId);
-  if (!card) {
-    return res
-      .status(404)
-      .send(
+router.post(
+  "/update-front/:cardId",
+  [auth, valObjectIdInUrl],
+  async (req, res, next) => {
+    const userId = req.user._id;
+    const user = await User.findById(userId);
+    if (!user)
+      return res
+        .status(404)
+        .send(
+          createResObject(
+            false,
+            {},
+            stringConstants.USER_ID_DOEST_NOT_EXISTS,
+            errorObjects.USER_ID_DOEST_NOT_EXISTS
+          )
+        );
+    // Check for card using ID
+    const cardId = req.params.cardId;
+
+    let card = await Card.findById(cardId);
+    if (!card)
+      return res.send(
         createResObject(
           false,
           {},
@@ -126,101 +153,105 @@ router.post("/add-back/:cardId", [auth, valObjectIdInUrl], async (req, res) => {
           errorObjects.CARD_ID_NOT_FOUND
         )
       );
-  }
 
-  const user = await User.findById(req.user._id);
-  if (!user)
-    return res
-      .status(404)
-      .send(
-        createResObject(
-          false,
-          {},
-          stringConstants.USER_ID_DOEST_NOT_EXISTS,
-          errorObjects.USER_ID_DOEST_NOT_EXISTS
-        )
-      );
+    req.cardId = cardId;
+    uploadCardFront(req, res, async function (err) {
+      if (err) {
+        SimpleLogger.error(err);
+        // If file type error return relavent message
+        if (err.message === stringConstants.NOT_A_VALID_FILE_TYPE) {
+          return res
+            .status(415)
+            .send(
+              createResObject(
+                false,
+                {},
+                stringConstants.FILE_TYPE_NOT_ACCEPTED,
+                errorObjects.FILE_TYPE_NOT_ACCEPTED
+              )
+            );
+        }
+        // Otherwise return unsuspected error
+        return next(err);
+      }
 
-  // Upload the back of the card
-  uploadCardBack(req, res, async function (err) {
-    if (err) {
-      SimpleLogger.error(err);
-      // If file type error return relavent message
-      if (err.message === stringConstants.NOT_A_VALID_FILE_TYPE) {
+      // Check file exists
+      if (!req.file)
         return res
-          .status(415)
+          .status(400)
           .send(
             createResObject(
               false,
               {},
-              stringConstants.FILE_TYPE_NOT_ACCEPTED,
-              errorObjects.FILE_TYPE_NOT_ACCEPTED
+              stringConstants.NO_FILE_FOUND,
+              errorObjects.NO_FILE_FOUND
+            )
+          );
+
+      // Check file size if corrupt delete the uploaded file
+      if (req.file.size <= 0) {
+        const cardDestination = path.join(
+          __dirname,
+          "../public/",
+          `${userId}/cards/${cardId}/`,
+          `${req.file.filename}`
+        );
+        try {
+          await fsPromises.unlink(cardDestination);
+        } catch (err) {
+          SimpleLogger.error(err);
+          await new PendingDeletion({
+            deletionType: stringConstants.deletionType.FILE,
+            data: cardDestination,
+          }).save();
+        }
+        return res
+          .status(400)
+          .send(
+            createResObject(
+              true,
+              {},
+              stringConstants.FILE_CORRUPTED,
+              errorObjects.FILE_CORRUPTED
             )
           );
       }
-      // Otherwise return unsuspected error
-      return next(err);
-    }
-
-    // Check file exists
-    if (!req.file)
-      return res
-        .status(400)
-        .send(
-          createResObject(
-            false,
-            {},
-            stringConstants.NO_FILE_FOUND,
-            errorObjects.NO_FILE_FOUND
-          )
-        );
-    // Check file size if corrupt delete the uploaded file
-    if (req.file.size <= 0) {
-      try {
-        await fsPromises.unlink(
-          path.join(__dirname, "../public/card_backs/", `${req.file.filename}`)
-        );
-      } catch (err) {
-        SimpleLogger.error(err);
-        await new PendingDeletion({
-          deletionType: stringConstants.deletionType.FILE,
-          data: path.join(
-            __dirname,
-            "../public/card_backs/",
-            `${req.file.filename}`
-          ),
-        }).save();
+      // All the check completed delete the old card and update the new
+      if (card.front) {
+        const pathToCardFront = path.join(__dirname, "../public/", card.front);
+        try {
+          await fsPromises.unlink(pathToCardFront);
+        } catch (error) {
+          SimpleLogger.error(error);
+          await new PendingDeletion({
+            deletionType: stringConstants.deletionType.FILE,
+            data: pathToCardFront,
+          }).save();
+        }
       }
-      return res
-        .status(400)
-        .send(
-          createResObject(
-            true,
-            {},
-            stringConstants.FILE_CORRUPTED,
-            errorObjects.FILE_CORRUPTED
-          )
-        );
-    }
-    card.back = path.join("card_backs/", `${req.file.filename}`);
-    card = await card.save();
 
-    card = _.pick(card, ["_id", "front", "back", "user"]);
+      card.front = path.join(`${userId}/cards/${cardId}/`, req.file.filename);
+      card = await card.save();
+      card = card.getCardDetails();
 
-    return res.send(
-      createResObject(true, { card }, stringConstants.UPDATE_SUCCESSFUL)
-    );
-  });
-});
+      return res.send(
+        createResObject(true, { card }, stringConstants.UPDATE_SUCCESSFUL)
+      );
+    });
+  }
+);
 
 /**
- * Step 3: This is where the user will upload the video for the game card
+ * Step 2: Add back of the card picture to an existing card
+ * requires the card id in request
  */
 router.post(
-  "/add-video/:cardId",
+  "/add-update-back/:cardId",
   [auth, valObjectIdInUrl],
   async (req, res) => {
-    let card = await Card.findById(req.params.cardId);
+    const cardId = req.params.cardId;
+    const userId = req.user._id;
+    let card = await Card.findById(cardId);
     if (!card) {
       return res
         .status(404)
@@ -247,6 +278,134 @@ router.post(
           )
         );
 
+    // Upload the back of the card
+    req.cardId = cardId;
+    uploadCardBack(req, res, async function (err) {
+      if (err) {
+        SimpleLogger.error(err);
+        // If file type error return relavent message
+        if (err.message === stringConstants.NOT_A_VALID_FILE_TYPE) {
+          return res
+            .status(415)
+            .send(
+              createResObject(
+                false,
+                {},
+                stringConstants.FILE_TYPE_NOT_ACCEPTED,
+                errorObjects.FILE_TYPE_NOT_ACCEPTED
+              )
+            );
+        }
+        // Otherwise return unsuspected error
+        return next(err);
+      }
+
+      // Check file exists
+      if (!req.file)
+        return res
+          .status(400)
+          .send(
+            createResObject(
+              false,
+              {},
+              stringConstants.NO_FILE_FOUND,
+              errorObjects.NO_FILE_FOUND
+            )
+          );
+      // Check file size if corrupt delete the uploaded file
+      if (req.file.size <= 0) {
+        const cardDestination = path.join(
+          __dirname,
+          "../public/",
+          `${userId}/cards/${cardId}/`,
+          `${req.file.filename}`
+        );
+        try {
+          await fsPromises.unlink(cardDestination);
+        } catch (err) {
+          SimpleLogger.error(err);
+          await new PendingDeletion({
+            deletionType: stringConstants.deletionType.FILE,
+            data: cardDestination,
+          }).save();
+        }
+        return res
+          .status(400)
+          .send(
+            createResObject(
+              true,
+              {},
+              stringConstants.FILE_CORRUPTED,
+              errorObjects.FILE_CORRUPTED
+            )
+          );
+      }
+      // Delete previous picture if any
+      if (card.back) {
+        try {
+          const cardBackPath = path.join(__dirname, "../public/", card.back);
+          await fsPromises.unlink(cardBackPath);
+        } catch (error) {
+          SimpleLogger.error(error);
+          await new PendingDeletion({
+            deletionType: stringConstants.deletionType.FILE,
+            data: path.join(
+              __dirname,
+              "../public/card_backs/",
+              `${req.file.filename}`
+            ),
+          }).save();
+        }
+      }
+      card.back = path.join(`${userId}/cards/${cardId}/`, req.file.filename);
+      card = await card.save();
+
+      card = card.getCardDetails();
+
+      return res.send(
+        createResObject(true, { card }, stringConstants.UPDATE_SUCCESSFUL)
+      );
+    });
+  }
+);
+
+/**
+ * Step 3: This is where the user will upload the video for the game card
+ */
+router.post(
+  "/add-update-video/:cardId",
+  [auth, valObjectIdInUrl],
+  async (req, res) => {
+    const cardId = req.params.cardId;
+    const userId = req.user._id;
+    let card = await Card.findById(cardId);
+    if (!card) {
+      return res
+        .status(404)
+        .send(
+          createResObject(
+            false,
+            {},
+            stringConstants.CARD_ID_NOT_FOUND,
+            errorObjects.CARD_ID_NOT_FOUND
+          )
+        );
+    }
+
+    const user = await User.findById(userId);
+    if (!user)
+      return res
+        .status(404)
+        .send(
+          createResObject(
+            false,
+            {},
+            stringConstants.USER_ID_DOEST_NOT_EXISTS,
+            errorObjects.USER_ID_DOEST_NOT_EXISTS
+          )
+        );
+
+    req.cardId = cardId;
     uploadCardVideo(req, res, async function (err) {
       if (err) {
         SimpleLogger.error(err);
@@ -260,6 +419,20 @@ router.post(
                 {},
                 stringConstants.FILE_TYPE_NOT_ACCEPTED,
                 errorObjects.FILE_TYPE_NOT_ACCEPTED
+              )
+            );
+        }
+        if (err.message === "Unexpected field") {
+          return res
+            .status(400)
+            .send(
+              createResObject(
+                false,
+                {},
+                stringConstants.REQUEST_VALIDATION_FAILED,
+                errorObjects.REQUEST_VALIDATION_ERROR(
+                  new Error("Key not valid")
+                )
               )
             );
         }
@@ -281,24 +454,19 @@ router.post(
       }
 
       if (req.file.size <= 0) {
+        const cardDestination = path.join(
+          __dirname,
+          "../public/",
+          `${userId}/cards/${cardId}/`,
+          `${req.file.filename}`
+        );
         try {
-          await fsPromises.unlink(
-            path.join(
-              __dirname,
-              "../public/card_videos/",
-              `${req.file.filename}`
-            )
-          );
+          await fsPromises.unlink(cardDestination);
         } catch (error) {
           SimpleLogger.error(error);
-          SimpleLogger.error(err);
           await new PendingDeletion({
             deletionType: stringConstants.deletionType.FILE,
-            data: path.join(
-              __dirname,
-              "../public/card_videos/",
-              `${req.file.filename}`
-            ),
+            data: cardDestination,
           }).save();
         }
         return res
@@ -313,10 +481,30 @@ router.post(
           );
       }
 
-      card.video = path.join("card_videos/", `${req.file.filename}`);
+      // Check if already has card video if yes the delete the old and replace with new
+      if (card.video) {
+        try {
+          const videoPath = path.join(__dirname, "../public/", card.video);
+          await fsPromises.unlink(videoPath);
+        } catch (error) {
+          SimpleLogger.error(error);
+          await new PendingDeletion({
+            deletionType: stringConstants.deletionType.FILE,
+            data: path.join(
+              __dirname,
+              "../public/card_videos/",
+              `${req.file.filename}`
+            ),
+          }).save();
+        }
+      }
+      card.video = path.join(
+        `${userId}/cards/${cardId}/`,
+        `${req.file.filename}`
+      );
       card = await card.save();
 
-      card = _.pick(card, ["_id", "front", "back", "video", "user"]);
+      card = card.getCardDetails();
 
       return res.send(
         createResObject(true, { card }, stringConstants.UPDATE_SUCCESSFUL)
@@ -330,10 +518,11 @@ router.post(
  * be pending. It will only change to submitted once we receive the payment
  */
 router.post(
-  "add-card-data/:cardId",
-  [auth, valObjectIdInUrl],
+  "/add-card-data/:cardId",
+  [auth, valObjectIdInUrl, valUpdateCardData],
   async (req, res) => {
-    let card = await Card.findById(req.params.id);
+    const cardId = req.params.cardId;
+    let card = await Card.findById(cardId);
     if (!card)
       return res
         .status(404)
@@ -346,40 +535,24 @@ router.post(
           )
         );
 
-    const athleteName = req.body.athleteName;
-    const cardName = req.body.cardName;
-    const cardYear = req.body.cardYear;
+    const year = req.body.year;
+    const brand = req.body.brand;
+    const cardNumber = req.body.cardNumber;
+    const playerNames = req.body.playerNames;
 
-    card.athleteName = athleteName;
-    card.cardName = cardName;
-    card.cardYear = cardYear;
+    card.year = year;
+    card.brand = brand;
+    card.cardNumber = cardNumber;
+    card.playerNames = playerNames;
 
-    if (
-      card.front &&
-      card.back &&
-      card.video &&
-      card.athleteName &&
-      card.cardName &&
-      card.cardYear
-    ) {
-      card.isComplete = true;
-    }
+    card.isCompleted = card.checkIfCompleted();
 
     card = await card.save();
 
-    card = _.pick(card, [
-      "_id",
-      "front",
-      "back",
-      "video",
-      "athleteName",
-      "cardName",
-      "cardYear",
-      "user",
-    ]);
+    card = card.getCardDetails();
 
     return res.send(
-      createResObject(true, { card }, stringConstants.FETCH_SUCESSFUL)
+      createResObject(true, { card }, stringConstants.UPDATE_SUCCESSFUL)
     );
   }
 );
@@ -387,8 +560,64 @@ router.post(
 /**
  * API endpoint to delete card with the card ID
  */
+router.delete(
+  "/delete-card/:cardId",
+  [auth, valObjectIdInUrl],
+  async (req, res, next) => {
+    const cardId = req.params.cardId;
+    let card = await Card.findById(cardId);
+    if (!card)
+      return res
+        .status(404)
+        .send(
+          createResObject(
+            false,
+            {},
+            stringConstants.CARD_ID_NOT_FOUND,
+            errorObjects.CARD_ID_NOT_FOUND
+          )
+        );
+
+    if (req.user._id !== card.user.toString())
+      return res
+        .status(401)
+        .send(
+          createResObject(
+            false,
+            {},
+            stringConstants.NOT_AUTHORIZED_TO_PERFORM_THE_ACTION,
+            errorObjects.NOT_AUTHORIZED_TO_PERFORM_THE_ACTION
+          )
+        );
+
+    card = await card.remove();
+
+    return res.send(
+      createResObject(true, { card }, stringConstants.DELETED_SUCCESSFULLY)
+    );
+  }
+);
 
 /**
  * API endpoint to get list of pending cards for user
+ * Checks if status is pending and isComplete is true
  */
+router.get(
+  "/pending-payment-cards/:pageSize/:pageNumber",
+  [auth, valPageSizeNumber],
+  async (req, res) => {
+    const cards = await Card.find({
+      $and: [
+        { user: req.user._id },
+        { isCompleted: true },
+        { status: stringConstants.cardState.PENDING },
+      ],
+    });
+
+    return res.send(
+      createResObject(true, { cards: cards }, stringConstants.FETCH_SUCESSFUL)
+    );
+  }
+);
+
 module.exports = router;

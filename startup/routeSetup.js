@@ -2,6 +2,7 @@ const user = require("../routes/user");
 const authenticate = require("../routes/authenticate");
 const payment = require("../routes/payments");
 const authToken = require("../routes/authToken");
+const sportsCard = require("../routes/card");
 
 module.exports = (app) => {
   // Import route and use app.use();
@@ -9,4 +10,5 @@ module.exports = (app) => {
   app.use("/authenticate", authenticate);
   app.use("/payment", payment);
   app.use("/auth-token", authToken);
+  app.use("/sports-card", sportsCard);
 };

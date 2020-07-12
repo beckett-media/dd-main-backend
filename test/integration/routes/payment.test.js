@@ -3,6 +3,8 @@ const request = require("supertest");
 const chai = require("chai");
 const expect = chai.expect;
 const config = require("config");
+const path = require("path");
+const rimraf = require("rimraf");
 let server;
 
 describe("INTEG: EndPoint /payment", function () {
@@ -13,7 +15,10 @@ describe("INTEG: EndPoint /payment", function () {
   // Close the server after test
   afterEach(async function () {
     await server.close();
-    await User.remove({});
+    const users = await User.find({});
+    for (const user of users) {
+      await user.remove();
+    }
   });
 
   /**
@@ -60,6 +65,12 @@ describe("INTEG: EndPoint /payment", function () {
    * Test block to test getting of saved cards
    */
   describe("INTEG: EndPoint: GET /saved-cards", function () {
+    afterEach(async function () {
+      const users = await User.find({});
+      for (const user of users) {
+        await user.remove();
+      }
+    });
     /**
      * Return a list of saved cards from stripe
      */

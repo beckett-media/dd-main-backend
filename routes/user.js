@@ -3,7 +3,8 @@ const router = express.Router();
 const bcrypt = require("bcrypt");
 const auth = require("../middlewares/authenticateRequest");
 const { uploadProfilePic } = require("../middlewares/multerSingle");
-const fsPromises = require("fs").promises;
+const fs = require("fs");
+const fsPromises = fs.promises;
 const path = require("path");
 const SimpleLogger = require("../utils/simpleLogger");
 const _ = require("lodash");
@@ -74,6 +75,12 @@ router.post("/register-user", valRegisterRequest, async (req, res) => {
   const refreshToken = user.generateRefreshToken();
 
   user.refreshToken = refreshToken.token;
+
+  // Create folder for user, user cards
+  const userDir = path.join(__dirname, "../public", user._id.toString());
+  const exists = fs.existsSync(user);
+  if (!exists) await fsPromises.mkdir(userDir);
+
   user = await user.save();
 
   res.header(stringConstants.AUTH_TOKEN_STRING, token.token);
@@ -99,7 +106,8 @@ router.post("/register-user", valRegisterRequest, async (req, res) => {
  */
 
 router.post("/add-update-profile-picture", auth, async (req, res, next) => {
-  let user = await User.findById(req.user._id);
+  const userId = req.user._id;
+  let user = await User.findById(userId);
 
   uploadProfilePic(req, res, async function (err) {
     // Check if error, log error and send error response
@@ -135,23 +143,18 @@ router.post("/add-update-profile-picture", auth, async (req, res, next) => {
         );
     // Check file size if corrupt delete the uploaded file
     if (req.file.size <= 0) {
+      const profilePicPath = path.join(
+        __dirname,
+        `../public/${userId}/profile_pictures/`,
+        `${req.file.filename}`
+      );
       try {
-        await fsPromises.unlink(
-          path.join(
-            __dirname,
-            "../public/profile_pictures/",
-            `${req.file.filename}`
-          )
-        );
+        await fsPromises.unlink(profilePicPath);
       } catch (err) {
         SimpleLogger.error(err);
         await new PendingDeletion({
           deletionType: stringConstants.deletionType.FILE,
-          data: path.join(
-            __dirname,
-            "../public/profile_pictures/",
-            `${req.file.filename}`
-          ),
+          data: profilePicPath,
         }).save();
       }
       return res
@@ -171,7 +174,7 @@ router.post("/add-update-profile-picture", auth, async (req, res, next) => {
     if (user.profilePicture) {
       const absolutePath = path.join(
         __dirname,
-        "../public/",
+        `../public`,
         `${user.profilePicture}`
       );
       try {
@@ -186,7 +189,7 @@ router.post("/add-update-profile-picture", auth, async (req, res, next) => {
     }
 
     user.profilePicture = path.join(
-      "profile_pictures/",
+      `${userId}/profile_pictures/`,
       `${req.file.filename}`
     );
     user = await user.save();

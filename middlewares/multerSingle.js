@@ -1,5 +1,6 @@
 const multer = require("multer");
 const path = require("path");
+const fs = require("fs");
 const { getRandomIntInclusive } = require("../utils/utilFunctions");
 const { stringConstants } = require("../utils/constants");
 
@@ -7,8 +8,22 @@ const { stringConstants } = require("../utils/constants");
  * Storage for user profile picture
  */
 const profilePicStorage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    const fileDestination = path.join(__dirname, "../public/profile_pictures");
+  destination: async function (req, file, cb) {
+    const userId = req.user._id;
+    if (!userId)
+      cb(new Error(stringConstants.USER_ID_NOT_FOUND_IN_REQUEST), false);
+    const fileDestination = path.join(
+      __dirname,
+      `../public/${userId}/profile_pictures`
+    );
+
+    try {
+      const exists = fs.existsSync(fileDestination);
+      if (!exists) fs.mkdirSync(fileDestination);
+    } catch (error) {
+      return cb(error, false);
+    }
+
     cb(null, fileDestination);
   },
   filename: function (req, file, cb) {
@@ -23,8 +38,27 @@ const profilePicStorage = multer.diskStorage({
  * Storage for game card front
  */
 const cardFrontStorage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    const fileDestination = path.join(__dirname, "../public/card_fronts");
+  destination: async function (req, file, cb) {
+    const cardId = req.cardId;
+    const userId = req.user._id;
+    if (!cardId) cb(new Error(stringConstants.CARD_ID_NOT_FOUND), false);
+    if (!userId)
+      cb(new Error(stringConstants.USER_ID_NOT_FOUND_IN_REQUEST), false);
+    const parentDir = path.join(__dirname, `../public/${userId}/cards/`);
+    const fileDestination = path.join(
+      __dirname,
+      `../public/${userId}/cards/${cardId}/`
+    );
+    const dirs = [parentDir, fileDestination];
+    try {
+      for (const dir of dirs) {
+        const exists = fs.existsSync(dir);
+        if (!exists) fs.mkdirSync(dir);
+      }
+    } catch (error) {
+      return cb(error, false);
+    }
+
     cb(null, fileDestination);
   },
   filename: function (req, file, cb) {
@@ -39,8 +73,29 @@ const cardFrontStorage = multer.diskStorage({
  * Storage for game card back
  */
 const cardBackStorage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    const fileDestination = path.join(__dirname, "../public/card_backs");
+  destination: async function (req, file, cb) {
+    const cardId = req.cardId;
+    const userId = req.user._id;
+
+    if (!cardId) cb(new Error(stringConstants.CARD_ID_NOT_FOUND), false);
+    if (!userId)
+      cb(new Error(stringConstants.USER_ID_NOT_FOUND_IN_REQUEST), false);
+
+    const parentDir = path.join(__dirname, `../public/${userId}/cards/`);
+    const fileDestination = path.join(
+      __dirname,
+      `../public/${userId}/cards/${cardId}/`
+    );
+    const dirs = [parentDir, fileDestination];
+    try {
+      for (const dir of dirs) {
+        const exists = fs.existsSync(dir);
+        if (!exists) fs.mkdirSync(dir);
+      }
+    } catch (error) {
+      return cb(error, false);
+    }
+
     cb(null, fileDestination);
   },
   filename: function (req, file, cb) {
@@ -56,11 +111,32 @@ const cardBackStorage = multer.diskStorage({
  * Storage to upload the video of the card
  */
 const cardVideoStorage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    const fileDestination = path.join(__dirname, "../public/card_videos");
+  destination: async function (req, file, cb) {
+    const cardId = req.cardId;
+    const userId = req.user._id;
+
+    if (!cardId) cb(new Error(stringConstants.CARD_ID_NOT_FOUND), false);
+    if (!userId)
+      cb(new Error(stringConstants.USER_ID_NOT_FOUND_IN_REQUEST), false);
+
+    const parentDir = path.join(__dirname, `../public/${userId}/cards/`);
+    const fileDestination = path.join(
+      __dirname,
+      `../public/${userId}/cards/${cardId}/`
+    );
+    const dirs = [parentDir, fileDestination];
+    try {
+      for (const dir of dirs) {
+        const exists = fs.existsSync(dir);
+        if (!exists) fs.mkdirSync(dir);
+      }
+    } catch (error) {
+      return cb(error, false);
+    }
+
     cb(null, fileDestination);
   },
-  fileName: function (req, file, cb) {
+  filename: function (req, file, cb) {
     const dateTime = Date.now();
     const extension = path.extname(file.originalname).toLowerCase();
     const rand = getRandomIntInclusive(100, 999);

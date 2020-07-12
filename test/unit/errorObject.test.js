@@ -187,4 +187,14 @@ describe("Error object fucntion tests", function () {
       errorMessage: stringConstants.APPLE_ID_DOES_NOT_MATCH_EMAIL,
     });
   });
+
+  it("Should return error object with error code 120", function () {
+    const result = errorObjects.NOT_AUTHORIZED_TO_PERFORM_THE_ACTION;
+
+    expect(result).to.be.eql({
+      errorCode: 120,
+      errorSubCode: "NOT_AUTHORIZED_TO_PERFORM_THE_ACTION",
+      errorMessage: stringConstants.NOT_AUTHORIZED_TO_PERFORM_THE_ACTION,
+    });
+  });
 });

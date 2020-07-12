@@ -7,6 +7,12 @@ const chai = require("chai");
 const expect = chai.expect;
 
 describe("User auth token testing", () => {
+  afterEach(async function () {
+    const users = await User.find({});
+    for (const user of users) {
+      await user.remove();
+    }
+  });
   it("Should return a valid JWT", () => {
     const payload = {
       _id: new mongoose.Types.ObjectId().toHexString(),
