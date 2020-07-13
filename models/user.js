@@ -75,9 +75,19 @@ const userSchema = new mongoose.Schema(
         enum: [
           stringConstants.signUpType.EBAY,
           stringConstants.signUpType.APPLE,
-          stringConstants.signUpType.MOBILE_APP,
+          stringConstants.signUpType.IN_APP,
         ],
-        default: stringConstants.signUpType.MOBILE_APP,
+        default: stringConstants.signUpType.IN_APP,
+      },
+      osType: {
+        type: String,
+        enum: [
+          stringConstants.osType.ANDROID,
+          stringConstants.osType.iOS,
+          stringConstants.osType.MAC_OS,
+          stringConstants.osType.WINDOWS,
+          stringConstants.osType.LINUX,
+        ],
       },
     },
   },
@@ -132,6 +142,16 @@ userSchema.methods.generateRefreshToken = function () {
   return {
     token: refreshToken,
     expiry: moment.utc(moment(Date.now()).add(30, "days")).format(),
+  };
+};
+// "_id", "fullName", "email", "profilePicture", "username"
+userSchema.methods.getUserBasicInfo = function () {
+  return {
+    id: this._id,
+    fullName: this.fullName,
+    email: this.email,
+    profilePicture: this.profilePicture,
+    username: this.username,
   };
 };
 

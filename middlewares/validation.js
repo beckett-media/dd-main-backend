@@ -33,6 +33,16 @@ module.exports = {
       fullName: Joi.string().required().min(2).max(255),
       email: Joi.string().email().required().min(5).max(255),
       password: Joi.string().required().min(6).max(255),
+      osType: Joi.string()
+        .valid(
+          stringConstants.osType.ANDROID,
+          stringConstants.osType.iOS,
+          stringConstants.osType.LINUX,
+          stringConstants.osType.MAC_OS,
+          stringConstants.osType.WINDOWS
+        )
+        .required(),
+      deviceToken: Joi.string().required(),
     });
 
     const { error } = schema.validate(req.body);

@@ -1,4 +1,5 @@
 const { User } = require("../../../models/user");
+const { stringConstants } = require("../../../utils/constants");
 const request = require("supertest");
 const chai = require("chai");
 const expect = chai.expect;
@@ -10,7 +11,7 @@ let server;
 /**
  * Test the authentication route
  */
-describe("INTEG: EndPoint: /authenticate/sign-in-user", function () {
+describe("INTEG: authenticate.test.js: EndPoint: /authenticate/sign-in-user", function () {
   // Start the server before test
   beforeEach(function () {
     server = require("../../../index");
@@ -31,7 +32,7 @@ describe("INTEG: EndPoint: /authenticate/sign-in-user", function () {
     /**
      * Code that is repeat in every test
      */
-    let fullName, email, password;
+    let fullName, email, password, osType, deviceToken;
 
     const registerUser = async function () {
       return request(server)
@@ -40,6 +41,8 @@ describe("INTEG: EndPoint: /authenticate/sign-in-user", function () {
           fullName,
           email,
           password,
+          osType,
+          deviceToken,
         })
         .set("Accept", "application/json")
         .set("x-app-token", config.get("appToken"));
@@ -60,6 +63,8 @@ describe("INTEG: EndPoint: /authenticate/sign-in-user", function () {
       fullName = "Test User";
       email = "test1@test.com";
       password = "test_password";
+      osType = stringConstants.osType.ANDROID;
+      deviceToken = "test";
     });
 
     /**

@@ -4,7 +4,7 @@ const testMessage = "Test message";
 const chai = require("chai");
 const expect = chai.expect;
 
-describe("Error object fucntion tests", function () {
+describe("Unit: errorObject.test.js: Error object fucntion tests", function () {
   it("Should return error object with error code 301", function () {
     const result = errorObjects.REQUEST_VALIDATION_ERROR(testMessage);
     expect(result).to.be.eql({

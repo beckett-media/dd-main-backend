@@ -4,7 +4,7 @@ const expect = chai.expect;
 const sinon = require("sinon");
 const httpMocks = require("node-mocks-http");
 
-describe("Sports card request related validations", function () {
+describe("Unit: sportsCardValMid.test.js: Sports card request related validations", function () {
   describe("Validation for add-update data", function () {
     let body;
 

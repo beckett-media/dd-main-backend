@@ -9,15 +9,18 @@ const chai = require("chai");
 const expect = chai.expect;
 const httpMocks = require("node-mocks-http");
 const sinon = require("sinon");
+const { stringConstants } = require("../../../../utils/constants");
 
 let body;
 
-describe("Tests for user registeration requests", function () {
+describe("Unit: userValMid.test.js: Tests for user registeration requests", function () {
   this.beforeAll(function () {
     body = {
       fullName: "test user",
       email: "test@test.com",
       password: "test_password",
+      osType: stringConstants.osType.ANDROID,
+      deviceToken: "test",
     };
   });
 
@@ -174,7 +177,7 @@ describe("Tests for user registeration requests", function () {
   });
 });
 
-describe("Test block for validating username request", function () {
+describe("Unit: userValMid.test.js: Test block for validating username request", function () {
   this.beforeEach(function () {
     body = {
       username: "test_user",
@@ -225,7 +228,7 @@ describe("Test block for validating username request", function () {
   });
 });
 
-describe("Test block to test sign in request", function () {
+describe("Unit: userValMid.test.js: Test block to test sign in request", function () {
   this.beforeEach(function () {
     body = {
       email: "test@test.com",
@@ -322,7 +325,7 @@ describe("Test block to test sign in request", function () {
 /**
  * Unit test for passward change request validator
  */
-describe("Request validator test block for password change request", function (req, res) {
+describe("Unit: userValMid.test.js: Request validator test block for password change request", function (req, res) {
   this.beforeEach(function () {
     body = {
       oldPassword: "old_password",

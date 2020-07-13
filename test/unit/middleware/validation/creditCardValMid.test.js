@@ -10,7 +10,7 @@ const sinon = require("sinon");
 const httpMocks = require("node-mocks-http");
 
 let body;
-describe("Update card request body validation tests", function () {
+describe("Unit: CreditCardValMid: Update card request body validation tests", function () {
   this.beforeEach(function () {
     const year = new Date().getFullYear() + 1;
     body = {

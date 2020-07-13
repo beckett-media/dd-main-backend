@@ -1,4 +1,5 @@
 const { User } = require("../../../models/user");
+const { stringConstants } = require("../../../utils/constants");
 const request = require("supertest");
 const chai = require("chai");
 const expect = chai.expect;
@@ -11,7 +12,7 @@ let server;
 /**
  * Test the authentication route
  */
-describe("EndPoint: /auth-token", function () {
+describe("Integ: renewToken.test.js: EndPoint: /auth-token", function () {
   // Start the server before test
   this.beforeEach(function () {
     server = require("../../../index");
@@ -67,6 +68,8 @@ describe("EndPoint: /auth-token", function () {
           fullName: "Test User",
           email: "test1@test.com",
           password: "test_password",
+          osType: stringConstants.osType.ANDROID,
+          deviceToken: "Test",
         })
         .set("Accept", "application/json")
         .set("x-app-token", config.get("appToken"));
@@ -106,6 +109,8 @@ describe("EndPoint: /auth-token", function () {
           fullName: "Test User",
           email: "test1@test.com",
           password: "test_password",
+          osType: stringConstants.osType.ANDROID,
+          deviceToken: "Test",
         })
         .set("Accept", "application/json")
         .set("x-app-token", config.get("appToken"));
@@ -141,6 +146,8 @@ describe("EndPoint: /auth-token", function () {
           fullName: "Test User",
           email: "test1@test.com",
           password: "test_password",
+          osType: stringConstants.osType.ANDROID,
+          deviceToken: "Test",
         })
         .set("Accept", "application/json")
         .set("x-app-token", config.get("appToken"));
@@ -176,6 +183,8 @@ describe("EndPoint: /auth-token", function () {
           fullName: "Test User",
           email: "test1@test.com",
           password: "test_password",
+          osType: stringConstants.osType.ANDROID,
+          deviceToken: "Test",
         })
         .set("Accept", "application/json")
         .set("x-app-token", config.get("appToken"));
@@ -189,6 +198,8 @@ describe("EndPoint: /auth-token", function () {
           fullName: "Test User",
           email: "test2@test.com",
           password: "test_password",
+          osType: stringConstants.osType.ANDROID,
+          deviceToken: "Test",
         })
         .set("Accept", "application/json")
         .set("x-app-token", config.get("appToken"));
@@ -256,6 +267,8 @@ describe("EndPoint: /auth-token", function () {
           fullName: "Test User",
           email: "test1@test.com",
           password: "test_password",
+          osType: stringConstants.osType.ANDROID,
+          deviceToken: "Test",
         })
         .set("Accept", "application/json")
         .set("x-app-token", config.get("appToken"));

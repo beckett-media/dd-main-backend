@@ -13,7 +13,7 @@ const appAuth = require("../../../middlewares/appAuth");
 const { stringConstants } = require("../../../utils/constants");
 
 let token;
-describe("Test block to test app token middleware", function () {
+describe("Unit: appAuth.test.js: Test block to test app token middleware", function () {
   this.beforeEach(function () {
     token = config.get("appToken");
   });

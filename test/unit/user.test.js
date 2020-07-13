@@ -6,7 +6,7 @@ const { stringConstants } = require("../../utils/constants");
 const chai = require("chai");
 const expect = chai.expect;
 
-describe("User auth token testing", () => {
+describe("Unit: user.test.js: User auth token testing", () => {
   afterEach(async function () {
     const users = await User.find({});
     for (const user of users) {

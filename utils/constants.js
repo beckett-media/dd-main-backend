@@ -129,7 +129,15 @@ module.exports.stringConstants = {
   signUpType: {
     EBAY: "ebay",
     APPLE: "apple",
-    MOBILE_APP: "mobile app",
+    IN_APP: "in app registeration",
+  },
+  // OS information
+  osType: {
+    iOS: "ios",
+    ANDROID: "android",
+    MAC_OS: "mac os",
+    WINDOWS: "windows",
+    LINUX: "linux",
   },
   // Image type
   iType: {

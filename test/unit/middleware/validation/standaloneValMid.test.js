@@ -13,7 +13,7 @@ const httpMocks = require("node-mocks-http");
 const sinon = require("sinon");
 
 let id;
-describe("Object ID middleware tests", function () {
+describe("Unit: standaloneValMid.test.js Object ID middleware tests", function () {
   this.beforeEach(function () {
     id = new User()._id.toString();
   });
@@ -53,7 +53,7 @@ describe("Object ID middleware tests", function () {
   });
 });
 
-describe("Page size and page number validation middleware tests", function () {
+describe("Unit: standaloneValMid.test.js Page size and page number validation middleware tests", function () {
   let params;
 
   this.beforeEach(function () {

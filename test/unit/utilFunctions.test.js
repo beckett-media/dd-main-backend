@@ -7,14 +7,14 @@ const { stringConstants } = require("../../utils/constants");
 const chai = require("chai");
 const expect = chai.expect;
 
-describe("Random Number Inclusive:", () => {
+describe("Unit: utilFunction.test.js: Random Number Inclusive:", () => {
   it("Should return random number between(Inclusive) min and max", () => {
     const result = getRandomIntInclusive(1, 1);
     expect(result).to.be.equal(1);
   });
 });
 
-describe("Create res object:", () => {
+describe("Unit: utilFunction.test.js: Create res object:", () => {
   it("Should return response object with error object", () => {
     const resObject = createResObject(true, {}, "Test message", {
       error: "Test",
@@ -45,7 +45,7 @@ describe("Create res object:", () => {
   });
 });
 
-describe("Get key from value in object", () => {
+describe("Unit: utilFunction.test.js: Get key from value in object", () => {
   it("Should return key", () => {
     const result = getKey(stringConstants, stringConstants.AUTH_TOKEN_STRING);
     expect(result).to.be.eql("AUTH_TOKEN_STRING");

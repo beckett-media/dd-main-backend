@@ -1,4 +1,5 @@
 const { User } = require("../../../models/user");
+const { stringConstants } = require("../../../utils/constants");
 const request = require("supertest");
 const chai = require("chai");
 const expect = chai.expect;
@@ -7,7 +8,7 @@ const path = require("path");
 const rimraf = require("rimraf");
 let server;
 
-describe("INTEG: POST /user", function () {
+describe(" user.test.js INTEG: POST /user", function () {
   // Start the server before test
   this.beforeEach(function () {
     server = require("../../../index");
@@ -42,6 +43,8 @@ describe("INTEG: POST /user", function () {
           fullName: "Test User",
           email: "test@test.com",
           password: "test_password",
+          osType: stringConstants.osType.ANDROID,
+          deviceToken: "Test",
         })
         .set("Accept", "application/json")
         .set("x-app-token", config.get("appToken"));
@@ -49,7 +52,7 @@ describe("INTEG: POST /user", function () {
       expect(res.status).to.be.equal(200);
       expect(res.body.success).to.be.true;
       expect(res.body.data.user).to.have.all.keys(
-        "_id",
+        "id",
         "fullName",
         "email",
         "authTokenExpiry",
@@ -69,8 +72,10 @@ describe("INTEG: POST /user", function () {
         .post("/user/register-user")
         .send({
           fullName: "Test User",
-          email: "tes@test.com",
+          email: "test@test.com",
           password: "test_password",
+          osType: stringConstants.osType.ANDROID,
+          deviceToken: "Test",
         })
         .set("Accept", "application/json")
         .set("x-app-token", config.get("appToken"));
@@ -79,8 +84,10 @@ describe("INTEG: POST /user", function () {
         .post("/user/register-user")
         .send({
           fullName: "Test User",
-          email: "tes@test.com",
+          email: "test@test.com",
           password: "test_password",
+          osType: stringConstants.osType.ANDROID,
+          deviceToken: "Test",
         })
         .set("Accept", "application/json")
         .set("x-app-token", config.get("appToken"));
@@ -124,6 +131,8 @@ describe("INTEG: POST /user", function () {
           fullName: "Test User",
           email: "test@test.com",
           password: "test_password",
+          osType: stringConstants.osType.ANDROID,
+          deviceToken: "Test",
         })
         .set("Accept", "application/json")
         .set("x-app-token", config.get("appToken"));
@@ -139,7 +148,7 @@ describe("INTEG: POST /user", function () {
       expect(res.body.success).to.be.true;
       expect(res.body.data.user).to.have.property("fullName");
       expect(res.body.data.user).to.have.property("email");
-      expect(res.body.data.user).to.have.property("_id");
+      expect(res.body.data.user).to.have.property("id");
       expect(res.body.data.user).to.have.property("username");
     });
 
@@ -151,9 +160,11 @@ describe("INTEG: POST /user", function () {
       let res = await request(server)
         .post("/user/register-user")
         .send({
-          fullName: "Test One User",
+          fullName: "Test User",
           email: "test1@test.com",
           password: "test_password",
+          osType: stringConstants.osType.ANDROID,
+          deviceToken: "Test",
         })
         .set("Accept", "application/json")
         .set("x-app-token", config.get("appToken"));
@@ -174,6 +185,8 @@ describe("INTEG: POST /user", function () {
           fullName: "Test Two User",
           email: "test2@test.com",
           password: "test_password",
+          osType: stringConstants.osType.ANDROID,
+          deviceToken: "Test",
         })
         .set("Accept", "application/json")
         .set("x-app-token", config.get("appToken"));
@@ -200,6 +213,8 @@ describe("INTEG: POST /user", function () {
           fullName: "Test User",
           email: "test@test.com",
           password: "test_password",
+          osType: stringConstants.osType.ANDROID,
+          deviceToken: "Test",
         })
         .set("Accept", "application/json")
         .set("x-app-token", config.get("appToken"));
@@ -256,6 +271,8 @@ describe("INTEG: POST /user", function () {
         email: "test@test.com",
         password: "test123!",
         fullName: "test_user",
+        osType: stringConstants.osType.ANDROID,
+        deviceToken: "Test",
       };
       let user = new User(body);
       token = user.generateAuthToken().token;

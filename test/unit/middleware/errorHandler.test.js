@@ -7,7 +7,7 @@ const chai = require("chai");
 const expect = chai.expect;
 const sinon = require("sinon");
 
-describe("Error handler middleware testing", function () {
+describe("Unit: errorHandler.test.js: Error handler middleware testing", function () {
   it("Should return 500 error for internal err", function () {
     const req = httpMocks.createRequest();
     const res = httpMocks.createResponse();

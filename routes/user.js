@@ -45,6 +45,9 @@ router.post("/register-user", valRegisterRequest, async (req, res) => {
 
   user = new User(_.pick(req.body, ["email", "password", "fullName"]));
 
+  user.deviceToken = req.body.deviceToken;
+  user.metadata.osType = req.body.osType;
+
   try {
     const customer = await stripe.customers.create({
       email: email,
@@ -87,7 +90,7 @@ router.post("/register-user", valRegisterRequest, async (req, res) => {
   res.header(stringConstants.REFRESH_TOKEN_STRING, refreshToken.token);
 
   const returnObject = {
-    ..._.pick(user, ["_id", "fullName", "email", "profilePicture", "username"]),
+    ...user.getUserBasicInfo(),
     authTokenExpiry: token.expiry,
     refreshTokenExpiry: refreshToken.expiry,
   };
@@ -193,13 +196,7 @@ router.post("/add-update-profile-picture", auth, async (req, res, next) => {
       `${req.file.filename}`
     );
     user = await user.save();
-    user = _.pick(user, [
-      "_id",
-      "fullName",
-      "email",
-      "profilePicture",
-      "username",
-    ]);
+    user = user.getUserBasicInfo();
     return res.send(
       createResObject(true, { user }, stringConstants.UPDATE_SUCCESSFUL)
     );
@@ -241,13 +238,7 @@ router.post(
           )
         );
 
-    user = _.pick(user, [
-      "_id",
-      "fullName",
-      "email",
-      "profilePicture",
-      "username",
-    ]);
+    user = user.getUserBasicInfo();
     return res.send(
       createResObject(true, { user }, stringConstants.UPDATE_SUCCESSFUL)
     );
@@ -294,13 +285,7 @@ router.post(
     user.password = await bcrypt.hash(newPassword, salt);
 
     user = await user.save();
-    user = _.pick(user, [
-      "_id",
-      "fullName",
-      "email",
-      "profilePicture",
-      "username",
-    ]);
+    user = user.getUserBasicInfo();
 
     return res.send(
       createResObject(

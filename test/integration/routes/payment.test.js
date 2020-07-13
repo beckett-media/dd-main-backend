@@ -1,13 +1,13 @@
 const { User } = require("../../../models/user");
+const { stringConstants } = require("../../../utils/constants");
 const request = require("supertest");
 const chai = require("chai");
 const expect = chai.expect;
 const config = require("config");
-const path = require("path");
-const rimraf = require("rimraf");
+
 let server;
 
-describe("INTEG: EndPoint /payment", function () {
+describe("INTEG: payment.test.js: EndPoint /payment", function () {
   // Start the server before test
   beforeEach(function () {
     server = require("../../../index");
@@ -36,6 +36,8 @@ describe("INTEG: EndPoint /payment", function () {
           fullName: "Test User",
           email: "test1@test.com",
           password: "test_password",
+          osType: stringConstants.osType.ANDROID,
+          deviceToken: "Test",
         })
         .set("Accept", "application/json")
         .set("x-app-token", config.get("appToken"));
@@ -64,7 +66,7 @@ describe("INTEG: EndPoint /payment", function () {
   /**
    * Test block to test getting of saved cards
    */
-  describe("INTEG: EndPoint: GET /saved-cards", function () {
+  describe("INTEG: payment.test.js: EndPoint: GET /saved-cards", function () {
     afterEach(async function () {
       const users = await User.find({});
       for (const user of users) {
@@ -82,6 +84,8 @@ describe("INTEG: EndPoint /payment", function () {
           fullName: "Test User",
           email: "test1@test.com",
           password: "test_password",
+          osType: stringConstants.osType.ANDROID,
+          deviceToken: "Test",
         })
         .set("Accept", "application/json")
         .set("x-app-token", config.get("appToken"));
