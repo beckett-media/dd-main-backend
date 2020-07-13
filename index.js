@@ -40,6 +40,7 @@ require("./startup/initFirebase")();
 require("./startup/envVariableCheck")();
 require("./startup/expressSetup")(app);
 require("./startup/routeSetup")(app);
+require("./startup/jobsSetups")();
 
 app.use(errorMid);
 

@@ -94,12 +94,17 @@ module.exports.stringConstants = {
 
   USER_ID_NOT_FOUND_IN_REQUEST: "User ID not found in req.user",
 
+  PENDING_DELETION_TYPE_NOT_HANDLED:
+    "Deletion type not handling by pending deletion",
+
   collectionNames: {
     USER_COLLECTION: "User",
     PENDING_DELETION: "Pending_Deletion",
     CARD_COLLECTION: "Card",
     TRANSACTION_COLLECTION: "Transaction",
     TRANSACTION_LOG_COLLECTION: "Transaction_log",
+    SCHEDULE_COLLECTION: "Schedule",
+    JOB: "jobs", // For Agenda package
   },
 
   deletionType: {
@@ -140,5 +145,15 @@ module.exports.stringConstants = {
     TS: ".ts",
     WEBM: ".webm",
     MKV: ".mkv",
+  },
+
+  jobType: {
+    INCOMPLETE_CARD_CLEANUP: "Incomplete card cleanup job",
+    PENDING_DELETION: "Pending deletion job",
+  },
+  cronString: {
+    INCOMPLETE_CARD_CLEANUP: "* * * * *",
+    PENDING_DELETION: "* * * * *",
+    DAILY_JOB: "* * * * *",
   },
 };
