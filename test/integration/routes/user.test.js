@@ -4,11 +4,9 @@ const request = require("supertest");
 const chai = require("chai");
 const expect = chai.expect;
 const config = require("config");
-const path = require("path");
-const rimraf = require("rimraf");
 let server;
 
-describe(" user.test.js INTEG: POST /user", function () {
+describe("INTEG: user.test.js INTEG: POST /user", function () {
   // Start the server before test
   this.beforeEach(function () {
     server = require("../../../index");
