@@ -207,6 +207,7 @@ router.post(
   "/add-update-username",
   [auth, valUsernameRequest],
   async (req, res) => {
+    const userId = req.user._id;
     const username = req.body.username.toLowerCase();
     let user = await User.findOne({ username: username });
     if (user)
@@ -220,11 +221,7 @@ router.post(
             errorObjects.USERNAME_ALREADY_TAKEN
           )
         );
-
-    user.username = username;
-    user.isComplete = user.isBasicInfoCompleted();
-    user = await user.save();
-
+    user = await User.findById(userId);
     if (!user)
       return res
         .status(404)
@@ -236,6 +233,9 @@ router.post(
             errorObjects.USER_ID_DOEST_NOT_EXISTS
           )
         );
+    user.username = username;
+    user.isComplete = user.isBasicInfoCompleted();
+    user = await user.save();
 
     user = user.getUserBasicInfo();
     return res.send(
