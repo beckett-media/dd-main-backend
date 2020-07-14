@@ -9,6 +9,7 @@ const router = express.Router();
 const auth = require("../middlewares/authenticateRequest");
 const currency = require("../utils/currency");
 const SimpleLogger = require("../utils/simpleLogger");
+const appAuth = require("../middlewares/appAuth");
 const { User } = require("../models/user");
 const { Card } = require("../models/card");
 const { Transaction } = require("../models/transaction");
@@ -19,7 +20,7 @@ const { createResObject } = require("../utils/utilFunctions");
 const config = require("config");
 const stripe = require("stripe")(config.get(stringConstants.STRIPE_TEST_KEY));
 
-router.post("/for-pending-cards", auth, async (req, res) => {
+router.post("/for-pending-cards", [appAuth, auth], async (req, res) => {
   const userId = req.user._id;
   const amount = currency(req.body.amount).intValue;
   const paymentMethod = req.body.paymentMethod;

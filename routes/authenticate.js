@@ -3,6 +3,7 @@ const router = express.Router();
 const bcrypt = require("bcrypt");
 const _ = require("lodash");
 const Joi = require("@hapi/joi");
+const appAuth = require("../middlewares/appAuth");
 const authAppleTokenMiddleware = require("../middlewares/authenticateAppleToken");
 const { User } = require("../models/user");
 const { stringConstants } = require("../utils/constants");
@@ -10,7 +11,7 @@ const { errorObjects } = require("../utils/errorObjects");
 const { createResObject } = require("../utils/utilFunctions");
 const { valSignInRequest } = require("../middlewares/validation");
 
-router.post("/sign-in-user", valSignInRequest, async (req, res) => {
+router.post("/sign-in-user", [appAuth, valSignInRequest], async (req, res) => {
   const email = req.body.email.toLowerCase();
   let user = await User.findOne({ email });
   if (!user)
@@ -67,7 +68,7 @@ router.post("/sign-in-user", valSignInRequest, async (req, res) => {
  */
 router.post(
   "/sign-in-with-apple",
-  authAppleTokenMiddleware,
+  [appAuth, authAppleTokenMiddleware],
   async (req, res, next) => {
     const email = req.payload.email;
     const userIdetifier = req.payload.sub;

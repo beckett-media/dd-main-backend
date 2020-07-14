@@ -18,5 +18,4 @@ module.exports = (app) => {
    * Not used in production as it pollutes the logs
    */
   app.use(simpleLoggerMid);
-  app.use(appToken);
 };

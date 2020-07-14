@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcrypt");
 const auth = require("../middlewares/authenticateRequest");
+const appAuth = require("../middlewares/appAuth");
 const { uploadProfilePic } = require("../middlewares/multerSingle");
 const fs = require("fs");
 const fsPromises = fs.promises;
@@ -28,7 +29,7 @@ const Joi = require("@hapi/joi");
  * Register user with full name, email and password
  */
 
-router.post("/register-user", valRegisterRequest, async (req, res) => {
+router.post("/register-user", [appAuth, valRegisterRequest], async (req, res) => {
   const email = req.body.email.toLowerCase();
   let user = await User.findOne({ email });
   if (user)
@@ -108,7 +109,7 @@ router.post("/register-user", valRegisterRequest, async (req, res) => {
  * Post or update the already existing profile picture
  */
 
-router.post("/add-update-profile-picture", auth, async (req, res, next) => {
+router.post("/add-update-profile-picture", [appAuth, auth], async (req, res, next) => {
   const userId = req.user._id;
   let user = await User.findById(userId);
 
@@ -205,7 +206,7 @@ router.post("/add-update-profile-picture", auth, async (req, res, next) => {
 
 router.post(
   "/add-update-username",
-  [auth, valUsernameRequest],
+  [appAuth, auth, valUsernameRequest],
   async (req, res) => {
     const userId = req.user._id;
     const username = req.body.username.toLowerCase();
@@ -249,7 +250,7 @@ router.post(
  */
 router.post(
   "/change-password",
-  [valChangePasswordRequest, auth],
+  [appAuth, valChangePasswordRequest, auth],
   async (req, res) => {
     const newPassword = req.body.newPassword;
     const oldPassword = req.body.oldPassword;
@@ -325,7 +326,7 @@ router.get("/notification-settings", auth, async (req, res) => {
 /**
  * Route to toggle notification settings
  */
-router.post("/toggle-notification-settings", auth, async (req, res) => {
+router.post("/toggle-notification-settings", [appAuth, auth], async (req, res) => {
   let user = await User.findById(req.user._id);
 
   user.settings.notifications = !user.settings.notifications;
@@ -343,7 +344,7 @@ router.post("/toggle-notification-settings", auth, async (req, res) => {
 /**
  * GET route to fetch user details including settins
  */
-router.get("/user-details", auth, async (req, res) => {
+router.get("/user-details", [appAuth, auth], async (req, res) => {
   const user = await User.findById(req.user._id);
 
   const userDetails = user.getUserDetails();

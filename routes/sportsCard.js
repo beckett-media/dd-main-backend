@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const auth = require("../middlewares/authenticateRequest");
+const appAuth = require("../middlewares/appAuth");
 const SimpleLogger = require("../utils/simpleLogger");
 const path = require("path");
 const fsPromises = require("fs").promises;
@@ -26,7 +27,7 @@ const {
 /**
  * Step 1: Create a new card and upload card front
  */
-router.post("/add-front", auth, async (req, res, next) => {
+router.post("/add-front", [appAuth, auth], async (req, res, next) => {
   const userId = req.user._id;
   const user = await User.findById(userId);
   if (!user)
@@ -126,7 +127,7 @@ router.post("/add-front", auth, async (req, res, next) => {
  */
 router.post(
   "/update-front/:cardId",
-  [auth, valObjectIdInUrl],
+  [appAuth, auth, valObjectIdInUrl],
   async (req, res, next) => {
     const userId = req.user._id;
     const user = await User.findById(userId);
@@ -248,7 +249,7 @@ router.post(
  */
 router.post(
   "/add-update-back/:cardId",
-  [auth, valObjectIdInUrl],
+  [appAuth, auth, valObjectIdInUrl],
   async (req, res) => {
     const cardId = req.params.cardId;
     const userId = req.user._id;
@@ -375,7 +376,7 @@ router.post(
  */
 router.post(
   "/add-update-video/:cardId",
-  [auth, valObjectIdInUrl],
+  [appAuth, auth, valObjectIdInUrl],
   async (req, res) => {
     const cardId = req.params.cardId;
     const userId = req.user._id;
@@ -520,7 +521,7 @@ router.post(
  */
 router.post(
   "/add-card-data/:cardId",
-  [auth, valObjectIdInUrl, valUpdateCardData],
+  [appAuth, auth, valObjectIdInUrl, valUpdateCardData],
   async (req, res) => {
     const cardId = req.params.cardId;
     let card = await Card.findById(cardId);
@@ -563,7 +564,7 @@ router.post(
  */
 router.delete(
   "/delete-card/:cardId",
-  [auth, valObjectIdInUrl],
+  [appAuth, auth, valObjectIdInUrl],
   async (req, res, next) => {
     const cardId = req.params.cardId;
     let card = await Card.findById(cardId);
@@ -605,7 +606,7 @@ router.delete(
  */
 router.get(
   "/pending-payment-cards/:pageSize/:pageNumber",
-  [auth, valPageSizeNumber],
+  [appAuth, auth, valPageSizeNumber],
   async (req, res) => {
     const pageSize = parseInt(req.params.pageSize);
     const pageNumber = parseInt(req.params.pageNumber);

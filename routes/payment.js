@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const auth = require("../middlewares/authenticateRequest");
+const appAuth = require("../middlewares/appAuth");
 const { User } = require("../models/user");
 const { stringConstants } = require("../utils/constants");
 const { errorObjects } = require("../utils/errorObjects");
@@ -10,7 +11,7 @@ const config = require("config");
 const stripe = require("stripe")(config.get(stringConstants.STRIPE_TEST_KEY));
 const SimpleLogger = require("../utils/simpleLogger");
 
-router.get("/save-card-client-secret", auth, async (req, res) => {
+router.get("/save-card-client-secret", [appAuth, auth], async (req, res) => {
   const user = await User.findById(req.user._id);
   if (!user)
     return res
@@ -52,7 +53,7 @@ router.get("/save-card-client-secret", auth, async (req, res) => {
   }
 });
 
-router.get("/saved-cards", auth, async (req, res) => {
+router.get("/saved-cards", [appAuth, auth], async (req, res) => {
   const user = await User.findById(req.user._id);
   if (!user)
     return res
@@ -92,7 +93,7 @@ router.get("/saved-cards", auth, async (req, res) => {
 
 router.post(
   "/update-card",
-  [auth, valUpdateCreditCardRequest],
+  [appAuth, auth, valUpdateCreditCardRequest],
   async (req, res) => {
     const user = await User.findById(req.user._id);
     const cardId = req.body.cardId;
