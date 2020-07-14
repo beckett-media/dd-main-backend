@@ -48,7 +48,7 @@ router.post("/sign-in-user", valSignInRequest, async (req, res) => {
   user = await user.save();
 
   const returnObject = {
-    ..._.pick(user, ["_id", "fullName", "email", "profilePicture", "username"]),
+    ...user.getUserBasicInfo(),
     authTokenExpiry: authToken.expiry,
     refreshTokenExpiry: refreshToken.expiry,
   };
@@ -165,13 +165,7 @@ router.post(
     user = await user.save();
 
     const returnObject = {
-      ..._.pick(user, [
-        "_id",
-        "fullName",
-        "email",
-        "profilePicture",
-        "username",
-      ]),
+      ...user.getUserBasicInfo(),
       authTokenExpiry: authToken.expiry,
       refreshTokenExpiry: refreshToken.expiry,
     };
