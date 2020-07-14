@@ -221,11 +221,10 @@ router.post(
           )
         );
 
-    user = await User.findByIdAndUpdate(
-      req.user._id,
-      { $set: { username: username } },
-      { new: true }
-    );
+    user.username = username;
+    user.isComplete = user.isComplete();
+    user = await user.save();
+
     if (!user)
       return res
         .status(404)

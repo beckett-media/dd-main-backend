@@ -59,7 +59,7 @@ const userSchema = new mongoose.Schema(
     appleId: {
       type: String,
     },
-    setupCompleted: {
+    isComplete: {
       type: Boolean,
       default: false,
     },
@@ -165,6 +165,10 @@ userSchema.methods.getUserDetails = function () {
     role: this.role,
     settings: this.settings,
   };
+};
+
+userSchema.methods.isComplete = function () {
+  return this.fullName && this.email && this.profilePicture && this.username;
 };
 
 const User = mongoose.model(
