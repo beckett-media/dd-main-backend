@@ -167,7 +167,7 @@ userSchema.methods.getUserDetails = function () {
   };
 };
 
-userSchema.methods.isComplete = function () {
+userSchema.methods.isBasicInfoCompleted = function () {
   return this.fullName && this.email && this.profilePicture && this.username;
 };
 

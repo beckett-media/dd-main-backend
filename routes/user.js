@@ -222,7 +222,7 @@ router.post(
         );
 
     user.username = username;
-    user.isComplete = user.isComplete();
+    user.isComplete = user.isBasicInfoCompleted();
     user = await user.save();
 
     if (!user)
