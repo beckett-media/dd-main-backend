@@ -29,6 +29,7 @@ router.get("/ebay-accepted", async (req, res) => {
       }
     );
     SimpleLogger.info(body);
+    console.log("Body", body);
   } catch (error) {
     SimpleLogger.error(error);
   }
