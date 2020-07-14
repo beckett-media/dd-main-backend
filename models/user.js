@@ -168,7 +168,10 @@ userSchema.methods.getUserDetails = function () {
 };
 
 userSchema.methods.isBasicInfoCompleted = function () {
-  return this.fullName && this.email && this.profilePicture && this.username;
+  console.log(typeof this.username);
+  return (
+    !!this.fullName && !!this.email && !!this.profilePicture && !!this.username
+  );
 };
 
 const User = mongoose.model(

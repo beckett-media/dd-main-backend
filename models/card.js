@@ -56,13 +56,13 @@ const cardSchema = new mongoose.Schema(
  */
 cardSchema.methods.checkIfCompleted = function () {
   return (
-    this.front &&
-    this.back &&
-    this.video &&
-    this.year &&
-    this.brand &&
-    this.cardNumber &&
-    this.playerNames.length > 0
+    !!this.front &&
+    !!this.back &&
+    !!this.video &&
+    !!this.year &&
+    !!this.brand &&
+    !!this.cardNumber &&
+    !!this.playerNames.length > 0
   );
 };
 /**
