@@ -18,7 +18,7 @@ router.get("/ebay-accepted", async (req, res) => {
       {
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
-          Authorization: authorization,
+          Authorization: `Basic ${authorization}`,
         },
         form: {
           grant_type: "authorization_code",
