@@ -151,6 +151,24 @@ module.exports.errorObjects = {
     errorMessage: stringConstants.NOT_AUTHORIZED_TO_PERFORM_THE_ACTION,
   },
 
+  NO_PEDNING_CARDS_FOUND_FOR_USER: {
+    errorCode: 121,
+    errorSubCode: getKey(
+      stringConstants,
+      stringConstants.NO_PEDNING_CARDS_FOUND_FOR_USER
+    ),
+    errorMessage: stringConstants.NO_PEDNING_CARDS_FOUND_FOR_USER,
+  },
+
+  PENDING_AMOUNT_AND_AMOUNT_DO_NOT_MATCH: {
+    errorCode: 122,
+    errorSubCode: getKey(
+      stringConstants,
+      stringConstants.PENDING_AMOUNT_AND_AMOUNT_DO_NOT_MATCH
+    ),
+    errorMessage: stringConstants.PENDING_AMOUNT_AND_AMOUNT_DO_NOT_MATCH,
+  },
+
   REQUEST_VALIDATION_ERROR: (errorMessage) => {
     return {
       errorCode: 301,
@@ -162,6 +180,13 @@ module.exports.errorObjects = {
     return {
       errorCode: 302,
       errorSubCode: getKey(stringConstants, stringConstants.UNSUSPECTED_ERROR),
+      errorMessage: errorMessage,
+    };
+  },
+  PAYMENT_ERRORED: (errorMessage) => {
+    return {
+      errorCode: 302,
+      errorSubCode: getKey(stringConstants, stringConstants.PAYMENT_ERRORED),
       errorMessage: errorMessage,
     };
   },

@@ -175,6 +175,69 @@ describe("Unit: userValMid.test.js: Tests for user registeration requests", func
       expect(res.statusCode).to.be.equal(400);
     });
   });
+
+  describe("All test related to osType field", function () {
+    it("Should return 400 when to osType field", function () {
+      delete body.osType;
+
+      const req = getRequest();
+      const res = getResponse();
+      const next = sinon.spy();
+
+      valRegisterRequest(req, res, next);
+      expect(next.called).to.be.false;
+      expect(res.statusCode).to.be.equal(400);
+    });
+
+    it("Should return 400 if osType not one of the predefined", function () {
+      body.osType = "test";
+
+      const req = getRequest();
+      const res = getResponse();
+      const next = sinon.spy();
+
+      valRegisterRequest(req, res, next);
+      expect(next.called).to.be.false;
+      expect(res.statusCode).to.be.equal(400);
+    });
+
+    it("Should return 400 is osType not string", function () {
+      body.deviceToken = 12345;
+
+      const req = getRequest();
+      const res = getResponse();
+      const next = sinon.spy();
+
+      valRegisterRequest(req, res, next);
+      expect(next.called).to.be.false;
+      expect(res.statusCode).to.be.equal(400);
+    });
+  });
+
+  describe("All test related to deviceToken", function () {
+    it("Should return 400 if no deviceToken field", function () {
+      delete body.deviceToken;
+
+      const req = getRequest();
+      const res = getResponse();
+      const next = sinon.spy();
+
+      valRegisterRequest(req, res, next);
+      expect(next.called).to.be.false;
+      expect(res.statusCode).to.be.equal(400);
+    });
+    it("Should return 400 if not a string", function () {
+      body.deviceToken = 12345;
+
+      const req = getRequest();
+      const res = getResponse();
+      const next = sinon.spy();
+
+      valRegisterRequest(req, res, next);
+      expect(next.called).to.be.false;
+      expect(res.statusCode).to.be.equal(400);
+    });
+  });
 });
 
 describe("Unit: userValMid.test.js: Test block for validating username request", function () {

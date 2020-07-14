@@ -97,6 +97,17 @@ module.exports.stringConstants = {
   PENDING_DELETION_TYPE_NOT_HANDLED:
     "Deletion type not handling by pending deletion",
 
+  NO_PEDNING_CARDS_FOUND_FOR_USER: "No pending cards found for the user",
+
+  NO_STRIPE_ID_FOUND_FOR_USER: "No stripe ID found for user: ",
+
+  PENDING_AMOUNT_AND_AMOUNT_DO_NOT_MATCH:
+    "Pending amount for cards do not match amount sent by clients",
+
+  PAYMENT_SUCCEEDED: "Payment succeeded",
+
+  PAYMENT_ERRORED: "Payment errored",
+
   collectionNames: {
     USER_COLLECTION: "User",
     PENDING_DELETION: "Pending_Deletion",
@@ -135,7 +146,7 @@ module.exports.stringConstants = {
   osType: {
     iOS: "ios",
     ANDROID: "android",
-    MAC_OS: "mac os",
+    MAC_OS: "mac_os",
     WINDOWS: "windows",
     LINUX: "linux",
   },
@@ -155,6 +166,12 @@ module.exports.stringConstants = {
     MKV: ".mkv",
   },
 
+  currency: {
+    USD: "usd",
+    CAD: "cad",
+    INR: "inr",
+  },
+
   jobType: {
     INCOMPLETE_CARD_CLEANUP: "Incomplete card cleanup job",
     PENDING_DELETION: "Pending deletion job",
@@ -163,5 +180,13 @@ module.exports.stringConstants = {
     INCOMPLETE_CARD_CLEANUP: "* * * * *",
     PENDING_DELETION: "* * * * *",
     DAILY_JOB: "* * * * *",
+  },
+
+  transactionStatus: {
+    CREATED: "created",
+    CANCELLED: "cancelled",
+    SUCCEEDED: "succeeded",
+    ERROR: "error",
+    REFUNDED: "refunded",
   },
 };

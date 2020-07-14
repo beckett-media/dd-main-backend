@@ -5,6 +5,7 @@ const SimpleLogger = require("../utils/simpleLogger");
 const path = require("path");
 const fsPromises = require("fs").promises;
 const _ = require("lodash");
+const currency = require("../utils/currency");
 const { User } = require("../models/user");
 const { Card } = require("../models/card");
 const { PendingDeletion } = require("../models/pendingDeletion");
@@ -606,16 +607,50 @@ router.get(
   "/pending-payment-cards/:pageSize/:pageNumber",
   [auth, valPageSizeNumber],
   async (req, res) => {
-    const cards = await Card.find({
+    const pageSize = parseInt(req.params.pageSize);
+    const pageNumber = parseInt(req.params.pageNumber);
+
+    let cards = await Card.find({
       $and: [
         { user: req.user._id },
         { isCompleted: true },
         { status: stringConstants.cardState.PENDING },
       ],
     });
+    /**
+     * Card pricing:
+     * $4.99 for <= 100
+     * $7.99 for > 100
+     */
+    let pendingAmount = 0,
+      price = 0;
+    const numCards = cards.length;
+    if (numCards <= 100) {
+      price = "4.99";
+      pendingAmount = currency(price).multiply(numCards);
+    } else if (numCards > 100) {
+      price = "7.99";
+      pendingAmount = currency(price).multiply(numCards);
+    }
+
+    // Query again for pagination
+    cards = await Card.find({
+      $and: [
+        { user: req.user._id },
+        { isCompleted: true },
+        { status: stringConstants.cardState.PENDING },
+      ],
+    })
+      .sort({ createdAt: 1 })
+      .skip((pageNumber - 1) * pageSize)
+      .limit(pageSize);
 
     return res.send(
-      createResObject(true, { cards: cards }, stringConstants.FETCH_SUCESSFUL)
+      createResObject(
+        true,
+        { cards: cards, pendingAmount, numCards },
+        stringConstants.FETCH_SUCESSFUL
+      )
     );
   }
 );
