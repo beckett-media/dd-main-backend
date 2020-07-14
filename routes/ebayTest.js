@@ -11,7 +11,7 @@ const ClientSecret = "SBX-c8ec7f0e11f2-4787-4b71-a936-0a8d";
 router.get("/ebay-accepted", async (req, res) => {
   SimpleLogger.info(req.query.code, req.query.expires_in);
   const authorizationString = `${ClientID}:${ClientSecret}`;
-  const authorization = Buffer.form(authorizationString).toString("base64");
+  const authorization = Buffer.from(authorizationString).toString("base64");
   try {
     const { body } = await got.post(
       "https://api.sandbox.ebay.com/identity/v1/oauth2/token",
