@@ -68,7 +68,7 @@ describe("Integ: renewToken.test.js: EndPoint: /auth-token", function () {
           fullName: "Test User",
           email: "test1@test.com",
           password: "test_password",
-          osType: stringConstants.osType.ANDROID,
+          osType: stringConstants.osType.MAC_OS,
           deviceToken: "Test",
         })
         .set("Accept", "application/json")
@@ -79,6 +79,8 @@ describe("Integ: renewToken.test.js: EndPoint: /auth-token", function () {
         .send({
           email: "test1@test.com",
           password: "test_password",
+          osType: stringConstants.osType.MAC_OS,
+          deviceToken: "Test",
         })
         .set("Accept", "application/json")
         .set("x-app-token", config.get("appToken"));
@@ -120,6 +122,8 @@ describe("Integ: renewToken.test.js: EndPoint: /auth-token", function () {
         .send({
           email: "test1@test.com",
           password: "test_password",
+          osType: stringConstants.osType.MAC_OS,
+          deviceToken: "Test",
         })
         .set("Accept", "application/json")
         .set("x-app-token", config.get("appToken"));
@@ -157,6 +161,8 @@ describe("Integ: renewToken.test.js: EndPoint: /auth-token", function () {
         .send({
           email: "test1@test.com",
           password: "test_password",
+          osType: stringConstants.osType.MAC_OS,
+          deviceToken: "Test",
         })
         .set("Accept", "application/json")
         .set("x-app-token", config.get("appToken"));
@@ -183,7 +189,7 @@ describe("Integ: renewToken.test.js: EndPoint: /auth-token", function () {
           fullName: "Test User",
           email: "test1@test.com",
           password: "test_password",
-          osType: stringConstants.osType.ANDROID,
+          osType: stringConstants.osType.MAC_OS,
           deviceToken: "Test",
         })
         .set("Accept", "application/json")
@@ -198,7 +204,7 @@ describe("Integ: renewToken.test.js: EndPoint: /auth-token", function () {
           fullName: "Test User",
           email: "test2@test.com",
           password: "test_password",
-          osType: stringConstants.osType.ANDROID,
+          osType: stringConstants.osType.MAC_OS,
           deviceToken: "Test",
         })
         .set("Accept", "application/json")

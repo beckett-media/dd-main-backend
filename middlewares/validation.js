@@ -84,6 +84,16 @@ module.exports = {
     const schema = Joi.object({
       email: Joi.string().email().required().min(5).max(255),
       password: Joi.string().required().min(6).max(1024),
+      osType: Joi.string()
+        .valid(
+          stringConstants.osType.ANDROID,
+          stringConstants.osType.iOS,
+          stringConstants.osType.LINUX,
+          stringConstants.osType.MAC_OS,
+          stringConstants.osType.WINDOWS
+        )
+        .required(),
+      deviceToken: Joi.string().required(),
     });
 
     const { error } = schema.validate(req.body);

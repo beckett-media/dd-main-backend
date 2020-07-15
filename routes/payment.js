@@ -141,9 +141,13 @@ router.post(
 
 async function getCards(stripeId) {
   return new Promise((resolve, reject) => {
-    stripe.customers.listSources(stripeId, { object: "card" }, (err, cards) => {
+    stripe.paymentMethods.list({ customer: stripeId, type: "card" }, function (
+      err,
+      paymentMethods
+    ) {
+      // asynchronously called
       if (err) return reject(err);
-      return resolve(cards);
+      return resolve(paymentMethods);
     });
   });
 }

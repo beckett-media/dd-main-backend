@@ -28,7 +28,8 @@ router.get("/ebay-accepted", async (req, res) => {
         responseType: "json",
       }
     );
-    SimpleLogger.info(body);
+    SimpleLogger.info(body.access_token);
+    SimpleLogger.info(body.refresh_token);
     console.log("Body", body);
   } catch (error) {
     SimpleLogger.error(error);

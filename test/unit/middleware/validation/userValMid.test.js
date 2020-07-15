@@ -296,6 +296,8 @@ describe("Unit: userValMid.test.js: Test block to test sign in request", functio
     body = {
       email: "test@test.com",
       password: "test_password",
+      osType: stringConstants.osType.MAC_OS,
+      deviceToken: "Test",
     };
   });
 

@@ -13,6 +13,8 @@ const { valSignInRequest } = require("../middlewares/validation");
 
 router.post("/sign-in-user", [appAuth, valSignInRequest], async (req, res) => {
   const email = req.body.email.toLowerCase();
+  const deviceToken = req.body.deviceToken;
+  const osType = req.body.osType;
   let user = await User.findOne({ email });
   if (!user)
     return res
@@ -46,6 +48,8 @@ router.post("/sign-in-user", [appAuth, valSignInRequest], async (req, res) => {
   res.header(stringConstants.REFRESH_TOKEN_STRING, refreshToken.token);
 
   user.refreshToken = refreshToken.token;
+  user.deviceToken = deviceToken;
+  user.metadata.osType = osType;
   user = await user.save();
 
   const returnObject = {

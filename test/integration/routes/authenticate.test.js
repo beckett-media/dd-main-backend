@@ -54,6 +54,8 @@ describe("INTEG: authenticate.test.js: EndPoint: /authenticate/sign-in-user", fu
         .send({
           email,
           password,
+          osType,
+          deviceToken,
         })
         .set("Accept", "application/json")
         .set("x-app-token", config.get("appToken"));

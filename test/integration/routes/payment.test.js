@@ -36,7 +36,7 @@ describe("INTEG: payment.test.js: EndPoint /payment", function () {
           fullName: "Test User",
           email: "test1@test.com",
           password: "test_password",
-          osType: stringConstants.osType.ANDROID,
+          osType: stringConstants.osType.MAC_OS,
           deviceToken: "Test",
         })
         .set("Accept", "application/json")
@@ -47,6 +47,8 @@ describe("INTEG: payment.test.js: EndPoint /payment", function () {
         .send({
           email: "test1@test.com",
           password: "test_password",
+          osType: stringConstants.osType.MAC_OS,
+          deviceToken: "test",
         })
         .set("Accept", "application/json")
         .set("x-app-token", config.get("appToken"));
@@ -84,7 +86,7 @@ describe("INTEG: payment.test.js: EndPoint /payment", function () {
           fullName: "Test User",
           email: "test1@test.com",
           password: "test_password",
-          osType: stringConstants.osType.ANDROID,
+          osType: stringConstants.osType.MAC_OS,
           deviceToken: "Test",
         })
         .set("Accept", "application/json")
@@ -95,6 +97,8 @@ describe("INTEG: payment.test.js: EndPoint /payment", function () {
         .send({
           email: "test1@test.com",
           password: "test_password",
+          osType: stringConstants.osType.MAC_OS,
+          deviceToken: "Test",
         })
         .set("Accept", "application/json")
         .set("x-app-token", config.get("appToken"));

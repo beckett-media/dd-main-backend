@@ -72,7 +72,7 @@ describe("INTEG: user.test.js INTEG: POST /user", function () {
           fullName: "Test User",
           email: "test@test.com",
           password: "test_password",
-          osType: stringConstants.osType.ANDROID,
+          osType: stringConstants.osType.MAC_OS,
           deviceToken: "Test",
         })
         .set("Accept", "application/json")
@@ -84,7 +84,7 @@ describe("INTEG: user.test.js INTEG: POST /user", function () {
           fullName: "Test User",
           email: "test@test.com",
           password: "test_password",
-          osType: stringConstants.osType.ANDROID,
+          osType: stringConstants.osType.MAC_OS,
           deviceToken: "Test",
         })
         .set("Accept", "application/json")
