@@ -17,6 +17,7 @@ const { valEbayOAuthTokenReq } = require("../middlewares/validation");
  * for eBay. Render page in the future.
  */
 router.get("/ebay-accepted", async (req, res) => {
+  SimpleLogger.info(req.query.code);
   // const clientId = config.get(stringConstants.EBAY_CLIENT_ID);
   // const clientSecret = config.get(stringConstants.EBAY_CLIENT_SECRET);
   // const authorizationString = `${clientId}:${clientSecret}`;
