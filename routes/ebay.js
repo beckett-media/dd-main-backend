@@ -37,6 +37,7 @@ router.get("/ebay-declined", (req, res) => {
  */
 router.get("/ebay-get-oauth/:code", async (req, res) => {
   const code = req.params.code;
+  console.log(code);
   if (!code)
     return res
       .status(400)
