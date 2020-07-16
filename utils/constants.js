@@ -19,6 +19,10 @@ module.exports.stringConstants = {
 
   GOOGLE_APPLICATION_CREDENTIALS: "googleApplicationCredentials",
 
+  EBAY_CLIENT_ID: "eBayClientId",
+
+  EBAY_CLIENT_SECRET: "eBayClientSecret",
+
   INTERNAL_SERVER_ERROR: "Internal server error",
 
   INVALID_OR_TOKEN_EXPIRED: "Auth token invalid or expired",
@@ -108,6 +112,7 @@ module.exports.stringConstants = {
 
   PAYMENT_ERRORED: "Payment errored",
 
+  EBAY_CODE_REQUIRED: "eBay code is required",
   collectionNames: {
     USER_COLLECTION: "User",
     PENDING_DELETION: "Pending_Deletion",
@@ -188,5 +193,9 @@ module.exports.stringConstants = {
     SUCCEEDED: "succeeded",
     ERROR: "error",
     REFUNDED: "refunded",
+  },
+
+  URLS: {
+    ebayoAuthUrl: "https://api.sandbox.ebay.com/identity/v1/oauth2/token",
   },
 };

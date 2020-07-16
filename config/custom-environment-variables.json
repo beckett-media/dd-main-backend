@@ -4,5 +4,8 @@
   "snapGradeJwtRefreshKey": "SNAP_GRADE_JWT_REFRESH_KEY",
   "snapGradeJwtAppKey": "SNAP_GRADE_JWT_APP_KEY",
   "stripeTestKey": "SNAP_GRADE_STRIPE_TEST_KEY",
-  "googleApplicationCredentials": "GOOGLE_APPLICATION_CREDENTIALS"
+  "stripeKey": "",
+  "googleApplicationCredentials": "GOOGLE_APPLICATION_CREDENTIALS",
+  "eBayClientId": "DCGS_EBAY_CLIENT_ID",
+  "eBayClientSecret": "DCGS_EBAY_CLIENT_SECRET"
 }

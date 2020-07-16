@@ -184,4 +184,9 @@ router.post(
     );
   }
 );
+
+/**
+ * Sign in with ebay
+ */
+router.post("/sign-in-with-ebay", [appAuth], async (req, res) => {});
 module.exports = router;

@@ -117,7 +117,6 @@ module.exports = {
       cardId: Joi.string().required(),
       expMonth: Joi.number().required().min(1).max(12),
       expYear: Joi.number().required().min(year).max(9999),
-      fullName: Joi.string().required(),
     });
 
     const { error } = schema.validate(req.body);
@@ -194,6 +193,48 @@ module.exports = {
     };
 
     const { error } = schema.validate(obj);
+    if (error) {
+      return res
+        .status(400)
+        .send(
+          createResObject(
+            false,
+            { errorMessage: error.details[0].message },
+            stringConstants.REQUEST_VALIDATION_FAILED,
+            errorObjects.REQUEST_VALIDATION_ERROR(error.details[0].message)
+          )
+        );
+    }
+    return next();
+  },
+
+  valEbayOAuthTokenReq: (req, res, next) => {
+    const schema = Joi.object({
+      code: Joi.string().required(),
+    });
+
+    const { error } = schema.validate(req.body);
+    if (error) {
+      return res
+        .status(400)
+        .send(
+          createResObject(
+            false,
+            { errorMessage: error.details[0].message },
+            stringConstants.REQUEST_VALIDATION_FAILED,
+            errorObjects.REQUEST_VALIDATION_ERROR(error.details[0].message)
+          )
+        );
+    }
+    return next();
+  },
+
+  valDeleteCreditCardReq: (req, res, next) => {
+    const schema = Joi.object({
+      cardId: Joi.string().required(),
+    });
+
+    const { error } = schema.validate(req.body);
     if (error) {
       return res
         .status(400)

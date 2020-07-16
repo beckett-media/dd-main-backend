@@ -10,14 +10,13 @@ const sinon = require("sinon");
 const httpMocks = require("node-mocks-http");
 
 let body;
-describe("Unit: CreditCardValMid: Update card request body validation tests", function () {
+describe("Unit: creditCardValMid.test.js: CreditCardValMid: Update card request body validation tests", function () {
   this.beforeEach(function () {
     const year = new Date().getFullYear() + 1;
     body = {
       cardId: "testcardid",
       expMonth: 12,
       expYear: year,
-      fullName: "test user",
     };
   });
 
@@ -50,20 +49,6 @@ describe("Unit: CreditCardValMid: Update card request body validation tests", fu
    */
   it("Should return 400 for no expYear", function () {
     delete body.expYear;
-    const req = getRequest();
-    const res = getResponse();
-    const next = sinon.spy();
-
-    valUpdateCreditCardRequest(req, res, next);
-
-    expect(res.statusCode).to.be.equal(400);
-    expect(next.called).to.be.false;
-  });
-  /**
-   * Request validation should fail since no full name
-   */
-  it("Should return 400 for no full name", function () {
-    delete body.fullName;
     const req = getRequest();
     const res = getResponse();
     const next = sinon.spy();
