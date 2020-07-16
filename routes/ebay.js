@@ -18,32 +18,6 @@ const { valEbayOAuthTokenReq } = require("../middlewares/validation");
  */
 router.get("/ebay-accepted", async (req, res) => {
   SimpleLogger.info(req.query.code);
-  // const clientId = config.get(stringConstants.EBAY_CLIENT_ID);
-  // const clientSecret = config.get(stringConstants.EBAY_CLIENT_SECRET);
-  // const authorizationString = `${clientId}:${clientSecret}`;
-  // const authorization = Buffer.from(authorizationString).toString("base64");
-  // try {
-  //   const { body } = await got.post(
-  //     "https://api.sandbox.ebay.com/identity/v1/oauth2/token",
-  //     {
-  //       headers: {
-  //         "Content-Type": "application/x-www-form-urlencoded",
-  //         Authorization: `Basic ${authorization}`,
-  //       },
-  //       form: {
-  //         grant_type: "authorization_code",
-  //         code: req.query.code,
-  //         redirect_uri: "Anurag_Singla-AnuragSi-DCGS-S-sqsppiy",
-  //       },
-  //       responseType: "json",
-  //     }
-  //   );
-  //   SimpleLogger.info(body.access_token);
-  //   SimpleLogger.info(body.refresh_token);
-  //   console.log("Body", body);
-  // } catch (error) {
-  //   SimpleLogger.error(error);
-  // }
 
   return res.send("Accepted");
 });
@@ -63,7 +37,6 @@ router.get("/ebay-declined", (req, res) => {
  */
 router.get("/ebay-get-oauth", [appAuth], async (req, res) => {
   const code = req.query.code;
-  console.log(code);
   if (!code)
     return res
       .status(400)
@@ -79,12 +52,13 @@ router.get("/ebay-get-oauth", [appAuth], async (req, res) => {
   const clientSecret = config.get(stringConstants.EBAY_CLIENT_SECRET);
   const authorizationString = `${clientId}:${clientSecret}`;
   const authorization = Buffer.from(authorizationString).toString("base64");
+  const token = `Basic ${authorization}`;
 
   try {
     const { body } = await got.post(stringConstants.URLS.ebayoAuthUrl, {
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
-        Authorization: `Basic ${authorization}`,
+        Authorization: token,
       },
       form: {
         grant_type: "authorization_code",
@@ -94,8 +68,8 @@ router.get("/ebay-get-oauth", [appAuth], async (req, res) => {
       responseType: "json",
     });
     let returnObject = {};
-    res.header("ebay-access-token") = body.access_token;
-    res.header("ebay-refresh-token") = body.refresh_token;
+    res.header("ebay-access-token", body.access_token);
+    res.header("ebay-refresh-token", body.refresh_token);
 
     returnObject.accessTokenExpiry = body.expires_in;
     returnObject.refreshTokenExpiry = body.refresh_token_expires_in;
