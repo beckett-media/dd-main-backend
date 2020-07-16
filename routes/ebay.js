@@ -35,9 +35,8 @@ router.get("/ebay-declined", (req, res) => {
  * Takes the code and returns the oAuth access token
  * in return
  */
-router.get("/ebay-get-oauth/:code", async (req, res) => {
-  const code = req.params.code;
-  console.log(code);
+router.get("/ebay-get-oauth", appAuth, async (req, res) => {
+  const code = req.query.code;
   if (!code)
     return res
       .status(400)
