@@ -36,6 +36,7 @@ router.post(
     const email = req.body.email.toLowerCase();
     const deviceToken = req.body.deviceToken;
     const osType = req.body.osType;
+    let firstTimeSignin = true;
     let user = await User.findOne({ email });
     if (user)
       return res
@@ -100,6 +101,7 @@ router.post(
       ...user.getUserBasicInfo(),
       authTokenExpiry: token.expiry,
       refreshTokenExpiry: refreshToken.expiry,
+      firstTimeSignin,
     };
 
     return res.send(

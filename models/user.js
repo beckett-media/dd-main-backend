@@ -153,6 +153,7 @@ userSchema.methods.getUserBasicInfo = function () {
     email: this.email,
     profilePicture: this.profilePicture,
     username: this.username,
+    signupType: this.metadata.signupType,
   };
 };
 
@@ -165,6 +166,7 @@ userSchema.methods.getUserDetails = function () {
     username: this.username,
     role: this.role,
     settings: this.settings,
+    signupType: this.metadata.signupType,
   };
 };
 
