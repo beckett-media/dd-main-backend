@@ -155,7 +155,7 @@ module.exports.stringConstants = {
   signupType: {
     EBAY: "ebay",
     APPLE: "apple",
-    IN_APP: "in app registeration",
+    IN_APP: "in_app",
   },
   // OS information
   osType: {

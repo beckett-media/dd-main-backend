@@ -21,7 +21,7 @@ router.post("/sign-in-user", [appAuth, valSignInRequest], async (req, res) => {
   const email = req.body.email.toLowerCase();
   const deviceToken = req.body.deviceToken;
   const osType = req.body.osType;
-  let firstTimeSignin = false;
+  let firstSignin = false;
   let user = await User.findOne({ email });
   if (!user)
     return res
@@ -63,7 +63,7 @@ router.post("/sign-in-user", [appAuth, valSignInRequest], async (req, res) => {
     ...user.getUserBasicInfo(),
     authTokenExpiry: authToken.expiry,
     refreshTokenExpiry: refreshToken.expiry,
-    firstTimeSignin,
+    firstSignin,
   };
 
   return res.send(
@@ -89,7 +89,7 @@ router.post(
 
     let user,
       schema,
-      firstTimeSignin = false;
+      firstSignin = false;
 
     if (!email) {
       return next(new Error("Apple sign in email not found in payload"));
@@ -116,7 +116,7 @@ router.post(
     }
 
     if (!user) {
-      firstTimeSignin = true;
+      firstSignin = true;
       // Create a new user
       schema = Joi.object({
         fullName: Joi.string().required().min(2).max(255),
@@ -220,7 +220,7 @@ router.post(
       ...user.getUserBasicInfo(),
       authTokenExpiry: authToken.expiry,
       refreshTokenExpiry: refreshToken.expiry,
-      firstTimeSignin,
+      firstSignin,
     };
 
     return res.send(
@@ -246,7 +246,7 @@ router.post(
     const accountType = req.body.accountType;
     const osType = req.body.osType;
     const deviceToken = req.body.deviceToken;
-    let firstTimeSignin = false;
+    let firstSignin = false;
 
     const authorizationHeader = `Bearer ${accessToken}`;
 
