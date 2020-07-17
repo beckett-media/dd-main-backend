@@ -47,3 +47,6 @@ app.use(errorMid);
 const server = require("./startup/startServer")(app);
 
 module.exports = server;
+/**
+ * Test auto merge
+ */
