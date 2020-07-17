@@ -17,6 +17,5 @@ module.exports = (app) => {
    * Simple logger middelware to log requests
    * Not used in production as it pollutes the logs
    */
-
   app.use(simpleLoggerMid);
 };
