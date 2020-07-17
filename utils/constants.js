@@ -23,6 +23,13 @@ module.exports.stringConstants = {
 
   EBAY_CLIENT_SECRET: "eBayClientSecret",
 
+  EBAY_ACCESS_TOKEN: "ebay-access-token",
+
+  EBAY_REFRESH_TOKEN: "ebay-refresh-token",
+
+  EBAY_ACCESS_TOKEN_REQUIRED:
+    "eBay refresh token is required in the header under ebay-access-token",
+
   INTERNAL_SERVER_ERROR: "Internal server error",
 
   INVALID_OR_TOKEN_EXPIRED: "Auth token invalid or expired",
@@ -113,6 +120,9 @@ module.exports.stringConstants = {
   PAYMENT_ERRORED: "Payment errored",
 
   EBAY_CODE_REQUIRED: "eBay code is required",
+
+  USER_ALREADY_SIGNED_UP_WITH_DIFFERENT_METHOD:
+    "User has already signed up with a different method",
   collectionNames: {
     USER_COLLECTION: "User",
     PENDING_DELETION: "Pending_Deletion",
@@ -142,7 +152,7 @@ module.exports.stringConstants = {
     GRADED: "graded", // Has been greaded
   },
 
-  signUpType: {
+  signupType: {
     EBAY: "ebay",
     APPLE: "apple",
     IN_APP: "in app registeration",
@@ -197,5 +207,11 @@ module.exports.stringConstants = {
 
   URLS: {
     ebayoAuthUrl: "https://api.sandbox.ebay.com/identity/v1/oauth2/token",
+    ebayGetUserUrl: "https://apiz.sandbox.ebay.com/commerce/identity/v1/user/",
+  },
+
+  ebayAccType: {
+    BUSINESS_ACCOUNT: "businessAccount",
+    INDIVIDUAL_ACCOUNT: "individualAccount",
   },
 };

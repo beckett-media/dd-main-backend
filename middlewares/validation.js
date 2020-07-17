@@ -249,4 +249,56 @@ module.exports = {
     }
     return next();
   },
+
+  valSignInWithEbay: (req, res, next) => {
+    const accessToken = req.header(stringConstants.EBAY_ACCESS_TOKEN);
+
+    if (!accessToken)
+      return res
+        .status(400)
+        .send(
+          createResObject(
+            false,
+            {},
+            stringConstants.EBAY_ACCESS_TOKEN_REQUIRED,
+            errorObjects.EBAY_ACCESS_TOKEN_REQUIRED
+          )
+        );
+
+    const schema = Joi.object({
+      fullName: Joi.string().required().min(2).max(255),
+      email: Joi.string().email().required().min(5).max(255),
+      accountType: Joi.string()
+        .valid(
+          stringConstants.ebayAccType.BUSINESS_ACCOUNT,
+          stringConstants.ebayAccType.INDIVIDUAL_ACCOUNT
+        )
+        .required(),
+      osType: Joi.string()
+        .valid(
+          stringConstants.osType.ANDROID,
+          stringConstants.osType.iOS,
+          stringConstants.osType.LINUX,
+          stringConstants.osType.MAC_OS,
+          stringConstants.osType.WINDOWS
+        )
+        .required(),
+      deviceToken: Joi.string().required(),
+    });
+
+    const { error } = schema.validate(req.body);
+    if (error) {
+      return res
+        .status(400)
+        .send(
+          createResObject(
+            false,
+            { errorMessage: error.details[0].message },
+            stringConstants.REQUEST_VALIDATION_FAILED,
+            errorObjects.REQUEST_VALIDATION_ERROR(error.details[0].message)
+          )
+        );
+    }
+    return next();
+  },
 };

@@ -169,6 +169,26 @@ module.exports.errorObjects = {
     errorMessage: stringConstants.PENDING_AMOUNT_AND_AMOUNT_DO_NOT_MATCH,
   },
 
+  EBAY_ACCESS_TOKEN_REQUIRED: {
+    errorCode: 123,
+    errorSubCode: getKey(
+      stringConstants,
+      stringConstants.EBAY_ACCESS_TOKEN_REQUIRED
+    ),
+    errorMessage: stringConstants.EBAY_ACCESS_TOKEN_REQUIRED,
+  },
+
+  USER_ALREADY_SIGNED_UP_WITH_DIFFERENT_METHOD: (method) => {
+    return {
+      errorCode: 124,
+      errorSubCode: getKey(
+        stringConstants,
+        stringConstants.USER_ALREADY_SIGNED_UP_WITH_DIFFERENT_METHOD
+      ),
+      errorMessage: `${stringConstants.USER_ALREADY_SIGNED_UP_WITH_DIFFERENT_METHOD}: ${method}`,
+    };
+  },
+
   REQUEST_VALIDATION_ERROR: (errorMessage) => {
     return {
       errorCode: 301,

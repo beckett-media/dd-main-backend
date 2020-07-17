@@ -29,7 +29,6 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      required: true,
       minlength: 6,
       maxlength: 1024,
     },
@@ -47,9 +46,11 @@ const userSchema = new mongoose.Schema(
       enum: [stringConstants.role.ADMIN, stringConstants.role.USER],
       default: stringConstants.role.USER,
     },
-    deviceToken: {
-      type: String,
-    },
+    deviceTokens: [
+      {
+        type: String,
+      },
+    ],
     refreshToken: {
       type: String,
     },
@@ -73,11 +74,11 @@ const userSchema = new mongoose.Schema(
       signupType: {
         type: String,
         enum: [
-          stringConstants.signUpType.EBAY,
-          stringConstants.signUpType.APPLE,
-          stringConstants.signUpType.IN_APP,
+          stringConstants.signupType.EBAY,
+          stringConstants.signupType.APPLE,
+          stringConstants.signupType.IN_APP,
         ],
-        default: stringConstants.signUpType.IN_APP,
+        default: stringConstants.signupType.IN_APP,
       },
       osType: {
         type: String,
@@ -168,10 +169,16 @@ userSchema.methods.getUserDetails = function () {
 };
 
 userSchema.methods.isBasicInfoCompleted = function () {
-  console.log(typeof this.username);
   return (
     !!this.fullName && !!this.email && !!this.profilePicture && !!this.username
   );
+};
+
+userSchema.methods.addDeviceToken = function (deviceToken) {
+  if (this.deviceTokens.indexOf(deviceToken) === -1) {
+    this.deviceTokens.push(deviceToken);
+  }
+  return this.deviceTokens;
 };
 
 const User = mongoose.model(

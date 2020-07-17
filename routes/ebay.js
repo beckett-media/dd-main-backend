@@ -68,8 +68,8 @@ router.get("/ebay-get-oauth", appAuth, async (req, res) => {
       responseType: "json",
     });
     let returnObject = {};
-    res.header("ebay-access-token", body.access_token);
-    res.header("ebay-refresh-token", body.refresh_token);
+    res.header(stringConstants.EBAY_ACCESS_TOKEN, body.access_token);
+    res.header(stringConstants.EBAY_REFRESH_TOKEN, body.refresh_token);
 
     returnObject.accessTokenExpiry = body.expires_in;
     returnObject.refreshTokenExpiry = body.refresh_token_expires_in;

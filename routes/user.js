@@ -29,180 +29,191 @@ const Joi = require("@hapi/joi");
  * Register user with full name, email and password
  */
 
-router.post("/register-user", [appAuth, valRegisterRequest], async (req, res) => {
-  const email = req.body.email.toLowerCase();
-  let user = await User.findOne({ email });
-  if (user)
-    return res
-      .status(400)
-      .send(
-        createResObject(
-          false,
-          {},
-          stringConstants.USER_EMAIL_ALREADY_EXISTS,
-          errorObjects.USER_EMAIL_ALREADY_EXISTS
-        )
-      );
-
-  user = new User(_.pick(req.body, ["email", "password", "fullName"]));
-
-  user.deviceToken = req.body.deviceToken;
-  user.metadata.osType = req.body.osType;
-
-  try {
-    const customer = await stripe.customers.create({
-      email: email,
-      metadata: {
-        userId: user._id.toString(),
-      },
-    });
-
-    user.stripeId = customer.id;
-  } catch (err) {
-    SimpleLogger.error(err);
-    return res
-      .status(400)
-      .send(
-        createResObject(
-          false,
-          {},
-          stringConstants.UNSUSPECTED_ERROR,
-          errorObjects.UNSUSPECTED_ERROR(err.message)
-        )
-      );
-  }
-
-  const salt = await bcrypt.genSalt(10);
-  user.password = await bcrypt.hash(user.password, salt);
-
-  const token = user.generateAuthToken();
-  const refreshToken = user.generateRefreshToken();
-
-  user.refreshToken = refreshToken.token;
-
-  // Create folder for user, user cards
-  const userDir = path.join(__dirname, "../public", user._id.toString());
-  const exists = fs.existsSync(user);
-  if (!exists) await fsPromises.mkdir(userDir);
-
-  user = await user.save();
-
-  res.header(stringConstants.AUTH_TOKEN_STRING, token.token);
-  res.header(stringConstants.REFRESH_TOKEN_STRING, refreshToken.token);
-
-  const returnObject = {
-    ...user.getUserBasicInfo(),
-    authTokenExpiry: token.expiry,
-    refreshTokenExpiry: refreshToken.expiry,
-  };
-
-  return res.send(
-    createResObject(
-      true,
-      { user: returnObject },
-      stringConstants.USER_REGISTERATION_SUCCESSFUL
-    )
-  );
-});
-
-/**
- * Post or update the already existing profile picture
- */
-
-router.post("/add-update-profile-picture", [appAuth, auth], async (req, res, next) => {
-  const userId = req.user._id;
-  let user = await User.findById(userId);
-
-  uploadProfilePic(req, res, async function (err) {
-    // Check if error, log error and send error response
-    if (err) {
-      SimpleLogger.error(err);
-      // If file type error return relavent message
-      if (err.message === stringConstants.NOT_A_VALID_FILE_TYPE) {
-        return res
-          .status(415)
-          .send(
-            createResObject(
-              false,
-              {},
-              stringConstants.FILE_TYPE_NOT_ACCEPTED,
-              errorObjects.FILE_TYPE_NOT_ACCEPTED
-            )
-          );
-      }
-      // Otherwise return 500
-      return next(err);
-    }
-    // Check file exists
-    if (!req.file)
+router.post(
+  "/register-user",
+  [appAuth, valRegisterRequest],
+  async (req, res) => {
+    const email = req.body.email.toLowerCase();
+    const deviceToken = req.body.deviceToken;
+    const osType = req.body.osType;
+    let user = await User.findOne({ email });
+    if (user)
       return res
         .status(400)
         .send(
           createResObject(
             false,
             {},
-            stringConstants.NO_FILE_FOUND,
-            errorObjects.NO_FILE_FOUND
+            stringConstants.USER_EMAIL_ALREADY_EXISTS,
+            errorObjects.USER_EMAIL_ALREADY_EXISTS
           )
         );
-    // Check file size if corrupt delete the uploaded file
-    if (req.file.size <= 0) {
-      const profilePicPath = path.join(
-        __dirname,
-        `../public/${userId}/profile_pictures/`,
-        `${req.file.filename}`
-      );
-      try {
-        await fsPromises.unlink(profilePicPath);
-      } catch (err) {
-        SimpleLogger.error(err);
-        await new PendingDeletion({
-          deletionType: stringConstants.deletionType.FILE,
-          data: profilePicPath,
-        }).save();
-      }
+
+    user = new User(_.pick(req.body, ["email", "password", "fullName"]));
+
+    user.addDeviceToken(deviceToken);
+    user.metadata.osType = osType;
+    user.metadata.signupType = stringConstants.signupType.IN_APP;
+
+    try {
+      const customer = await stripe.customers.create({
+        email: email,
+        metadata: {
+          userId: user._id.toString(),
+        },
+      });
+
+      user.stripeId = customer.id;
+    } catch (err) {
+      SimpleLogger.error(err);
       return res
         .status(400)
         .send(
           createResObject(
-            true,
+            false,
             {},
-            stringConstants.FILE_CORRUPTED,
-            errorObjects.FILE_CORRUPTED
+            stringConstants.UNSUSPECTED_ERROR,
+            errorObjects.UNSUSPECTED_ERROR(err.message)
           )
         );
     }
 
-    // Save the profile to user document and return user document
-    // Before that check if profile picture already exists and replace if it does
-    if (user.profilePicture) {
-      const absolutePath = path.join(
-        __dirname,
-        `../public`,
-        `${user.profilePicture}`
-      );
-      try {
-        await fsPromises.unlink(absolutePath);
-      } catch (err) {
-        SimpleLogger.error(err);
-        await new PendingDeletion({
-          deletionType: stringConstants.deletionType.FILE,
-          data: absolutePath,
-        }).save();
-      }
-    }
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(user.password, salt);
 
-    user.profilePicture = path.join(
-      `${userId}/profile_pictures/`,
-      `${req.file.filename}`
-    );
+    const token = user.generateAuthToken();
+    const refreshToken = user.generateRefreshToken();
+
+    user.refreshToken = refreshToken.token;
+
+    // Create folder for user, user cards
+    const userDir = path.join(__dirname, "../public", user._id.toString());
+    const exists = fs.existsSync(user);
+    if (!exists) await fsPromises.mkdir(userDir);
+
     user = await user.save();
-    user = user.getUserBasicInfo();
+
+    res.header(stringConstants.AUTH_TOKEN_STRING, token.token);
+    res.header(stringConstants.REFRESH_TOKEN_STRING, refreshToken.token);
+
+    const returnObject = {
+      ...user.getUserBasicInfo(),
+      authTokenExpiry: token.expiry,
+      refreshTokenExpiry: refreshToken.expiry,
+    };
+
     return res.send(
-      createResObject(true, { user }, stringConstants.UPDATE_SUCCESSFUL)
+      createResObject(
+        true,
+        { user: returnObject },
+        stringConstants.USER_REGISTERATION_SUCCESSFUL
+      )
     );
-  });
-});
+  }
+);
+
+/**
+ * Post or update the already existing profile picture
+ */
+
+router.post(
+  "/add-update-profile-picture",
+  [appAuth, auth],
+  async (req, res, next) => {
+    const userId = req.user._id;
+    let user = await User.findById(userId);
+
+    uploadProfilePic(req, res, async function (err) {
+      // Check if error, log error and send error response
+      if (err) {
+        SimpleLogger.error(err);
+        // If file type error return relavent message
+        if (err.message === stringConstants.NOT_A_VALID_FILE_TYPE) {
+          return res
+            .status(415)
+            .send(
+              createResObject(
+                false,
+                {},
+                stringConstants.FILE_TYPE_NOT_ACCEPTED,
+                errorObjects.FILE_TYPE_NOT_ACCEPTED
+              )
+            );
+        }
+        // Otherwise return 500
+        return next(err);
+      }
+      // Check file exists
+      if (!req.file)
+        return res
+          .status(400)
+          .send(
+            createResObject(
+              false,
+              {},
+              stringConstants.NO_FILE_FOUND,
+              errorObjects.NO_FILE_FOUND
+            )
+          );
+      // Check file size if corrupt delete the uploaded file
+      if (req.file.size <= 0) {
+        const profilePicPath = path.join(
+          __dirname,
+          `../public/${userId}/profile_pictures/`,
+          `${req.file.filename}`
+        );
+        try {
+          await fsPromises.unlink(profilePicPath);
+        } catch (err) {
+          SimpleLogger.error(err);
+          await new PendingDeletion({
+            deletionType: stringConstants.deletionType.FILE,
+            data: profilePicPath,
+          }).save();
+        }
+        return res
+          .status(400)
+          .send(
+            createResObject(
+              true,
+              {},
+              stringConstants.FILE_CORRUPTED,
+              errorObjects.FILE_CORRUPTED
+            )
+          );
+      }
+
+      // Save the profile to user document and return user document
+      // Before that check if profile picture already exists and replace if it does
+      if (user.profilePicture) {
+        const absolutePath = path.join(
+          __dirname,
+          `../public`,
+          `${user.profilePicture}`
+        );
+        try {
+          await fsPromises.unlink(absolutePath);
+        } catch (err) {
+          SimpleLogger.error(err);
+          await new PendingDeletion({
+            deletionType: stringConstants.deletionType.FILE,
+            data: absolutePath,
+          }).save();
+        }
+      }
+
+      user.profilePicture = path.join(
+        `${userId}/profile_pictures/`,
+        `${req.file.filename}`
+      );
+      user = await user.save();
+      user = user.getUserBasicInfo();
+      return res.send(
+        createResObject(true, { user }, stringConstants.UPDATE_SUCCESSFUL)
+      );
+    });
+  }
+);
 
 router.post(
   "/add-update-username",
@@ -326,20 +337,24 @@ router.get("/notification-settings", auth, async (req, res) => {
 /**
  * Route to toggle notification settings
  */
-router.post("/toggle-notification-settings", [appAuth, auth], async (req, res) => {
-  let user = await User.findById(req.user._id);
+router.post(
+  "/toggle-notification-settings",
+  [appAuth, auth],
+  async (req, res) => {
+    let user = await User.findById(req.user._id);
 
-  user.settings.notifications = !user.settings.notifications;
-  user = await user.save();
+    user.settings.notifications = !user.settings.notifications;
+    user = await user.save();
 
-  return res.send(
-    createResObject(
-      true,
-      { notifications: user.settings.notifications },
-      stringConstants.UPDATE_SUCCESSFUL
-    )
-  );
-});
+    return res.send(
+      createResObject(
+        true,
+        { notifications: user.settings.notifications },
+        stringConstants.UPDATE_SUCCESSFUL
+      )
+    );
+  }
+);
 
 /**
  * GET route to fetch user details including settins
