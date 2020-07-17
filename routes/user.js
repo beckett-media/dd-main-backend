@@ -113,7 +113,6 @@ router.post(
     );
   }
 );
-
 /**
  * Post or update the already existing profile picture
  */
