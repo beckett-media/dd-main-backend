@@ -197,4 +197,47 @@ describe("Unit: errorObject.test.js: Error object fucntion tests", function () {
       errorMessage: stringConstants.NOT_AUTHORIZED_TO_PERFORM_THE_ACTION,
     });
   });
+
+  it("Should return error object with error code 121", function () {
+    const result = errorObjects.NO_PEDNING_CARDS_FOUND_FOR_USER;
+
+    expect(result).to.be.eql({
+      errorCode: 121,
+      errorSubCode: "NO_PEDNING_CARDS_FOUND_FOR_USER",
+      errorMessage: stringConstants.NO_PEDNING_CARDS_FOUND_FOR_USER,
+    });
+  });
+
+  it("Should return error object with error code 122", function () {
+    const result = errorObjects.PENDING_AMOUNT_AND_AMOUNT_DO_NOT_MATCH;
+
+    expect(result).to.be.eql({
+      errorCode: 122,
+      errorSubCode: "PENDING_AMOUNT_AND_AMOUNT_DO_NOT_MATCH",
+      errorMessage: stringConstants.PENDING_AMOUNT_AND_AMOUNT_DO_NOT_MATCH,
+    });
+  });
+
+  it("Should return error object with error code 123", function () {
+    const result = errorObjects.EBAY_ACCESS_TOKEN_REQUIRED;
+
+    expect(result).to.be.eql({
+      errorCode: 123,
+      errorSubCode: "EBAY_ACCESS_TOKEN_REQUIRED",
+      errorMessage: stringConstants.EBAY_ACCESS_TOKEN_REQUIRED,
+    });
+  });
+
+  it("Should return error object with error code 124", function () {
+    const result = errorObjects.USER_ALREADY_SIGNED_UP_WITH_DIFFERENT_METHOD(
+      "test"
+    );
+
+    expect(result).to.be.eql({
+      errorCode: 124,
+      errorSubCode: "USER_ALREADY_SIGNED_UP_WITH_DIFFERENT_METHOD",
+      errorMessage:
+        stringConstants.USER_ALREADY_SIGNED_UP_WITH_DIFFERENT_METHOD + ": test",
+    });
+  });
 });
