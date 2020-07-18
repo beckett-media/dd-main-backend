@@ -4,6 +4,7 @@ const config = require("config");
 const moment = require("moment");
 const path = require("path");
 const SimpleLogger = require("../utils/simpleLogger");
+const fs = require("fs");
 const rimraf = require("rimraf");
 const { stringConstants } = require("../utils/constants");
 const stripe = require("stripe")(config.get(stringConstants.STRIPE_TEST_KEY));
@@ -96,7 +97,53 @@ const userSchema = new mongoose.Schema(
 );
 
 /**
- * Pre hookd to delete dependent data
+ * Pre hook to create all folders for user and stripe ID
+ * 1. User folder
+ * 2. Profile Picture folder
+ * 3. Card folder
+ * 4. Stripe ID
+ */
+userSchema.pre("save", async function (next) {
+  const userDir = path.join(__dirname, "../public", this._id.toString());
+  const profilePictureDir = path.join(userDir, "profile_pictures");
+  const cardDir = path.join(userDir, "cards");
+  const directories = [userDir, profilePictureDir, cardDir];
+  try {
+    for (const dir of directories) {
+      const exists = fs.existsSync(dir);
+      if (!exists) fs.mkdirSync(dir);
+    }
+
+    // Stripe
+    if (!this.stripeId) {
+      const customer = await stripe.customers.create({
+        email: this.email,
+        metadata: {
+          userId: this._id.toString(),
+        },
+      });
+
+      this.stripeId = customer.id;
+    }
+  } catch (error) {
+    SimpleLogger.error(error);
+    // Roll back and delete folders created
+    try {
+      for (const dir of directories) {
+        const exists = fs.existsSync(dir);
+        if (exists) fs.rmdirSync(dir);
+      }
+    } catch (err) {
+      SimpleLogger.error(err);
+      return next(error);
+    }
+
+    return next(error);
+  }
+  return next();
+});
+/**
+ * Pre hook to delete dependent data
  * Don't want execution to stop due to error in file
  * deletion thus not calling next with error
  */

@@ -56,29 +56,6 @@ router.post(
     user.metadata.osType = osType;
     user.metadata.signupType = stringConstants.signupType.IN_APP;
 
-    try {
-      const customer = await stripe.customers.create({
-        email: email,
-        metadata: {
-          userId: user._id.toString(),
-        },
-      });
-
-      user.stripeId = customer.id;
-    } catch (err) {
-      SimpleLogger.error(err);
-      return res
-        .status(400)
-        .send(
-          createResObject(
-            false,
-            {},
-            stringConstants.UNSUSPECTED_ERROR,
-            errorObjects.UNSUSPECTED_ERROR(err.message)
-          )
-        );
-    }
-
     const salt = await bcrypt.genSalt(10);
     user.password = await bcrypt.hash(user.password, salt);
 
@@ -86,11 +63,6 @@ router.post(
     const refreshToken = user.generateRefreshToken();
 
     user.refreshToken = refreshToken.token;
-
-    // Create folder for user, user cards
-    const userDir = path.join(__dirname, "../public", user._id.toString());
-    const exists = fs.existsSync(user);
-    if (!exists) await fsPromises.mkdir(userDir);
 
     user = await user.save();
 

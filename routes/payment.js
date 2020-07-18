@@ -12,7 +12,7 @@ const stripe = require("stripe")(config.get(stringConstants.STRIPE_TEST_KEY));
 const SimpleLogger = require("../utils/simpleLogger");
 
 router.get("/save-card-client-secret", [appAuth, auth], async (req, res) => {
-  const user = await User.findById(req.user._id);
+  let user = await User.findById(req.user._id);
   if (!user)
     return res
       .status(404)
@@ -24,6 +24,32 @@ router.get("/save-card-client-secret", [appAuth, auth], async (req, res) => {
           errorObjects.USER_ID_DOEST_NOT_EXISTS
         )
       );
+
+  // Check if stripe ID, if not then create one
+  if (!user.stripeId) {
+    let customer;
+    try {
+      customer = await stripe.customers.create({
+        email: user.email,
+        metadata: {
+          userId: user._id.toString(),
+        },
+      });
+    } catch (err) {
+      SimpleLogger.error(err);
+      return res
+        .status(400)
+        .send(
+          createResObject(
+            false,
+            {},
+            stringConstants.UNSUSPECTED_ERROR,
+            errorObjects.UNSUSPECTED_ERROR(err.message)
+          )
+        );
+    }
+    user = await User.findByIdAndUpdate(user, { stripeId: customer.id });
+  }
 
   try {
     const setupIntent = await stripe.setupIntents.create({
@@ -54,7 +80,7 @@ router.get("/save-card-client-secret", [appAuth, auth], async (req, res) => {
 });
 
 router.get("/saved-cards", [appAuth, auth], async (req, res) => {
-  const user = await User.findById(req.user._id);
+  let user = await User.findById(req.user._id);
   if (!user)
     return res
       .status(404)
@@ -66,6 +92,32 @@ router.get("/saved-cards", [appAuth, auth], async (req, res) => {
           errorObjects.USER_ID_DOEST_NOT_EXISTS
         )
       );
+
+  // Check if stripe ID, if not then create one
+  if (!user.stripeId) {
+    let customer;
+    try {
+      customer = await stripe.customers.create({
+        email: user.email,
+        metadata: {
+          userId: user._id.toString(),
+        },
+      });
+    } catch (err) {
+      SimpleLogger.error(err);
+      return res
+        .status(400)
+        .send(
+          createResObject(
+            false,
+            {},
+            stringConstants.UNSUSPECTED_ERROR,
+            errorObjects.UNSUSPECTED_ERROR(err.message)
+          )
+        );
+    }
+    user = await User.findByIdAndUpdate(user, { stripeId: customer.id });
+  }
 
   try {
     const cards = await getCards(user.stripeId);
