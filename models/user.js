@@ -2,12 +2,12 @@ const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 const config = require("config");
 const moment = require("moment");
-const fsPromises = require("fs").promises;
 const path = require("path");
 const SimpleLogger = require("../utils/simpleLogger");
 const rimraf = require("rimraf");
-const { Card } = require("./card");
 const { stringConstants } = require("../utils/constants");
+const stripe = require("stripe")(config.get(stringConstants.STRIPE_TEST_KEY));
+const { Card } = require("./card");
 
 const userSchema = new mongoose.Schema(
   {
@@ -118,6 +118,18 @@ userSchema.pre("remove", async function (next) {
       data: absolutePath,
     }).save();
   }
+
+  if (this.stripeId) {
+    try {
+      const confirmation = await deleteStripeCustomer(this.stripeId);
+      SimpleLogger.info(
+        `Stripe deleted customer: ${confirmation.id} deleted: ${confirmation.deleted}`
+      );
+    } catch (error) {
+      SimpleLogger.error(error);
+    }
+  }
+
   next();
 });
 
@@ -211,3 +223,16 @@ const User = mongoose.model(
 );
 
 module.exports.User = User;
+
+/**
+ * Async and await conversion of function to
+ * delete stripe customer
+ */
+function deleteStripeCustomer(stripeId) {
+  return new Promise((resolve, reject) => {
+    stripe.customers.del(stripeId, function (err, confirmation) {
+      if (err) return reject(err);
+      return resolve(confirmation);
+    });
+  });
+}
