@@ -137,12 +137,12 @@ userSchema.methods.generateAuthToken = function () {
   const token = jwt.sign(
     { _id: this._id, role: this.role },
     config.get(stringConstants.JWT_PRIATE_KEY),
-    { expiresIn: "30m" }
+    { expiresIn: "10m" }
   );
 
   return {
     token,
-    expiry: moment.utc(moment(Date.now()).add(30, "minutes")).format(),
+    expiry: moment.utc(moment(Date.now()).add(10, "minutes")).format(),
   };
 };
 
