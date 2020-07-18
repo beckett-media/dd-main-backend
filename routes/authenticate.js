@@ -339,7 +339,7 @@ router.post(
     }
     // Else proceed with registering or signig user in
     if (!user) {
-      firstTimeSignin = true;
+      firstSignin = true;
       user = new User({
         fullName: reqFullName,
         email: reqEmail,
@@ -363,7 +363,7 @@ router.post(
       ...user.getUserBasicInfo(),
       authTokenExpiry: authToken.expiry,
       refreshTokenExpiry: refreshToken.expiry,
-      firstTimeSignin,
+      firstSignin,
     };
 
     return res.send(
