@@ -5,6 +5,7 @@ const _ = require("lodash");
 const Joi = require("@hapi/joi");
 const got = require("got");
 const config = require("config");
+const fs = require("fs");
 const SimpleLogger = require("../utils/simpleLogger");
 const appAuth = require("../middlewares/appAuth");
 const auth = require("../middlewares/authenticateRequest");
@@ -18,6 +19,7 @@ const {
   valSignInWithEbay,
   valSignOutReq,
 } = require("../middlewares/validation");
+const stripe = require("stripe")(config.get(stringConstants.STRIPE_TEST_KEY));
 
 router.post("/sign-in-user", [appAuth, valSignInRequest], async (req, res) => {
   const email = req.body.email.toLowerCase();

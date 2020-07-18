@@ -54,7 +54,11 @@ describe("INTEG: user.test.js INTEG: POST /user", function () {
         "fullName",
         "email",
         "authTokenExpiry",
-        "refreshTokenExpiry"
+        "refreshTokenExpiry",
+        "firstSignin",
+        "profilePicture",
+        "signupType",
+        "username"
       );
       expect(res.headers).to.have.property("x-auth-token");
       expect(res.headers).to.have.property("x-refresh-token");
@@ -339,6 +343,7 @@ describe("INTEG: user.test.js INTEG: POST /user", function () {
         email: "test@test.com",
         profilePicture: "test",
         username: "test.test",
+        signupType: stringConstants.signupType.IN_APP,
         role: "user",
         settings: {
           notifications: true,
