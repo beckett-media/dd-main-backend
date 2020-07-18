@@ -301,4 +301,24 @@ module.exports = {
     }
     return next();
   },
+  valSignOutReq: (req, res, next) => {
+    const schema = Joi.object({
+      deviceToken: Joi.string().required(),
+    });
+
+    const { error } = schema.validate(req.body);
+    if (error) {
+      return res
+        .status(400)
+        .send(
+          createResObject(
+            false,
+            { errorMessage: error.details[0].message },
+            stringConstants.REQUEST_VALIDATION_FAILED,
+            errorObjects.REQUEST_VALIDATION_ERROR(error.details[0].message)
+          )
+        );
+    }
+    return next();
+  },
 };

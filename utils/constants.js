@@ -123,6 +123,8 @@ module.exports.stringConstants = {
 
   USER_ALREADY_SIGNED_UP_WITH_DIFFERENT_METHOD:
     "User has already signed up with a different method",
+
+  SIGNED_OUT_SUCCESSFULLY: "Signed out successfully",
   collectionNames: {
     USER_COLLECTION: "User",
     PENDING_DELETION: "Pending_Deletion",

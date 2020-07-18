@@ -7,6 +7,7 @@ const got = require("got");
 const config = require("config");
 const SimpleLogger = require("../utils/simpleLogger");
 const appAuth = require("../middlewares/appAuth");
+const auth = require("../middlewares/authenticateRequest");
 const authAppleTokenMiddleware = require("../middlewares/authenticateAppleToken");
 const { User } = require("../models/user");
 const { stringConstants } = require("../utils/constants");
@@ -15,6 +16,7 @@ const { createResObject } = require("../utils/utilFunctions");
 const {
   valSignInRequest,
   valSignInWithEbay,
+  valSignOutReq,
 } = require("../middlewares/validation");
 
 router.post("/sign-in-user", [appAuth, valSignInRequest], async (req, res) => {
@@ -373,4 +375,21 @@ router.post(
     );
   }
 );
+
+router.post("/sign-out", [appAuth, auth, valSignOutReq], async (req, res) => {
+  const deviceToken = req.body.deviceToken;
+  const userId = req.user._id;
+
+  let user = await User.findById(userId);
+  // User exists or not will be checked in auth middleware
+  user.removeToken(deviceToken);
+
+  user = await user.save();
+
+  user = user.getUserBasicInfo();
+
+  return res.send(
+    createResObject(true, { user }, stringConstants.SIGNED_OUT_SUCCESSFULLY)
+  );
+});
 module.exports = router;

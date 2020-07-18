@@ -69,6 +69,15 @@ cardSchema.methods.checkIfCompleted = function () {
  * Method to return card details
  */
 cardSchema.methods.getCardDetails = function () {
+  const id = this._id || null;
+  const front = this.front || null;
+  const back = this.back || null;
+  const video = this.back || null;
+  const year = this.year || null;
+  const brand = this.brand || null;
+  const cardNumber = this.cardNumber || null;
+  const playerNames = this.playerNames || null;
+
   return {
     id: this._id,
     front: this.front,

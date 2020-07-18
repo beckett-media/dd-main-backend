@@ -147,26 +147,41 @@ userSchema.methods.generateRefreshToken = function () {
 };
 // "_id", "fullName", "email", "profilePicture", "username"
 userSchema.methods.getUserBasicInfo = function () {
+  const id = this._id || null;
+  const fullName = this.fullName || null;
+  const email = this.email || null;
+  const profilePicture = this.profilePicture || null;
+  const username = this.username || null;
+  const signupType = this.metadata.signupType || null;
   return {
-    id: this._id,
-    fullName: this.fullName,
-    email: this.email,
-    profilePicture: this.profilePicture,
-    username: this.username,
-    signupType: this.metadata.signupType,
+    id: id,
+    fullName: fullName,
+    email: email,
+    profilePicture: profilePicture,
+    username: username,
+    signupType: signupType,
   };
 };
 
 userSchema.methods.getUserDetails = function () {
+  const id = this._id || null;
+  const fullName = this.fullName || null;
+  const email = this.email || null;
+  const profilePicture = this.profilePicture || null;
+  const username = this.username || null;
+  const role = this.role || null;
+  const settings = this.settings || null;
+  const signupType = this.metadata.signupType || null;
+
   return {
-    id: this._id,
-    fullName: this.fullName,
-    email: this.email,
-    profilePicture: this.profilePicture,
-    username: this.username,
-    role: this.role,
-    settings: this.settings,
-    signupType: this.metadata.signupType,
+    id: id,
+    fullName: fullName,
+    email: email,
+    profilePicture: profilePicture,
+    username: username,
+    role: role,
+    settings: settings,
+    signupType: signupType,
   };
 };
 
@@ -181,6 +196,13 @@ userSchema.methods.addDeviceToken = function (deviceToken) {
     this.deviceTokens.push(deviceToken);
   }
   return this.deviceTokens;
+};
+
+userSchema.methods.removeToken = function (deviceToken) {
+  const index = this.deviceTokens.indexOf(deviceToken);
+  if (index > -1) {
+    this.deviceTokens.splice(index, 1);
+  }
 };
 
 const User = mongoose.model(

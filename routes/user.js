@@ -402,4 +402,5 @@ router.delete("/delete-user", async (req, res) => {
     createResObject(true, {}, `${userArray.length} user deleted`)
   );
 });
+
 module.exports = router;
