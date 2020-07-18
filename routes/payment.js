@@ -6,10 +6,7 @@ const { User } = require("../models/user");
 const { stringConstants } = require("../utils/constants");
 const { errorObjects } = require("../utils/errorObjects");
 const { createResObject } = require("../utils/utilFunctions");
-const {
-  valUpdateCreditCardRequest,
-  valDeleteCreditCardReq,
-} = require("../middlewares/validation");
+const { valUpdateCreditCardRequest } = require("../middlewares/validation");
 const config = require("config");
 const stripe = require("stripe")(config.get(stringConstants.STRIPE_TEST_KEY));
 const SimpleLogger = require("../utils/simpleLogger");
@@ -102,6 +99,7 @@ router.post(
     const cardId = req.body.cardId;
     const expMonth = req.body.expMonth;
     const expYear = req.body.expYear;
+    const fullName = req.body.fullName;
     if (!user)
       return res
         .status(404)
@@ -115,7 +113,8 @@ router.post(
         );
 
     try {
-      const card = await updateCard(cardId, expMonth, expYear);
+      const card = await updateCard(cardId, expMonth, expYear, fullName);
+      // const card = await updateCard("pm_1H6EpqBA2vsISVcRXliuiH5o", 12, 2021);
       return res.send(
         createResObject(true, { card }, stringConstants.FETCH_SUCESSFUL)
       );
@@ -135,31 +134,40 @@ router.post(
   }
 );
 
-router.delete(
-  "/delete-card",
-  [appAuth, auth, valDeleteCreditCardReq],
-  async (req, res) => {
-    const cardId = req.body.cardId;
-    try {
-      const card = await deleteCard(cardId);
-      return res.send(
-        createResObject(true, { card }, stringConstants.DELETED_SUCCESSFULLY)
-      );
-    } catch (error) {
-      SimpleLogger.error(error);
-      return res
-        .status(400)
-        .send(
-          createResObject(
-            false,
-            {},
-            stringConstants.UNSUSPECTED_ERROR,
-            errorObjects.UNSUSPECTED_ERROR(error.message)
+router.delete("/delete-card", [appAuth, auth], async (req, res) => {
+  const cardId = req.query.card;
+  if (!cardId)
+    return res
+      .status(400)
+      .send(
+        createResObject(
+          false,
+          {},
+          stringConstants.REQUEST_VALIDATION_FAILED,
+          errorObjects.REQUEST_VALIDATION_ERROR(
+            "No card found in query parameters"
           )
-        );
-    }
+        )
+      );
+  try {
+    const card = await deleteCard(cardId);
+    return res.send(
+      createResObject(true, { card }, stringConstants.DELETED_SUCCESSFULLY)
+    );
+  } catch (error) {
+    SimpleLogger.error(error);
+    return res
+      .status(400)
+      .send(
+        createResObject(
+          false,
+          {},
+          stringConstants.UNSUSPECTED_ERROR,
+          errorObjects.UNSUSPECTED_ERROR(error.message)
+        )
+      );
   }
-);
+});
 
 async function getCards(stripeId) {
   return new Promise((resolve, reject) => {
@@ -174,7 +182,7 @@ async function getCards(stripeId) {
   });
 }
 
-async function updateCard(paymentMethodId, expMonth, expYear) {
+async function updateCard(paymentMethodId, expMonth, expYear, fullName) {
   // Not sure if these methods can be used with async and await
   // So converting them to async and await form
   return new Promise((resolve, reject) => {
@@ -189,8 +197,13 @@ async function updateCard(paymentMethodId, expMonth, expYear) {
       stripe.paymentMethods.update(
         paymentMethodId,
         {
-          "card.exp_month": expMonth,
-          "card.exp_year": expYear,
+          billing_details: {
+            name: fullName,
+          },
+          card: {
+            exp_month: expMonth,
+            exp_year: expYear,
+          },
         },
         function (err, paymentMethod) {
           if (err) return reject(err);
