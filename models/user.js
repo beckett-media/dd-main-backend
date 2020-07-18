@@ -2,6 +2,11 @@ const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 const config = require("config");
 const moment = require("moment");
+const fsPromises = require("fs").promises;
+const path = require("path");
+const SimpleLogger = require("../utils/simpleLogger");
+const rimraf = require("rimraf");
+const { Card } = require("./card");
 const { stringConstants } = require("../utils/constants");
 
 const userSchema = new mongoose.Schema(
@@ -24,7 +29,6 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      required: true,
       minlength: 6,
       maxlength: 1024,
     },
@@ -42,9 +46,11 @@ const userSchema = new mongoose.Schema(
       enum: [stringConstants.role.ADMIN, stringConstants.role.USER],
       default: stringConstants.role.USER,
     },
-    deviceToken: {
-      type: String,
-    },
+    deviceTokens: [
+      {
+        type: String,
+      },
+    ],
     refreshToken: {
       type: String,
     },
@@ -54,7 +60,7 @@ const userSchema = new mongoose.Schema(
     appleId: {
       type: String,
     },
-    setupCompleted: {
+    isComplete: {
       type: Boolean,
       default: false,
     },
@@ -68,16 +74,52 @@ const userSchema = new mongoose.Schema(
       signupType: {
         type: String,
         enum: [
-          stringConstants.signUpType.EBAY,
-          stringConstants.signUpType.APPLE,
-          stringConstants.signUpType.MOBILE_APP,
+          stringConstants.signupType.EBAY,
+          stringConstants.signupType.APPLE,
+          stringConstants.signupType.IN_APP,
         ],
-        default: stringConstants.signUpType.MOBILE_APP,
+        default: stringConstants.signupType.IN_APP,
+      },
+      osType: {
+        type: String,
+        enum: [
+          stringConstants.osType.ANDROID,
+          stringConstants.osType.iOS,
+          stringConstants.osType.MAC_OS,
+          stringConstants.osType.WINDOWS,
+          stringConstants.osType.LINUX,
+        ],
       },
     },
   },
   { timestamps: true }
 );
+
+/**
+ * Pre hookd to delete dependent data
+ * Don't want execution to stop due to error in file
+ * deletion thus not calling next with error
+ */
+userSchema.pre("remove", async function (next) {
+  // Remove all user cards
+  const cards = await Card.find({ user: this._id });
+  for (const card of cards) {
+    await card.remove();
+  }
+
+  // Remove user public folder
+  const absolutePath = path.join(__dirname, `../public/${this._id}`);
+  try {
+    rimraf.sync(absolutePath);
+  } catch (error) {
+    SimpleLogger.error(error);
+    await new PendingDeletion({
+      deletionType: stringConstants.deletionType.DIR,
+      data: absolutePath,
+    }).save();
+  }
+  next();
+});
 
 userSchema.methods.generateAuthToken = function () {
   const token = jwt.sign(
@@ -103,17 +145,64 @@ userSchema.methods.generateRefreshToken = function () {
     expiry: moment.utc(moment(Date.now()).add(30, "days")).format(),
   };
 };
+// "_id", "fullName", "email", "profilePicture", "username"
+userSchema.methods.getUserBasicInfo = function () {
+  const id = this._id || null;
+  const fullName = this.fullName || null;
+  const email = this.email || null;
+  const profilePicture = this.profilePicture || null;
+  const username = this.username || null;
+  const signupType = this.metadata.signupType || null;
+  return {
+    id: id,
+    fullName: fullName,
+    email: email,
+    profilePicture: profilePicture,
+    username: username,
+    signupType: signupType,
+  };
+};
 
 userSchema.methods.getUserDetails = function () {
+  const id = this._id || null;
+  const fullName = this.fullName || null;
+  const email = this.email || null;
+  const profilePicture = this.profilePicture || null;
+  const username = this.username || null;
+  const role = this.role || null;
+  const settings = this.settings || null;
+  const signupType = this.metadata.signupType || null;
+
   return {
-    id: this._id,
-    fullName: this.fullName,
-    email: this.email,
-    profilePicture: this.profilePicture,
-    username: this.username,
-    role: this.role,
-    settings: this.settings,
+    id: id,
+    fullName: fullName,
+    email: email,
+    profilePicture: profilePicture,
+    username: username,
+    role: role,
+    settings: settings,
+    signupType: signupType,
   };
+};
+
+userSchema.methods.isBasicInfoCompleted = function () {
+  return (
+    !!this.fullName && !!this.email && !!this.profilePicture && !!this.username
+  );
+};
+
+userSchema.methods.addDeviceToken = function (deviceToken) {
+  if (this.deviceTokens.indexOf(deviceToken) === -1) {
+    this.deviceTokens.push(deviceToken);
+  }
+  return this.deviceTokens;
+};
+
+userSchema.methods.removeToken = function (deviceToken) {
+  const index = this.deviceTokens.indexOf(deviceToken);
+  if (index > -1) {
+    this.deviceTokens.splice(index, 1);
+  }
 };
 
 const User = mongoose.model(

@@ -1,7 +1,9 @@
 const user = require("../routes/user");
 const authenticate = require("../routes/authenticate");
-const payment = require("../routes/payments");
+const payment = require("../routes/payment");
 const authToken = require("../routes/authToken");
+const sportsCard = require("../routes/sportsCard");
+const ebay = require("../routes/ebay");
 
 module.exports = (app) => {
   // Import route and use app.use();
@@ -9,4 +11,6 @@ module.exports = (app) => {
   app.use("/authenticate", authenticate);
   app.use("/payment", payment);
   app.use("/auth-token", authToken);
+  app.use("/sports-card", sportsCard);
+  app.use("/ebay", ebay);
 };

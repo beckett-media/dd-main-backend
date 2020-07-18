@@ -1,0 +1,4 @@
+{
+    "card_cleanup_cron_string": "0 2 * * *",
+    "pending_deletion_cron_string": "0 2 * * *" 
+}

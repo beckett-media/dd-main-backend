@@ -19,6 +19,17 @@ module.exports.stringConstants = {
 
   GOOGLE_APPLICATION_CREDENTIALS: "googleApplicationCredentials",
 
+  EBAY_CLIENT_ID: "eBayClientId",
+
+  EBAY_CLIENT_SECRET: "eBayClientSecret",
+
+  EBAY_ACCESS_TOKEN: "ebay-access-token",
+
+  EBAY_REFRESH_TOKEN: "ebay-refresh-token",
+
+  EBAY_ACCESS_TOKEN_REQUIRED:
+    "eBay refresh token is required in the header under ebay-access-token",
+
   INTERNAL_SERVER_ERROR: "Internal server error",
 
   INVALID_OR_TOKEN_EXPIRED: "Auth token invalid or expired",
@@ -86,16 +97,49 @@ module.exports.stringConstants = {
   APPLE_ID_DOES_NOT_MATCH_EMAIL:
     "User Identifier does not match the given email",
 
+  NOT_A_VALID_FILE_TYPE: "Not a valid file type",
+
+  NOT_AUTHORIZED_TO_PERFORM_THE_ACTION: "Not authorized to perform the action",
+
+  DELETED_SUCCESSFULLY: "Resource deleted successfully",
+
+  USER_ID_NOT_FOUND_IN_REQUEST: "User ID not found in req.user",
+
+  PENDING_DELETION_TYPE_NOT_HANDLED:
+    "Deletion type not handling by pending deletion",
+
+  NO_PEDNING_CARDS_FOUND_FOR_USER: "No pending cards found for the user",
+
+  NO_STRIPE_ID_FOUND_FOR_USER: "No stripe ID found for user: ",
+
+  PENDING_AMOUNT_AND_AMOUNT_DO_NOT_MATCH:
+    "Pending amount for cards do not match amount sent by clients",
+
+  PAYMENT_SUCCEEDED: "Payment succeeded",
+
+  PAYMENT_ERRORED: "Payment errored",
+
+  EBAY_CODE_REQUIRED: "eBay code is required",
+
+  USER_ALREADY_SIGNED_UP_WITH_DIFFERENT_METHOD:
+    "User has already signed up with a different method",
+
+  SIGNED_OUT_SUCCESSFULLY: "Signed out successfully",
   collectionNames: {
     USER_COLLECTION: "User",
-    PENDING_DELETION: "PendingDeletion",
+    PENDING_DELETION: "Pending_Deletion",
     CARD_COLLECTION: "Card",
+    TRANSACTION_COLLECTION: "Transaction",
+    TRANSACTION_LOG_COLLECTION: "Transaction_log",
+    SCHEDULE_COLLECTION: "Schedule",
+    JOB: "jobs", // For Agenda package
   },
 
   deletionType: {
     USER: "User",
     FILE: "File",
     CARD: "Card",
+    DIR: "Directory",
   },
 
   role: {
@@ -104,14 +148,72 @@ module.exports.stringConstants = {
   },
 
   cardState: {
-    PENDING: "pending",
+    PENDING: "pending", // Pending payment
     SUBMITTED: "submitted",
-    GRADED: "graded",
+    PAID: "paid", // Payment made
+    GRADED: "graded", // Has been greaded
   },
 
-  signUpType: {
+  signupType: {
     EBAY: "ebay",
     APPLE: "apple",
-    MOBILE_APP: "mobile app",
+    IN_APP: "in_app",
+  },
+  // OS information
+  osType: {
+    iOS: "ios",
+    ANDROID: "android",
+    MAC_OS: "mac_os",
+    WINDOWS: "windows",
+    LINUX: "linux",
+  },
+  // Image type
+  iType: {
+    PNG: ".png",
+    JPG: ".jpg",
+    GIF: ".gif",
+    JPEG: ".jpeg",
+  },
+  // Video type
+  vType: {
+    THREEGP: ".3gp",
+    MPFOUR: ".mp4",
+    TS: ".ts",
+    WEBM: ".webm",
+    MKV: ".mkv",
+  },
+
+  currency: {
+    USD: "usd",
+    CAD: "cad",
+    INR: "inr",
+  },
+
+  jobType: {
+    INCOMPLETE_CARD_CLEANUP: "Incomplete card cleanup job",
+    PENDING_DELETION: "Pending deletion job",
+  },
+  cronString: {
+    INCOMPLETE_CARD_CLEANUP: "* * * * *",
+    PENDING_DELETION: "* * * * *",
+    DAILY_JOB: "* * * * *",
+  },
+
+  transactionStatus: {
+    CREATED: "created",
+    CANCELLED: "cancelled",
+    SUCCEEDED: "succeeded",
+    ERROR: "error",
+    REFUNDED: "refunded",
+  },
+
+  URLS: {
+    ebayoAuthUrl: "https://api.sandbox.ebay.com/identity/v1/oauth2/token",
+    ebayGetUserUrl: "https://apiz.sandbox.ebay.com/commerce/identity/v1/user/",
+  },
+
+  ebayAccType: {
+    BUSINESS_ACCOUNT: "businessAccount",
+    INDIVIDUAL_ACCOUNT: "individualAccount",
   },
 };

@@ -3,6 +3,7 @@ const Schema = mongoose.Schema;
 const path = require("path");
 const fsPromises = require("fs").promises;
 const SimpleLogger = require("../utils/simpleLogger");
+const rimraf = require("rimraf");
 const { PendingDeletion } = require("./pendingDeletion");
 const { stringConstants } = require("../utils/constants");
 
@@ -17,24 +18,28 @@ const cardSchema = new mongoose.Schema(
     video: {
       type: String,
     },
-    athleteName: {
+    year: {
+      type: Number,
+      min: 1000,
+      max: 9999,
+    },
+    brand: {
       type: String,
     },
-    cardName: {
-      type: String,
-    },
-    cardYear: {
+    cardNumber: {
       type: Number,
     },
+    playerNames: [{ type: String }],
     user: {
       type: Schema.Types.ObjectId,
       ref: stringConstants.collectionNames.USER_COLLECTION,
+      required: true,
     },
     status: {
       type: String,
       enum: [
         stringConstants.cardState.PENDING,
-        stringConstants.cardState.SUBMITTED,
+        stringConstants.cardState.PAID,
         stringConstants.cardState.GRADED,
       ],
       default: stringConstants.cardState.PENDING,
@@ -46,45 +51,63 @@ const cardSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+/**
+ * Static method to check if card complete
+ */
+cardSchema.methods.checkIfCompleted = function () {
+  return (
+    !!this.front &&
+    !!this.back &&
+    !!this.video &&
+    !!this.year &&
+    !!this.brand &&
+    !!this.cardNumber &&
+    !!this.playerNames.length > 0
+  );
+};
+/**
+ * Method to return card details
+ */
+cardSchema.methods.getCardDetails = function () {
+  const id = this._id || null;
+  const front = this.front || null;
+  const back = this.back || null;
+  const video = this.back || null;
+  const year = this.year || null;
+  const brand = this.brand || null;
+  const cardNumber = this.cardNumber || null;
+  const playerNames = this.playerNames || null;
 
+  return {
+    id: this._id,
+    front: this.front,
+    back: this.back,
+    video: this.video,
+    year: this.year,
+    brand: this.brand,
+    cardNumber: this.cardNumber,
+    playerNames: this.playerNames,
+  };
+};
 /**
  * Pre hook to clean card data
  */
-cardSchema.pre("remove", function () {
-  if (this.front) {
-    try {
-      await fsPromises.unlink(path.join(__dirname, "../public", this.front));
-    } catch (error) {
-      SimpleLogger.error(error);
-      await new PendingDeletion({
-        deletionType: stringConstants.deletionType.FILE,
-        data: path.join(__dirname, "../public", this.front),
-      }).save();
-    }
-  }
-
-  if(this.back){
-    try {
-      await fsPromises.unlink(path.join(__dirname, "../public", this.back));
-    } catch (error) {
-      SimpleLogger.error(error);
-      await new PendingDeletion({
-        deletionType: stringConstants.deletionType.FILE,
-        data: path.join(__dirname, "../public", this.back)
-      }).save();
-    }
-  }
-
-  if(this.video){
-    try{
-      await fsPromises.unlink(path.join(__dirname, "../public", this.video));
-    }catch(error){
-      SimpleLogger.error(error);
-      await new PendingDeletion({
-        deletionType: stringConstants.deletionType.FILE,
-        data: path.join(__dirname, "../public", this.video)
-      }).save();
-    }
+cardSchema.pre("remove", async function () {
+  const cardDir = path.join(
+    __dirname,
+    "../public",
+    `${this.user}`,
+    "cards",
+    `${this._id}/`
+  );
+  try {
+    rimraf.sync(cardDir);
+  } catch (error) {
+    SimpleLogger.error(error);
+    await new PendingDeletion({
+      deletionType: stringConstants.deletionType.DIR,
+      data: cardDir,
+    }).save();
   }
 });
 

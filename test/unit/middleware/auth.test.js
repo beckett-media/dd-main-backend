@@ -7,7 +7,7 @@ const expect = chai.expect;
 const sinon = require("sinon");
 
 let body, token;
-describe("Auth middleware", function () {
+describe("Unit: auth.test.js: Auth middleware", function () {
   /**
    * Testing the authentication middleware
    */

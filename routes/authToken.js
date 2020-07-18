@@ -2,13 +2,14 @@ const express = require("express");
 const router = express.Router();
 const jwt = require("jsonwebtoken");
 const config = require("config");
+const appAuth = require("../middlewares/appAuth");
 const { stringConstants } = require("../utils/constants");
 const { createResObject } = require("../utils/utilFunctions");
 const { errorObjects } = require("../utils/errorObjects");
 const { User } = require("../models/user");
 const SimpleLogger = require("../utils/simpleLogger");
 
-router.get("/renew-auth-token", async (req, res) => {
+router.get("/renew-auth-token", appAuth, async (req, res) => {
   let user, token, refreshToken, refreshDecoded;
 
   token = req.header(stringConstants.AUTH_TOKEN_STRING);
@@ -140,7 +141,7 @@ router.get("/renew-auth-token", async (req, res) => {
   );
 });
 
-router.get("/check-auth-token", (req, res) => {
+router.get("/check-auth-token", appAuth, (req, res) => {
   const token = req.header(stringConstants.AUTH_TOKEN_STRING);
   if (!token) {
     return res

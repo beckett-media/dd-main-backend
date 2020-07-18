@@ -1,14 +1,17 @@
 const { User } = require("../../../models/user");
+const { stringConstants } = require("../../../utils/constants");
 const request = require("supertest");
 const chai = require("chai");
 const expect = chai.expect;
 const config = require("config");
+const rimraf = require("rimraf");
+const path = require("path");
 let server;
 
 /**
  * Test the authentication route
  */
-describe("INTEG: EndPoint: /authenticate/sign-in-user", function () {
+describe("INTEG: authenticate.test.js: EndPoint: /authenticate/sign-in-user", function () {
   // Start the server before test
   beforeEach(function () {
     server = require("../../../index");
@@ -16,7 +19,10 @@ describe("INTEG: EndPoint: /authenticate/sign-in-user", function () {
   // Close the server after test
   afterEach(async function () {
     await server.close();
-    await User.remove({});
+    const users = await User.find({});
+    for (const user of users) {
+      await user.remove();
+    }
   });
 
   /**
@@ -26,7 +32,7 @@ describe("INTEG: EndPoint: /authenticate/sign-in-user", function () {
     /**
      * Code that is repeat in every test
      */
-    let fullName, email, password;
+    let fullName, email, password, osType, deviceToken;
 
     const registerUser = async function () {
       return request(server)
@@ -35,6 +41,8 @@ describe("INTEG: EndPoint: /authenticate/sign-in-user", function () {
           fullName,
           email,
           password,
+          osType,
+          deviceToken,
         })
         .set("Accept", "application/json")
         .set("x-app-token", config.get("appToken"));
@@ -46,6 +54,8 @@ describe("INTEG: EndPoint: /authenticate/sign-in-user", function () {
         .send({
           email,
           password,
+          osType,
+          deviceToken,
         })
         .set("Accept", "application/json")
         .set("x-app-token", config.get("appToken"));
@@ -55,7 +65,10 @@ describe("INTEG: EndPoint: /authenticate/sign-in-user", function () {
       fullName = "Test User";
       email = "test1@test.com";
       password = "test_password";
+      osType = stringConstants.osType.ANDROID;
+      deviceToken = "test";
     });
+
     /**
      * Register the user and then sign in with the
      * credentials. It should successfully sign the

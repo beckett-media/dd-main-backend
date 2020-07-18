@@ -1,11 +1,13 @@
 const { User } = require("../../../models/user");
+const { stringConstants } = require("../../../utils/constants");
 const request = require("supertest");
 const chai = require("chai");
 const expect = chai.expect;
 const config = require("config");
+
 let server;
 
-describe("INTEG: EndPoint /payment", function () {
+describe("INTEG: payment.test.js: EndPoint /payment", function () {
   // Start the server before test
   beforeEach(function () {
     server = require("../../../index");
@@ -13,7 +15,10 @@ describe("INTEG: EndPoint /payment", function () {
   // Close the server after test
   afterEach(async function () {
     await server.close();
-    await User.remove({});
+    const users = await User.find({});
+    for (const user of users) {
+      await user.remove();
+    }
   });
 
   /**
@@ -31,6 +36,8 @@ describe("INTEG: EndPoint /payment", function () {
           fullName: "Test User",
           email: "test1@test.com",
           password: "test_password",
+          osType: stringConstants.osType.MAC_OS,
+          deviceToken: "Test",
         })
         .set("Accept", "application/json")
         .set("x-app-token", config.get("appToken"));
@@ -40,6 +47,8 @@ describe("INTEG: EndPoint /payment", function () {
         .send({
           email: "test1@test.com",
           password: "test_password",
+          osType: stringConstants.osType.MAC_OS,
+          deviceToken: "test",
         })
         .set("Accept", "application/json")
         .set("x-app-token", config.get("appToken"));
@@ -59,7 +68,13 @@ describe("INTEG: EndPoint /payment", function () {
   /**
    * Test block to test getting of saved cards
    */
-  describe("INTEG: EndPoint: GET /saved-cards", function () {
+  describe("INTEG: payment.test.js: EndPoint: GET /saved-cards", function () {
+    afterEach(async function () {
+      const users = await User.find({});
+      for (const user of users) {
+        await user.remove();
+      }
+    });
     /**
      * Return a list of saved cards from stripe
      */
@@ -71,6 +86,8 @@ describe("INTEG: EndPoint /payment", function () {
           fullName: "Test User",
           email: "test1@test.com",
           password: "test_password",
+          osType: stringConstants.osType.MAC_OS,
+          deviceToken: "Test",
         })
         .set("Accept", "application/json")
         .set("x-app-token", config.get("appToken"));
@@ -80,6 +97,8 @@ describe("INTEG: EndPoint /payment", function () {
         .send({
           email: "test1@test.com",
           password: "test_password",
+          osType: stringConstants.osType.MAC_OS,
+          deviceToken: "Test",
         })
         .set("Accept", "application/json")
         .set("x-app-token", config.get("appToken"));

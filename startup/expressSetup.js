@@ -1,6 +1,5 @@
 const express = require("express");
 const helmet = require("helmet");
-const path = require("path");
 const compression = require("compression");
 const useragent = require("express-useragent");
 const appToken = require("../middlewares/appAuth");
@@ -18,5 +17,4 @@ module.exports = (app) => {
    * Not used in production as it pollutes the logs
    */
   app.use(simpleLoggerMid);
-  app.use(appToken);
 };

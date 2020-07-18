@@ -142,6 +142,53 @@ module.exports.errorObjects = {
     errorMessage: stringConstants.APPLE_ID_DOES_NOT_MATCH_EMAIL,
   },
 
+  NOT_AUTHORIZED_TO_PERFORM_THE_ACTION: {
+    errorCode: 120,
+    errorSubCode: getKey(
+      stringConstants,
+      stringConstants.NOT_AUTHORIZED_TO_PERFORM_THE_ACTION
+    ),
+    errorMessage: stringConstants.NOT_AUTHORIZED_TO_PERFORM_THE_ACTION,
+  },
+
+  NO_PEDNING_CARDS_FOUND_FOR_USER: {
+    errorCode: 121,
+    errorSubCode: getKey(
+      stringConstants,
+      stringConstants.NO_PEDNING_CARDS_FOUND_FOR_USER
+    ),
+    errorMessage: stringConstants.NO_PEDNING_CARDS_FOUND_FOR_USER,
+  },
+
+  PENDING_AMOUNT_AND_AMOUNT_DO_NOT_MATCH: {
+    errorCode: 122,
+    errorSubCode: getKey(
+      stringConstants,
+      stringConstants.PENDING_AMOUNT_AND_AMOUNT_DO_NOT_MATCH
+    ),
+    errorMessage: stringConstants.PENDING_AMOUNT_AND_AMOUNT_DO_NOT_MATCH,
+  },
+
+  EBAY_ACCESS_TOKEN_REQUIRED: {
+    errorCode: 123,
+    errorSubCode: getKey(
+      stringConstants,
+      stringConstants.EBAY_ACCESS_TOKEN_REQUIRED
+    ),
+    errorMessage: stringConstants.EBAY_ACCESS_TOKEN_REQUIRED,
+  },
+
+  USER_ALREADY_SIGNED_UP_WITH_DIFFERENT_METHOD: (method) => {
+    return {
+      errorCode: 124,
+      errorSubCode: getKey(
+        stringConstants,
+        stringConstants.USER_ALREADY_SIGNED_UP_WITH_DIFFERENT_METHOD
+      ),
+      errorMessage: `${stringConstants.USER_ALREADY_SIGNED_UP_WITH_DIFFERENT_METHOD}: ${method}`,
+    };
+  },
+
   REQUEST_VALIDATION_ERROR: (errorMessage) => {
     return {
       errorCode: 301,
@@ -153,6 +200,13 @@ module.exports.errorObjects = {
     return {
       errorCode: 302,
       errorSubCode: getKey(stringConstants, stringConstants.UNSUSPECTED_ERROR),
+      errorMessage: errorMessage,
+    };
+  },
+  PAYMENT_ERRORED: (errorMessage) => {
+    return {
+      errorCode: 302,
+      errorSubCode: getKey(stringConstants, stringConstants.PAYMENT_ERRORED),
       errorMessage: errorMessage,
     };
   },
