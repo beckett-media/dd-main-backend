@@ -126,8 +126,12 @@ router.get("/renew-auth-token", appAuth, async (req, res) => {
   res.header(stringConstants.AUTH_TOKEN_STRING, token.token);
   res.header(stringConstants.REFRESH_TOKEN_STRING, refreshToken.token);
 
-  user.refreshToken = refreshToken.token;
-  await user.save();
+  const userId = user._id;
+  user = await User.findByIdAndUpdate(
+    userId,
+    { $set: { refreshToken: refreshToken.token } },
+    { new: true }
+  );
 
   return res.send(
     createResObject(

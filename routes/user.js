@@ -19,8 +19,7 @@ const {
 const { createResObject } = require("../utils/utilFunctions");
 const { stringConstants } = require("../utils/constants");
 const { errorObjects } = require("../utils/errorObjects");
-const config = require("config");
-const stripe = require("stripe")(config.get(stringConstants.STRIPE_TEST_KEY));
+const sendNotifications = require("../utils/sendNotifications");
 
 // Dev remove in production
 const Joi = require("@hapi/joi");
@@ -36,8 +35,11 @@ router.post(
     const email = req.body.email.toLowerCase();
     const deviceToken = req.body.deviceToken;
     const osType = req.body.osType;
+
     let firstSignin = true;
+
     let user = await User.findOne({ email });
+
     if (user)
       return res
         .status(400)
@@ -175,11 +177,15 @@ router.post(
         }
       }
 
-      user.profilePicture = path.join(
+      const profilePicPath = path.join(
         `${userId}/profile_pictures/`,
         `${req.file.filename}`
       );
-      user = await user.save();
+      user = await User.findByIdAndUpdate(
+        userId,
+        { $set: { profilePicture: profilePicPath } },
+        { new: true }
+      );
       user = user.getUserBasicInfo();
       return res.send(
         createResObject(true, { user }, stringConstants.UPDATE_SUCCESSFUL)
@@ -238,8 +244,9 @@ router.post(
   async (req, res) => {
     const newPassword = req.body.newPassword;
     const oldPassword = req.body.oldPassword;
+    const userId = req.user._id;
 
-    let user = await User.findById(req.user._id);
+    let user = await User.findById(userId);
     if (!user)
       return res
         .status(404)
@@ -266,10 +273,13 @@ router.post(
         );
 
     const salt = await bcrypt.genSalt(10);
-    user.password = await bcrypt.hash(newPassword, salt);
+    const encrypterNewPass = await bcrypt.hash(newPassword, salt);
 
-    user = await user.save();
-    user = user.getUserBasicInfo();
+    user = await User.findByIdAndUpdate(
+      userId,
+      { $set: { password: encrypterNewPass } },
+      { new: true }
+    );
 
     return res.send(
       createResObject(
@@ -314,10 +324,16 @@ router.post(
   "/toggle-notification-settings",
   [appAuth, auth],
   async (req, res) => {
-    let user = await User.findById(req.user._id);
+    const userId = req.user._id;
+    let user = await User.findById(userId);
 
-    user.settings.notifications = !user.settings.notifications;
-    user = await user.save();
+    const currentStatus = user.settings.notifications;
+
+    user = await User.findByIdAndUpdate(
+      userId,
+      { $set: { "settings.notifications": !currentStatus } },
+      { new: true }
+    );
 
     return res.send(
       createResObject(

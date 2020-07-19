@@ -19,7 +19,6 @@ const {
   valSignInWithEbay,
   valSignOutReq,
 } = require("../middlewares/validation");
-const stripe = require("stripe")(config.get(stringConstants.STRIPE_TEST_KEY));
 
 router.post("/sign-in-user", [appAuth, valSignInRequest], async (req, res) => {
   const email = req.body.email.toLowerCase();

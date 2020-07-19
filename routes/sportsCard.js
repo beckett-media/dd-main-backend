@@ -47,6 +47,7 @@ router.post("/add-front", [appAuth, auth], async (req, res, next) => {
   });
   const cardId = card._id;
 
+  // Send card ID to multer
   req.cardId = cardId;
 
   uploadCardFront(req, res, async function (err) {

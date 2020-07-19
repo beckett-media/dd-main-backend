@@ -108,13 +108,20 @@ userSchema.pre("save", async function (next) {
   const profilePictureDir = path.join(userDir, "profile_pictures");
   const cardDir = path.join(userDir, "cards");
   const directories = [userDir, profilePictureDir, cardDir];
+
   try {
+    /**
+     * Create all the required user inventories
+     * Then check if inventory does not already exists
+     * if exists then skip creation otherwise create
+     */
+
     for (const dir of directories) {
       const exists = fs.existsSync(dir);
       if (!exists) fs.mkdirSync(dir);
     }
 
-    // Stripe
+    // Stripe, if does not exists already create stripe customer
     if (!this.stripeId) {
       const customer = await stripe.customers.create({
         email: this.email,
@@ -127,15 +134,18 @@ userSchema.pre("save", async function (next) {
     }
   } catch (error) {
     SimpleLogger.error(error);
-    // Roll back and delete folders created
+
+    // Roll back and delete folders created or
+    // do it at once and delete the whole user dir
     try {
-      for (const dir of directories) {
-        const exists = fs.existsSync(dir);
-        if (exists) fs.rmdirSync(dir);
-      }
-    } catch (err) {
-      SimpleLogger.error(err);
-      return next(error);
+      const isThere = fs.existsSync(userDir);
+      if (isThere) rimraf.sync(userDir);
+    } catch (error) {
+      SimpleLogger.error(error);
+      await new PendingDeletion({
+        deletionType: stringConstants.deletionType.DIR,
+        data: userDir,
+      }).save();
     }
 
     return next(error);
