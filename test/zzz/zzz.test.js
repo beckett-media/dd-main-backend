@@ -14,6 +14,6 @@ describe("Last run", function () {
     for (const user of users) {
       await user.remove();
     }
-    rimraf.sync(absolutePath);
+    // rimraf.sync(absolutePath);
   });
 });

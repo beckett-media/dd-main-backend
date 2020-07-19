@@ -19,7 +19,7 @@ const { valEbayOAuthTokenReq } = require("../middlewares/validation");
 router.get("/ebay-accepted", async (req, res) => {
   SimpleLogger.info(req.query.code);
 
-  return res.send("Accepted");
+  return res.render("ebay", { accepted: true });
 });
 
 /**
@@ -28,7 +28,7 @@ router.get("/ebay-accepted", async (req, res) => {
  */
 router.get("/ebay-declined", (req, res) => {
   SimpleLogger.info(req.query.code, req.query.expires_id);
-  return res.send("Declined");
+  return res.render("ebay", { accepted: false });
 });
 
 /**
