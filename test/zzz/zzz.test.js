@@ -9,11 +9,11 @@ const { User } = require("../../models/user");
 
 describe("Last run", function () {
   it("Should run last", async function () {
-    const absolutePath = path.join(__dirname, "../../public/*");
-    const users = await User.find({});
-    for (const user of users) {
-      await user.remove();
-    }
+    // const absolutePath = path.join(__dirname, "../../public/*");
+    // const users = await User.find({});
+    // for (const user of users) {
+    //   await user.remove();
+    // }
     // rimraf.sync(absolutePath);
   });
 });

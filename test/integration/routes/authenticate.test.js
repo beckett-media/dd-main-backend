@@ -72,6 +72,14 @@ describe("INTEG: authenticate.test.js: EndPoint: /authenticate/sign-in-user", fu
      * credentials. It should successfully sign the
      * user in this the happy path
      */
+
+    this.afterEach(async function () {
+      const users = await User.find({});
+      for (const user of users) {
+        await user.remove();
+      }
+    });
+
     it("Should successfully sign in user successfully", async function () {
       await registerUser();
       let res = await signInUser();

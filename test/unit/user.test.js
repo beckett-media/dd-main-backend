@@ -6,14 +6,8 @@ const { stringConstants } = require("../../utils/constants");
 const chai = require("chai");
 const expect = chai.expect;
 
-describe("Unit: user.test.js: User auth token testing", () => {
-  afterEach(async function () {
-    const users = await User.find({});
-    for (const user of users) {
-      await user.remove();
-    }
-  });
-  it("Should return a valid JWT", () => {
+describe("Unit: user.test.js: User auth token testing", function () {
+  it("Should return a valid JWT", function () {
     const payload = {
       _id: new mongoose.Types.ObjectId().toHexString(),
       fullName: "Test User",
@@ -33,7 +27,7 @@ describe("Unit: user.test.js: User auth token testing", () => {
     });
   });
 
-  it("Should have token and expiry properties", () => {
+  it("Should have token and expiry properties", function () {
     const payload = {
       _id: new mongoose.Types.ObjectId().toHexString(),
       fullName: "Test User",
@@ -47,8 +41,8 @@ describe("Unit: user.test.js: User auth token testing", () => {
   });
 });
 
-describe("User refresh token testing", () => {
-  it("Should return a valid refresh token", () => {
+describe("User refresh token testing", function () {
+  it("Should return a valid refresh token", function () {
     const payload = {
       _id: new mongoose.Types.ObjectId().toHexString(),
       fullName: "Test User",
@@ -65,7 +59,7 @@ describe("User refresh token testing", () => {
     expect(decoded).to.include({ _id: payload._id });
   });
 
-  it("Should have token and expiry properties", () => {
+  it("Should have token and expiry properties", function () {
     const payload = {
       _id: new mongoose.Types.ObjectId().toHexString(),
       fullName: "Test User",

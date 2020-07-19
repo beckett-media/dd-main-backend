@@ -79,14 +79,14 @@ cardSchema.methods.getCardDetails = function () {
   const playerNames = this.playerNames || null;
 
   return {
-    id: this._id,
-    front: this.front,
-    back: this.back,
-    video: this.video,
-    year: this.year,
-    brand: this.brand,
-    cardNumber: this.cardNumber,
-    playerNames: this.playerNames,
+    id,
+    front,
+    back,
+    video,
+    year,
+    brand,
+    cardNumber,
+    playerNames,
   };
 };
 /**

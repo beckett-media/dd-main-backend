@@ -14,5 +14,6 @@ describe("Unit: errorHandler.test.js: Error handler middleware testing", functio
     const next = sinon.spy();
     errorHandler(new Error("Test error"), req, res, next);
     expect(res.statusCode).to.be.equal(500);
+    expect(next.called).to.be.false;
   });
 });

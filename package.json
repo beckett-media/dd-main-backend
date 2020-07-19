@@ -4,8 +4,8 @@
   "description": "Snap Grade app to grade player cards",
   "main": "index.js",
   "scripts": {
-    "test": "NODE_ENV=test mocha --recursive --sort --exit",
-    "test-coverage": "NODE_ENV=test nyc mocha --recursive --sort --exit"
+    "test": "NODE_ENV=test mocha --timeout 3000 --recursive --sort --exit",
+    "test-coverage": "NODE_ENV=test nyc mocha --timeout 3000 --recursive --sort --exit"
   },
   "author": "Love Bhardwaj (SimpleDev.Solutions)",
   "license": "ISC",

@@ -25,6 +25,12 @@ describe("INTEG: payment.test.js: EndPoint /payment", function () {
    * Test block to test /save-card-client-secret
    */
   describe("INTEG: EndPoint: GET /save-card-client-secret", function () {
+    this.afterEach(async function () {
+      const users = await User.find({});
+      for (const user of users) {
+        await user.remove();
+      }
+    });
     /**
      * Should get client secret from stripe
      */
