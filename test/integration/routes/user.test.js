@@ -4,6 +4,8 @@ const request = require("supertest");
 const chai = require("chai");
 const expect = chai.expect;
 const config = require("config");
+const fs = require("fs");
+const path = require("path");
 let server;
 
 describe("INTEG: user.test.js INTEG: POST /user", function () {
@@ -62,6 +64,17 @@ describe("INTEG: user.test.js INTEG: POST /user", function () {
       );
       expect(res.headers).to.have.property("x-auth-token");
       expect(res.headers).to.have.property("x-refresh-token");
+      // Assertions for folders being created
+      const userId = res.body.data.user.id;
+      const userDir = path.join(__dirname, "../../../public", userId);
+      const profilePicturesDir = path.join(userDir, "profile_pictures");
+      const cardsDir = path.join(userDir, "cards");
+      const userDirExists = fs.existsSync(userDir);
+      const profilePicsDirExists = fs.existsSync(profilePicturesDir);
+      const cardsDirExists = fs.existsSync(cardsDir);
+      expect(userDirExists).to.be.true;
+      expect(profilePicsDirExists).to.be.true;
+      expect(cardsDirExists).to.be.true;
     });
     /**
      * Test block to get registeration of user and if

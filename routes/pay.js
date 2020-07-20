@@ -25,7 +25,7 @@ router.post("/for-pending-cards", [appAuth, auth], async (req, res) => {
   const amount = currency(req.body.amount).intValue;
   const paymentMethod = req.body.paymentMethod;
 
-  const user = await User.findById(userId);
+  let user = await User.findById(userId);
   if (!user)
     return res
       .status(404)
@@ -38,8 +38,38 @@ router.post("/for-pending-cards", [appAuth, auth], async (req, res) => {
         )
       );
 
-  if (!user.stripeId)
-    throw new Error(`${stringConstants.NO_STRIPE_ID_FOUND_FOR_USER}${userId}`);
+  // Check if stripe ID, if not then create one
+  if (!user.stripeId) {
+    let customer;
+    try {
+      customer = await stripe.customers.create({
+        email: user.email,
+        metadata: {
+          userId: user._id.toString(),
+        },
+      });
+    } catch (err) {
+      SimpleLogger.error(err);
+      return res
+        .status(400)
+        .send(
+          createResObject(
+            false,
+            {},
+            stringConstants.UNSUSPECTED_ERROR,
+            errorObjects.UNSUSPECTED_ERROR(err.message)
+          )
+        );
+    }
+    // Everything went well add the ID to customer object
+    user = await User.findByIdAndUpdate(
+      userId,
+      {
+        $set: { stripeId: customer.id },
+      },
+      { new: true }
+    );
+  }
 
   const stripeId = user.stripeId;
   //   Get all cards

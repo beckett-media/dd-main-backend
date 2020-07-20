@@ -18,6 +18,9 @@ const cardSchema = new mongoose.Schema(
     video: {
       type: String,
     },
+    gradedImage: {
+      type: String,
+    },
     year: {
       type: Number,
       min: 1000,
@@ -73,6 +76,7 @@ cardSchema.methods.getCardDetails = function () {
   const front = this.front || null;
   const back = this.back || null;
   const video = this.back || null;
+  const gradedImage = this.gradedImage || null;
   const year = this.year || null;
   const brand = this.brand || null;
   const cardNumber = this.cardNumber || null;
@@ -83,6 +87,7 @@ cardSchema.methods.getCardDetails = function () {
     front,
     back,
     video,
+    gradedImage,
     year,
     brand,
     cardNumber,
