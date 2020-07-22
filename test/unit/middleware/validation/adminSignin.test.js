@@ -44,9 +44,42 @@ describe("UNIT: adminSignin.test.js: Test for admin sign in validation middlewar
     expect(res.statusCode).to.be.equal(400);
   });
 
-  it("Should return 400 if email not valid");
-  it("Should return 400 if email less than 5 char");
-  it("Should return 400 if email more than 255");
+  it("Should return 400 if email not valid", function () {
+    reqBody.email = "something";
+
+    const req = getRequest();
+    const res = getResponse();
+    const next = sinon.spy();
+
+    valAdminSignIn(req, res, next);
+
+    expect(next.called).to.be.false;
+    expect(res.statusCode).to.be.equal(400);
+  });
+  it("Should return 400 if email less than 5 char", function () {
+    reqBody.email = "t@t.c";
+
+    const req = getRequest();
+    const res = getResponse();
+    const next = sinon.spy();
+
+    valAdminSignIn(req, res, next);
+
+    expect(next.called).to.be.false;
+    expect(res.statusCode).to.be.equal(400);
+  });
+  it("Should return 400 if email more than 255", function () {
+    reqBody.email = new Array(300).join() + "@test.com";
+
+    const req = getRequest();
+    const res = getResponse();
+    const next = sinon.spy();
+
+    valAdminSignIn(req, res, next);
+
+    expect(next.called).to.be.false;
+    expect(res.statusCode).to.be.equal(400);
+  });
   it("Should return 400 for no password in request", function () {
     delete reqBody.password;
 
@@ -59,6 +92,27 @@ describe("UNIT: adminSignin.test.js: Test for admin sign in validation middlewar
     expect(next.called).to.be.false;
     expect(res.statusCode).to.be.equal(400);
   });
-  it("Should return 400 for password less than 6 char");
-  it("Should return 400 for password more than 255");
+  it("Should return 400 for password less than 6 char", function () {
+    reqBody.password = "test";
+
+    const req = getRequest();
+    const res = getResponse();
+    const next = sinon.spy();
+
+    valAdminSignIn(req, res, next);
+
+    expect(next.called).to.be.false;
+    expect(res.statusCode).to.be.equal(400);
+  });
+  it("Should return 400 for password more than 255", function () {
+    reqBody.password = new Array(300).join();
+    const req = getRequest();
+    const res = getResponse();
+    const next = sinon.spy();
+
+    valAdminSignIn(req, res, next);
+
+    expect(next.called).to.be.false;
+    expect(res.statusCode).to.be.equal(400);
+  });
 });

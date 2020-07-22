@@ -38,8 +38,8 @@ require("./startup/initFirebase")();
  * User startup files to intiate app
  */
 require("./startup/envVariableCheck")();
-require("./startup/corsSetup")(app);
 require("./startup/expressSetup")(app);
+require("./startup/corsSetup")(app);
 require("./startup/routeSetup")(app);
 require("./startup/jobsSetups")();
 
