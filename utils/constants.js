@@ -125,6 +125,11 @@ module.exports.stringConstants = {
     "User has already signed up with a different method",
 
   SIGNED_OUT_SUCCESSFULLY: "Signed out successfully",
+
+  FORBIDDEN_RESOURCE: "Forbidden resource!",
+
+  INVALID_SIGN_UP_METHOD: "Invalid sign up method for admin",
+
   collectionNames: {
     USER_COLLECTION: "User",
     PENDING_DELETION: "Pending_Deletion",

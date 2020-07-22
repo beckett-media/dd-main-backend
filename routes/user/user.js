@@ -1,25 +1,25 @@
 const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcrypt");
-const auth = require("../middlewares/authenticateRequest");
-const appAuth = require("../middlewares/appAuth");
-const { uploadProfilePic } = require("../middlewares/multerSingle");
+const auth = require("../../middlewares/authenticateRequest");
+const appAuth = require("../../middlewares/authenticateApp");
+const { uploadProfilePic } = require("../../middlewares/multerSingle");
 const fs = require("fs");
 const fsPromises = fs.promises;
 const path = require("path");
-const SimpleLogger = require("../utils/simpleLogger");
+const SimpleLogger = require("../../utils/simpleLogger");
 const _ = require("lodash");
-const { User } = require("../models/user");
-const { PendingDeletion } = require("../models/pendingDeletion");
+const { User } = require("../../models/user");
+const { PendingDeletion } = require("../../models/pendingDeletion");
 const {
   valRegisterRequest,
   valUsernameRequest,
   valChangePasswordRequest,
-} = require("../middlewares/validation");
-const { createResObject } = require("../utils/utilFunctions");
-const { stringConstants } = require("../utils/constants");
-const { errorObjects } = require("../utils/errorObjects");
-const sendNotifications = require("../utils/sendNotifications");
+} = require("../../middlewares/validation");
+const { createResObject } = require("../../utils/utilFunctions");
+const { stringConstants } = require("../../utils/constants");
+const { errorObjects } = require("../../utils/errorObjects");
+const sendNotifications = require("../../utils/sendNotifications");
 
 // Dev remove in production
 const Joi = require("@hapi/joi");

@@ -1,15 +1,15 @@
 const express = require("express");
 const router = express.Router();
-const auth = require("../middlewares/authenticateRequest");
-const appAuth = require("../middlewares/appAuth");
-const { User } = require("../models/user");
-const { stringConstants } = require("../utils/constants");
-const { errorObjects } = require("../utils/errorObjects");
-const { createResObject } = require("../utils/utilFunctions");
-const { valUpdateCreditCardRequest } = require("../middlewares/validation");
+const auth = require("../../middlewares/authenticateRequest");
+const appAuth = require("../../middlewares/authenticateApp");
+const { User } = require("../../models/user");
+const { stringConstants } = require("../../utils/constants");
+const { errorObjects } = require("../../utils/errorObjects");
+const { createResObject } = require("../../utils/utilFunctions");
+const { valUpdateCreditCardRequest } = require("../../middlewares/validation");
 const config = require("config");
 const stripe = require("stripe")(config.get(stringConstants.STRIPE_TEST_KEY));
-const SimpleLogger = require("../utils/simpleLogger");
+const SimpleLogger = require("../../utils/simpleLogger");
 
 router.get("/save-card-client-secret", [appAuth, auth], async (req, res) => {
   let user = await User.findById(req.user._id);

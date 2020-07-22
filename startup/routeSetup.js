@@ -1,9 +1,10 @@
-const user = require("../routes/user");
-const authenticate = require("../routes/authenticate");
-const payment = require("../routes/payment");
-const authToken = require("../routes/authToken");
-const sportsCard = require("../routes/sportsCard");
-const ebay = require("../routes/ebay");
+const user = require("../routes/user/user");
+const authenticate = require("../routes/user/authenticate");
+const payment = require("../routes/user/payment");
+const authToken = require("../routes/common/authToken");
+const sportsCard = require("../routes/user/sportsCard");
+const ebay = require("../routes/user/ebay");
+const adminAuth = require("../routes/admin/authenticate");
 
 module.exports = (app) => {
   // Import route and use app.use();
@@ -13,4 +14,5 @@ module.exports = (app) => {
   app.use("/auth-token", authToken);
   app.use("/sports-card", sportsCard);
   app.use("/ebay", ebay);
+  app.use("/admin-auth", adminAuth);
 };

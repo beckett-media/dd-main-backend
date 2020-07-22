@@ -301,4 +301,25 @@ module.exports = {
     }
     return next();
   },
+  valAdminSignIn: (req, res, next) => {
+    const schema = Joi.object({
+      email: Joi.string().email().required().min(5).max(255),
+      password: Joi.string().required().min(6).max(255),
+    });
+
+    const { error } = schema.validate(req.body);
+    if (error) {
+      return res
+        .status(400)
+        .send(
+          createResObject(
+            false,
+            { errorMessage: error.details[0].message },
+            stringConstants.REQUEST_VALIDATION_FAILED,
+            errorObjects.REQUEST_VALIDATION_ERROR(error.details[0].message)
+          )
+        );
+    }
+    return next();
+  },
 };

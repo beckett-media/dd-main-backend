@@ -5,12 +5,12 @@ const got = require("got");
 const express = require("express");
 const router = express.Router();
 const config = require("config");
-const appAuth = require("../middlewares/appAuth");
-const SimpleLogger = require("../utils/simpleLogger");
-const { stringConstants } = require("../utils/constants");
-const { createResObject } = require("../utils/utilFunctions");
-const { errorObjects } = require("../utils/errorObjects");
-const { valEbayOAuthTokenReq } = require("../middlewares/validation");
+const appAuth = require("../../middlewares/authenticateApp");
+const SimpleLogger = require("../../utils/simpleLogger");
+const { stringConstants } = require("../../utils/constants");
+const { createResObject } = require("../../utils/utilFunctions");
+const { errorObjects } = require("../../utils/errorObjects");
+const { valEbayOAuthTokenReq } = require("../../middlewares/validation");
 
 /**
  * Redirect route once user accepts the terms and conditions

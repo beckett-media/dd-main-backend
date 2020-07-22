@@ -6,17 +6,17 @@
 
 const express = require("express");
 const router = express.Router();
-const auth = require("../middlewares/authenticateRequest");
-const currency = require("../utils/currency");
-const SimpleLogger = require("../utils/simpleLogger");
-const appAuth = require("../middlewares/appAuth");
-const { User } = require("../models/user");
-const { Card } = require("../models/card");
-const { Transaction } = require("../models/transaction");
-const { TransactionLog } = require("../models/transactionLog");
-const { stringConstants } = require("../utils/constants");
-const { errorObjects } = require("../utils/errorObjects");
-const { createResObject } = require("../utils/utilFunctions");
+const auth = require("../../middlewares/authenticateRequest");
+const currency = require("../../utils/currency");
+const SimpleLogger = require("../../utils/simpleLogger");
+const appAuth = require("../../middlewares/authenticateApp");
+const { User } = require("../../models/user");
+const { Card } = require("../../models/card");
+const { Transaction } = require("../../models/transaction");
+const { TransactionLog } = require("../../models/transactionLog");
+const { stringConstants } = require("../../utils/constants");
+const { errorObjects } = require("../../utils/errorObjects");
+const { createResObject } = require("../../utils/utilFunctions");
 const config = require("config");
 const stripe = require("stripe")(config.get(stringConstants.STRIPE_TEST_KEY));
 

@@ -1,28 +1,28 @@
 const express = require("express");
 const router = express.Router();
-const auth = require("../middlewares/authenticateRequest");
-const appAuth = require("../middlewares/appAuth");
-const SimpleLogger = require("../utils/simpleLogger");
+const auth = require("../../middlewares/authenticateRequest");
+const appAuth = require("../../middlewares/authenticateApp");
+const SimpleLogger = require("../../utils/simpleLogger");
 const path = require("path");
 const fsPromises = require("fs").promises;
 const _ = require("lodash");
-const currency = require("../utils/currency");
-const { User } = require("../models/user");
-const { Card } = require("../models/card");
-const { PendingDeletion } = require("../models/pendingDeletion");
-const { stringConstants } = require("../utils/constants");
-const { errorObjects } = require("../utils/errorObjects");
-const { createResObject } = require("../utils/utilFunctions");
+const currency = require("../../utils/currency");
+const { User } = require("../../models/user");
+const { Card } = require("../../models/card");
+const { PendingDeletion } = require("../../models/pendingDeletion");
+const { stringConstants } = require("../../utils/constants");
+const { errorObjects } = require("../../utils/errorObjects");
+const { createResObject } = require("../../utils/utilFunctions");
 const {
   uploadCardFront,
   uploadCardBack,
   uploadCardVideo,
-} = require("../middlewares/multerSingle");
+} = require("../../middlewares/multerSingle");
 const {
   valObjectIdInUrl,
   valUpdateCardData,
   valPageSizeNumber,
-} = require("../middlewares/validation");
+} = require("../../middlewares/validation");
 
 /**
  * Step 1: Create a new card and upload card front

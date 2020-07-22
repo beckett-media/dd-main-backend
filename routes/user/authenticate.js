@@ -6,19 +6,19 @@ const Joi = require("@hapi/joi");
 const got = require("got");
 const config = require("config");
 const fs = require("fs");
-const SimpleLogger = require("../utils/simpleLogger");
-const appAuth = require("../middlewares/appAuth");
-const auth = require("../middlewares/authenticateRequest");
-const authAppleTokenMiddleware = require("../middlewares/authenticateAppleToken");
-const { User } = require("../models/user");
-const { stringConstants } = require("../utils/constants");
-const { errorObjects } = require("../utils/errorObjects");
-const { createResObject } = require("../utils/utilFunctions");
+const SimpleLogger = require("../../utils/simpleLogger");
+const appAuth = require("../../middlewares/authenticateApp");
+const auth = require("../../middlewares/authenticateRequest");
+const authAppleTokenMiddleware = require("../../middlewares/authenticateAppleToken");
+const { User } = require("../../models/user");
+const { stringConstants } = require("../../utils/constants");
+const { errorObjects } = require("../../utils/errorObjects");
+const { createResObject } = require("../../utils/utilFunctions");
 const {
   valSignInRequest,
   valSignInWithEbay,
   valSignOutReq,
-} = require("../middlewares/validation");
+} = require("../../middlewares/validation");
 
 router.post("/sign-in-user", [appAuth, valSignInRequest], async (req, res) => {
   const email = req.body.email.toLowerCase();
@@ -38,8 +38,22 @@ router.post("/sign-in-user", [appAuth, valSignInRequest], async (req, res) => {
         )
       );
 
-  const valid = await bcrypt.compare(req.body.password, user.password);
-  if (!valid)
+  if (!user.password)
+    return res
+      .status(400)
+      .send(
+        createResObject(
+          false,
+          {},
+          stringConstants.USER_ALREADY_SIGNED_UP_WITH_DIFFERENT_METHOD,
+          errorObjects.USER_ALREADY_SIGNED_UP_WITH_DIFFERENT_METHOD(
+            user.metadata.signupType
+          )
+        )
+      );
+
+  const isValid = await bcrypt.compare(req.body.password, user.password);
+  if (!isValid)
     return res
       .status(400)
       .send(

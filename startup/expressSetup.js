@@ -2,7 +2,6 @@ const express = require("express");
 const helmet = require("helmet");
 const compression = require("compression");
 const useragent = require("express-useragent");
-const appToken = require("../middlewares/appAuth");
 const path = require("path");
 const simpleLoggerMid = require("../middlewares/simpleLogger");
 

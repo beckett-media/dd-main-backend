@@ -9,11 +9,11 @@ const sinon = require("sinon");
 const chai = require("chai");
 const expect = chai.expect;
 const config = require("config");
-const appAuth = require("../../../middlewares/appAuth");
+const appAuth = require("../../../middlewares/authenticateApp");
 const { stringConstants } = require("../../../utils/constants");
 
 let token;
-describe("Unit: appAuth.test.js: Test block to test app token middleware", function () {
+describe("Unit: authenticateApp.test.js: Test block to test app token middleware", function () {
   this.beforeEach(function () {
     token = config.get("appToken");
   });

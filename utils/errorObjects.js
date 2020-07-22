@@ -189,6 +189,23 @@ module.exports.errorObjects = {
     };
   },
 
+  FORBIDDEN_RESOURCE: {
+    errorCode: 125,
+    errorSubCode: getKey(stringConstants, stringConstants.FORBIDDEN_RESOURCE),
+    errorMessage: stringConstants.FORBIDDEN_RESOURCE,
+  },
+
+  INVALID_SIGN_UP_METHOD: (method) => {
+    return {
+      errorCode: 126,
+      errorSubCode: getKey(
+        stringConstants,
+        stringConstants.INVALID_SIGN_UP_METHOD
+      ),
+      errorMessage: `${stringConstants.INVALID_SIGN_UP_METHOD}. Needs to be ${method}`,
+    };
+  },
+
   REQUEST_VALIDATION_ERROR: (errorMessage) => {
     return {
       errorCode: 301,

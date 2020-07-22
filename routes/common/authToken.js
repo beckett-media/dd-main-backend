@@ -2,12 +2,12 @@ const express = require("express");
 const router = express.Router();
 const jwt = require("jsonwebtoken");
 const config = require("config");
-const appAuth = require("../middlewares/appAuth");
-const { stringConstants } = require("../utils/constants");
-const { createResObject } = require("../utils/utilFunctions");
-const { errorObjects } = require("../utils/errorObjects");
-const { User } = require("../models/user");
-const SimpleLogger = require("../utils/simpleLogger");
+const appAuth = require("../../middlewares/authenticateApp");
+const { stringConstants } = require("../../utils/constants");
+const { createResObject } = require("../../utils/utilFunctions");
+const { errorObjects } = require("../../utils/errorObjects");
+const { User } = require("../../models/user");
+const SimpleLogger = require("../../utils/simpleLogger");
 
 router.get("/renew-auth-token", appAuth, async (req, res) => {
   let user, token, refreshToken, refreshDecoded;
