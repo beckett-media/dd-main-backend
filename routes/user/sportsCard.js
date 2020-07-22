@@ -86,7 +86,7 @@ router.post("/add-front", [appAuth, auth], async (req, res, next) => {
     if (req.file.size <= 0) {
       const cardDestination = path.join(
         __dirname,
-        "../public/",
+        "../../public/",
         `${userId}/cards/${cardId}/`,
         `${req.file.filename}`
       );
@@ -195,7 +195,7 @@ router.post(
       if (req.file.size <= 0) {
         const cardDestination = path.join(
           __dirname,
-          "../public/",
+          "../../public/",
           `${userId}/cards/${cardId}/`,
           `${req.file.filename}`
         );
@@ -221,7 +221,11 @@ router.post(
       }
       // All the check completed delete the old card and update the new
       if (card.front) {
-        const pathToCardFront = path.join(__dirname, "../public/", card.front);
+        const pathToCardFront = path.join(
+          __dirname,
+          "../../public/",
+          card.front
+        );
         try {
           await fsPromises.unlink(pathToCardFront);
         } catch (error) {
@@ -319,7 +323,7 @@ router.post(
       if (req.file.size <= 0) {
         const cardDestination = path.join(
           __dirname,
-          "../public/",
+          "../../public/",
           `${userId}/cards/${cardId}/`,
           `${req.file.filename}`
         );
@@ -346,7 +350,7 @@ router.post(
       // Delete previous picture if any
       if (card.back) {
         try {
-          const cardBackPath = path.join(__dirname, "../public/", card.back);
+          const cardBackPath = path.join(__dirname, "../../public/", card.back);
           await fsPromises.unlink(cardBackPath);
         } catch (error) {
           SimpleLogger.error(error);
@@ -354,7 +358,7 @@ router.post(
             deletionType: stringConstants.deletionType.FILE,
             data: path.join(
               __dirname,
-              "../public/card_backs/",
+              "../../public/card_backs/",
               `${req.file.filename}`
             ),
           }).save();
@@ -459,7 +463,7 @@ router.post(
       if (req.file.size <= 0) {
         const cardDestination = path.join(
           __dirname,
-          "../public/",
+          "../../public/",
           `${userId}/cards/${cardId}/`,
           `${req.file.filename}`
         );
@@ -487,7 +491,7 @@ router.post(
       // Check if already has card video if yes the delete the old and replace with new
       if (card.video) {
         try {
-          const videoPath = path.join(__dirname, "../public/", card.video);
+          const videoPath = path.join(__dirname, "../../public/", card.video);
           await fsPromises.unlink(videoPath);
         } catch (error) {
           SimpleLogger.error(error);
@@ -495,7 +499,7 @@ router.post(
             deletionType: stringConstants.deletionType.FILE,
             data: path.join(
               __dirname,
-              "../public/card_videos/",
+              "../../public/card_videos/",
               `${req.file.filename}`
             ),
           }).save();

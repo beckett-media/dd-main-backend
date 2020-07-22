@@ -134,7 +134,7 @@ router.post(
       if (req.file.size <= 0) {
         const profilePicPath = path.join(
           __dirname,
-          `../public/${userId}/profile_pictures/`,
+          `../../public/${userId}/profile_pictures/`,
           `${req.file.filename}`
         );
         try {
@@ -163,7 +163,7 @@ router.post(
       if (user.profilePicture) {
         const absolutePath = path.join(
           __dirname,
-          `../public`,
+          `../../public`,
           `${user.profilePicture}`
         );
         try {
