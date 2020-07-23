@@ -4,8 +4,17 @@ const { stringConstants } = require("../utils/constants");
 const corsOptions = {
   origin: "*",
   optionsSuccessStatus: 200,
-  exposedHeaders: ["x-app-token", "x-auth-token"],
-  allowedHeaders: ["x-app-token", "x-auth-token", "Accept", "Content-Type"],
+  exposedHeaders: [
+    stringConstants.AUTH_TOKEN_STRING,
+    stringConstants.REFRESH_TOKEN_STRING,
+  ],
+  allowedHeaders: [
+    stringConstants.APP_TOKEN_STRING,
+    stringConstants.AUTH_TOKEN_STRING,
+    stringConstants.REFRESH_TOKEN_STRING,
+    "Accept",
+    "Content-Type",
+  ],
 };
 
 module.exports = (app) => {
