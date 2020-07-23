@@ -5,7 +5,7 @@ const corsOptions = {
   origin: "*",
   optionsSuccessStatus: 200,
   exposedHeaders: ["x-app-token", "x-auth-token"],
-  // allowedHeaders: ["x-app-token", "x-auth-token", "Accept", "Content-Type"],
+  allowedHeaders: ["x-app-token", "x-auth-token", "Accept", "Content-Type"],
 };
 
 module.exports = (app) => {

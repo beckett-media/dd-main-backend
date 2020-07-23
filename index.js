@@ -1,5 +1,6 @@
 const express = require("express");
 const app = express();
+require("./startup/corsSetup")(app);
 const path = require("path");
 const errorMid = require("./middlewares/errorHandler");
 require("./startup/directoryCreator")();
@@ -39,7 +40,6 @@ require("./startup/initFirebase")();
  */
 require("./startup/envVariableCheck")();
 require("./startup/expressSetup")(app);
-require("./startup/corsSetup")(app);
 require("./startup/routeSetup")(app);
 require("./startup/jobsSetups")();
 
