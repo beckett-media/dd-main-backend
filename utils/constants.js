@@ -132,6 +132,8 @@ module.exports.stringConstants = {
 
   NEEDS_TO_BE_INTEGER: "need to be Integer",
 
+  TOO_MANY_REQUESTS: "Too many requests, please try again later",
+
   collectionNames: {
     USER_COLLECTION: "User",
     PENDING_DELETION: "Pending_Deletion",
@@ -139,7 +141,9 @@ module.exports.stringConstants = {
     TRANSACTION_COLLECTION: "Transaction",
     TRANSACTION_LOG_COLLECTION: "Transaction_log",
     SCHEDULE_COLLECTION: "Schedule",
-    JOB: "jobs", // For Agenda package
+    JOB: "jobs", // For Agenda package,
+    GLOBAL_REQ_RATE_RECORDS: "global_req_rate_records",
+    WRONG_SIGNIN_REQ_RECORDS: "wrong_signin_req_records",
   },
 
   deletionType: {
@@ -222,5 +226,11 @@ module.exports.stringConstants = {
   ebayAccType: {
     BUSINESS_ACCOUNT: "businessAccount",
     INDIVIDUAL_ACCOUNT: "individualAccount",
+  },
+
+  headerNames: {
+    X_RATELIMIT_LIMIT: "X-RateLimit-Limit",
+    X_RATELIMIT_REMAINING: "X-RateLimit-Remaining",
+    RETRY_AFTER: "Retry-After",
   },
 };

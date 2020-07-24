@@ -19,101 +19,106 @@ const {
   valSignInWithEbay,
   valSignOutReq,
 } = require("../../middlewares/validation");
+const { wrongSigninLimiter } = require("../../middlewares/rateLimiter");
 
-router.post("/sign-in-user", [appAuth, valSignInRequest], async (req, res) => {
-  const email = req.body.email.toLowerCase();
-  const deviceToken = req.body.deviceToken;
-  const osType = req.body.osType;
-  let firstSignin = false;
-  let user = await User.findOne({ email });
-  if (!user)
-    return res
-      .status(404)
-      .send(
-        createResObject(
-          false,
-          {},
-          stringConstants.USER_EMAIL_NOT_FOUND,
-          errorObjects.USER_EMAIL_NOT_FOUND
-        )
-      );
-
-  const role = user.role;
-
-  if (role !== stringConstants.role.USER || role !== user.role) {
-    //   Forbidden resource
-    return res
-      .status(403)
-      .send(
-        createResObject(
-          false,
-          {},
-          stringConstants.FORBIDDEN_RESOURCE,
-          errorObjects.FORBIDDEN_RESOURCE
-        )
-      );
-  }
-
-  if (!user.password)
-    return res
-      .status(400)
-      .send(
-        createResObject(
-          false,
-          {},
-          stringConstants.USER_ALREADY_SIGNED_UP_WITH_DIFFERENT_METHOD,
-          errorObjects.USER_ALREADY_SIGNED_UP_WITH_DIFFERENT_METHOD(
-            user.metadata.signupType
+router.post(
+  "/sign-in-user",
+  [appAuth, wrongSigninLimiter, valSignInRequest],
+  async (req, res) => {
+    const email = req.body.email.toLowerCase();
+    const deviceToken = req.body.deviceToken;
+    const osType = req.body.osType;
+    let firstSignin = false;
+    let user = await User.findOne({ email });
+    if (!user)
+      return res
+        .status(404)
+        .send(
+          createResObject(
+            false,
+            {},
+            stringConstants.USER_EMAIL_NOT_FOUND,
+            errorObjects.USER_EMAIL_NOT_FOUND
           )
-        )
-      );
+        );
 
-  const isValid = await bcrypt.compare(req.body.password, user.password);
-  if (!isValid)
-    return res
-      .status(400)
-      .send(
-        createResObject(
-          false,
-          {},
-          stringConstants.INCORRECT_PASSWORD,
-          errorObjects.INCORRECT_PASSWORD
-        )
-      );
+    const role = user.role;
 
-  const authToken = user.generateAuthToken();
-  const refreshToken = user.generateRefreshToken();
+    if (role !== stringConstants.role.USER || role !== user.role) {
+      //   Forbidden resource
+      return res
+        .status(403)
+        .send(
+          createResObject(
+            false,
+            {},
+            stringConstants.FORBIDDEN_RESOURCE,
+            errorObjects.FORBIDDEN_RESOURCE
+          )
+        );
+    }
 
-  res.header(stringConstants.AUTH_TOKEN_STRING, authToken.token);
-  res.header(stringConstants.REFRESH_TOKEN_STRING, refreshToken.token);
+    if (!user.password)
+      return res
+        .status(400)
+        .send(
+          createResObject(
+            false,
+            {},
+            stringConstants.USER_ALREADY_SIGNED_UP_WITH_DIFFERENT_METHOD,
+            errorObjects.USER_ALREADY_SIGNED_UP_WITH_DIFFERENT_METHOD(
+              user.metadata.signupType
+            )
+          )
+        );
 
-  user.refreshToken = refreshToken.token;
-  user.metadata.osType = osType;
-  user.addDeviceToken(deviceToken);
-  user = await user.save();
+    const isValid = await bcrypt.compare(req.body.password, user.password);
+    if (!isValid)
+      return res
+        .status(400)
+        .send(
+          createResObject(
+            false,
+            {},
+            stringConstants.INCORRECT_PASSWORD,
+            errorObjects.INCORRECT_PASSWORD
+          )
+        );
 
-  const returnObject = {
-    ...user.getUserBasicInfo(),
-    authTokenExpiry: authToken.expiry,
-    refreshTokenExpiry: refreshToken.expiry,
-    firstSignin,
-  };
+    const authToken = user.generateAuthToken();
+    const refreshToken = user.generateRefreshToken();
 
-  return res.send(
-    createResObject(
-      true,
-      { user: returnObject },
-      stringConstants.SIGN_IN_SUCCESSFUL
-    )
-  );
-});
+    res.header(stringConstants.AUTH_TOKEN_STRING, authToken.token);
+    res.header(stringConstants.REFRESH_TOKEN_STRING, refreshToken.token);
+
+    user.refreshToken = refreshToken.token;
+    user.metadata.osType = osType;
+    user.addDeviceToken(deviceToken);
+    user = await user.save();
+
+    const returnObject = {
+      ...user.getUserBasicInfo(),
+      authTokenExpiry: authToken.expiry,
+      refreshTokenExpiry: refreshToken.expiry,
+      firstSignin,
+    };
+
+    return res.send(
+      createResObject(
+        true,
+        { user: returnObject },
+        stringConstants.SIGN_IN_SUCCESSFUL
+      )
+    );
+  }
+);
 
 /**
  * Route to sign in user using Apple ID
  */
 router.post(
   "/sign-in-with-apple",
-  [appAuth, authAppleTokenMiddleware],
+  [wrongSigninLimiter, appAuth, authAppleTokenMiddleware],
   async (req, res, next) => {
     const email = req.payload.email;
     const userIdetifier = req.payload.sub;
@@ -286,7 +291,7 @@ router.post(
  */
 router.post(
   "/sign-in-with-ebay",
-  [appAuth, valSignInWithEbay],
+  [wrongSigninLimiter, appAuth, valSignInWithEbay],
   async (req, res) => {
     const accessToken = req.header(stringConstants.EBAY_ACCESS_TOKEN);
     const reqFullName = req.body.fullName;

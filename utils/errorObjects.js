@@ -217,6 +217,12 @@ module.exports.errorObjects = {
     };
   },
 
+  TOO_MANY_REQUESTS: {
+    errorCode: 128,
+    errorSubCode: "TOO_MANY_REQUESTS",
+    errorMessage: stringConstants.TOO_MANY_REQUESTS,
+  },
+
   REQUEST_VALIDATION_ERROR: (errorMessage) => {
     return {
       errorCode: 301,

@@ -273,4 +273,14 @@ describe("Unit: errorObject.test.js: Error object fucntion tests", function () {
       errorMessage: `${valueName} ${stringConstants.NEEDS_TO_BE_INTEGER}`,
     });
   });
+
+  it("should return error object with error code 128", function () {
+    const result = errorObjects.TOO_MANY_REQUESTS;
+
+    expect(result).to.be.eql({
+      errorCode: 128,
+      errorSubCode: "TOO_MANY_REQUESTS",
+      errorMessage: stringConstants.TOO_MANY_REQUESTS,
+    });
+  });
 });
