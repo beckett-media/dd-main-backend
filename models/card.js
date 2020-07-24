@@ -52,7 +52,7 @@ const cardSchema = new mongoose.Schema(
       default: false,
     },
   },
-  { timestamps: true }
+  { timestamps: true, toJSON: { getters: true } }
 );
 /**
  * Static method to check if card complete

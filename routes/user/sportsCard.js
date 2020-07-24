@@ -622,7 +622,7 @@ router.get(
         { isCompleted: true },
         { status: stringConstants.cardState.PENDING },
       ],
-    });
+    }).lean();
     /**
      * Card pricing:
      * $4.99 for <= 100
