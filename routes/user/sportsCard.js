@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const auth = require("../../middlewares/authenticateRequest");
+const auth = require("../../middlewares/authenticateUser");
 const appAuth = require("../../middlewares/authenticateApp");
 const SimpleLogger = require("../../utils/simpleLogger");
 const path = require("path");

@@ -25,6 +25,7 @@ module.exports = async (req, res, next) => {
       token,
       config.get(stringConstants.JWT_PRIATE_KEY)
     );
+    const role = decoded.role;
     // Check if user exists in the database, if not return from here itself
     const user = await User.findById(decoded._id);
     if (!user)
@@ -38,6 +39,20 @@ module.exports = async (req, res, next) => {
             errorObjects.USER_ID_DOEST_NOT_EXISTS
           )
         );
+
+    if (role !== stringConstants.role.USER || role !== user.role) {
+      //   Forbidden resource
+      return res
+        .status(403)
+        .send(
+          createResObject(
+            false,
+            {},
+            stringConstants.FORBIDDEN_RESOURCE,
+            errorObjects.FORBIDDEN_RESOURCE
+          )
+        );
+    }
     req.user = decoded;
     return next();
   } catch (ex) {

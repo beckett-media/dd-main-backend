@@ -130,6 +130,8 @@ module.exports.stringConstants = {
 
   INVALID_SIGN_UP_METHOD: "Invalid sign up method for admin",
 
+  NEEDS_TO_BE_INTEGER: "need to be Integer",
+
   collectionNames: {
     USER_COLLECTION: "User",
     PENDING_DELETION: "Pending_Deletion",

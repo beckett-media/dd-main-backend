@@ -262,4 +262,15 @@ describe("Unit: errorObject.test.js: Error object fucntion tests", function () {
       errorMessage: `${stringConstants.INVALID_SIGN_UP_METHOD}. Needs to be ${stringConstants.signupType.IN_APP}`,
     });
   });
+
+  it("Should return error object with error code 127", function () {
+    const valueName = "Page number";
+    const result = errorObjects.NEEDS_TO_BE_INTEGER(valueName);
+
+    expect(result).to.be.eql({
+      errorCode: 127,
+      errorSubCode: "NEEDS_TO_BE_INTEGER",
+      errorMessage: `${valueName} ${stringConstants.NEEDS_TO_BE_INTEGER}`,
+    });
+  });
 });

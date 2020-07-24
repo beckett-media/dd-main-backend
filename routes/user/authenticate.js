@@ -8,7 +8,7 @@ const config = require("config");
 const fs = require("fs");
 const SimpleLogger = require("../../utils/simpleLogger");
 const appAuth = require("../../middlewares/authenticateApp");
-const auth = require("../../middlewares/authenticateRequest");
+const auth = require("../../middlewares/authenticateUser");
 const authAppleTokenMiddleware = require("../../middlewares/authenticateAppleToken");
 const { User } = require("../../models/user");
 const { stringConstants } = require("../../utils/constants");
@@ -37,6 +37,22 @@ router.post("/sign-in-user", [appAuth, valSignInRequest], async (req, res) => {
           errorObjects.USER_EMAIL_NOT_FOUND
         )
       );
+
+  const role = user.role;
+
+  if (role !== stringConstants.role.USER || role !== user.role) {
+    //   Forbidden resource
+    return res
+      .status(403)
+      .send(
+        createResObject(
+          false,
+          {},
+          stringConstants.FORBIDDEN_RESOURCE,
+          errorObjects.FORBIDDEN_RESOURCE
+        )
+      );
+  }
 
   if (!user.password)
     return res
@@ -174,6 +190,21 @@ router.post(
         "metadata.signupType": stringConstants.signupType.APPLE,
       });
     } else {
+      const role = user.role;
+
+      if (role !== stringConstants.role.USER || role !== user.role) {
+        //   Forbidden resource
+        return res
+          .status(403)
+          .send(
+            createResObject(
+              false,
+              {},
+              stringConstants.FORBIDDEN_RESOURCE,
+              errorObjects.FORBIDDEN_RESOURCE
+            )
+          );
+      }
       schema = Joi.object({
         fullName: Joi.string(),
         userIdetifier: Joi.string().required(), // Already checked in middleware
@@ -361,6 +392,22 @@ router.post(
         "metadata.osType": osType,
         "metadata.signupType": stringConstants.signupType.EBAY,
       });
+    } else {
+      const role = user.role;
+
+      if (role !== stringConstants.role.USER || role !== user.role) {
+        //   Forbidden resource
+        return res
+          .status(403)
+          .send(
+            createResObject(
+              false,
+              {},
+              stringConstants.FORBIDDEN_RESOURCE,
+              errorObjects.FORBIDDEN_RESOURCE
+            )
+          );
+      }
     }
 
     const authToken = user.generateAuthToken();

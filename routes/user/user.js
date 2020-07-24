@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcrypt");
-const auth = require("../../middlewares/authenticateRequest");
+const auth = require("../../middlewares/authenticateUser");
 const appAuth = require("../../middlewares/authenticateApp");
 const { uploadProfilePic } = require("../../middlewares/multerSingle");
 const fs = require("fs");

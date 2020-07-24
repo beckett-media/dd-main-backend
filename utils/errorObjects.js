@@ -206,6 +206,17 @@ module.exports.errorObjects = {
     };
   },
 
+  NEEDS_TO_BE_INTEGER: (valueName) => {
+    return {
+      errorCode: 127,
+      errorSubCode: getKey(
+        stringConstants,
+        stringConstants.NEEDS_TO_BE_INTEGER
+      ),
+      errorMessage: `${valueName} ${stringConstants.NEEDS_TO_BE_INTEGER}`,
+    };
+  },
+
   REQUEST_VALIDATION_ERROR: (errorMessage) => {
     return {
       errorCode: 301,

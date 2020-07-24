@@ -1,6 +1,6 @@
 const { User } = require("../../../models/user");
 const { stringConstants } = require("../../../utils/constants");
-const auth = require("../../../middlewares/authenticateRequest");
+const auth = require("../../../middlewares/authenticateUser");
 const httpMocks = require("node-mocks-http");
 const chai = require("chai");
 const expect = chai.expect;
