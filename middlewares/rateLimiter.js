@@ -4,6 +4,7 @@
 const RateLimit = require("express-rate-limit");
 const MongoStore = require("rate-limit-mongo");
 const config = require("config");
+const SimpleLogger = require("../utils/simpleLogger");
 const { stringConstants } = require("../utils/constants");
 const { errorObjects } = require("../utils/errorObjects");
 const { createResObject } = require("../utils/utilFunctions");
@@ -17,6 +18,9 @@ module.exports.globalLimiter = new RateLimit({
   store: new MongoStore({
     uri: dbConnectionString,
     collectionName: stringConstants.collectionNames.GLOBAL_REQ_RATE_RECORDS,
+    errorHandler: (err) => {
+      SimpleLogger.error(err);
+    },
   }),
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 200,
