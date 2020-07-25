@@ -124,8 +124,8 @@ router.post(
       paymentIntent = await stripe.paymentIntents.create({
         amount: amount,
         currency: stringConstants.currency.USD,
-        // customer: stripeId,
-        customer: "cus_HgxWVGiRx5yRFI",
+        customer: stripeId,
+        // customer: "cus_HgxWVGiRx5yRFI",
         payment_method: paymentMethod,
         confirm: true,
         description: "Payment for card grading @ DCGS.AI",
