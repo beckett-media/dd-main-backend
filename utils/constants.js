@@ -113,7 +113,7 @@ module.exports.stringConstants = {
   NO_STRIPE_ID_FOUND_FOR_USER: "No stripe ID found for user: ",
 
   PENDING_AMOUNT_AND_AMOUNT_DO_NOT_MATCH:
-    "Pending amount for cards do not match amount sent by clients",
+    "Pending amount for cards do not match amount sent by client application",
 
   PAYMENT_SUCCEEDED: "Payment succeeded",
 

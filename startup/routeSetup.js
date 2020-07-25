@@ -5,6 +5,7 @@ const authToken = require("../routes/common/authToken");
 const sportsCard = require("../routes/user/sportsCard");
 const ebay = require("../routes/user/ebay");
 const adminAuth = require("../routes/admin/authenticate");
+const pay = require("../routes/user/pay");
 
 module.exports = (app) => {
   // Import route and use app.use();
@@ -15,4 +16,5 @@ module.exports = (app) => {
   app.use("/sports-card", sportsCard);
   app.use("/ebay", ebay);
   app.use("/admin-auth", adminAuth);
+  app.use("/pay", pay);
 };
