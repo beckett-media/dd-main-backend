@@ -15,6 +15,8 @@ const { stringConstants } = require("../../utils/constants");
 const { errorObjects } = require("../../utils/errorObjects");
 const { createResObject } = require("../../utils/utilFunctions");
 const { valPayPenReq } = require("../../middlewares/validation");
+const { Transaction } = require("../../models/transaction");
+const { TransactionLog } = require("../../models/transactionLog");
 const config = require("config");
 const stripe = require("stripe")(config.get(stringConstants.STRIPE_TEST_KEY));
 const mongoose = require("mongoose");
@@ -124,11 +126,12 @@ router.post(
       paymentIntent = await stripe.paymentIntents.create({
         amount: amount,
         currency: stringConstants.currency.USD,
-        customer: stripeId,
-        // customer: "cus_HgxWVGiRx5yRFI",
+        // customer: stripeId,
+        customer: "cus_HgxWVGiRx5yRFI",
         payment_method: paymentMethod,
         confirm: true,
         description: "Payment for card grading @ DCGS.AI",
+        receipt_email: user.email,
       });
     } catch (error) {
       SimpleLogger.info(error.code);
@@ -149,67 +152,175 @@ router.post(
         );
     }
 
-    // If payment intent succeeded
-    if (paymentIntent.status === stringConstants.transactionStatus.SUCCEEDED) {
-      //   Preform the update to cards
-      const session = await mongoose.startSession();
-      try {
-        session.startTransaction();
-        await Card.updateMany(
-          {
-            $and: [
-              { user: userId },
-              { isCompleted: true },
-              { status: stringConstants.cardState.PENDING },
-            ],
-          },
-          { $set: { status: stringConstants.cardState.SUBMITTED } },
-          { session: session }
-        );
+    // Everything else will be done use database transactions
+    // The try and catch block will acts as the main block
+    const session = await mongoose.startSession();
+    try {
+      session.startTransaction();
+      // Create a transaction and relating transaction log
+      transaction = new Transaction({
+        amount: amount,
+        currency: stringConstants.currency.USD,
+        status: stringConstants.transactionStatus.CREATED,
+        piId: paymentIntent.id,
+        desc: "Transaction created in the system",
+        user: userId,
+        cards: cards,
+      });
+      transaction = await transaction.save(session);
 
-        await session.commitTransaction();
-        session.endSession();
+      transactionLog = new TransactionLog({
+        transaction: transaction._id,
+        amount: transaction.amount,
+        currency: transaction.currency,
+        status: transaction.status,
+        piId: transaction.piId,
+        desc: transaction.desc,
+        user: transaction.user,
+        cards: transaction.cards,
+      });
 
-        return res.send(
-          createResObject(
-            true,
-            { cardsUpdated: cards.length },
-            stringConstants.UPDATE_SUCCESSFUL
-          )
-        );
-      } catch (error) {
-        // Refund the payment
-        await session.abortTransaction();
-        session.endSession();
+      transactionLog = await transactionLog.save(session);
 
-        const refund = await stripe.refunds.create({
-          payment_intent: paymentIntent.id,
-        });
+      switch (paymentIntent.status) {
+        case stringConstants.piStatus.SUCCEEDED:
+          await Card.updateMany(
+            {
+              $and: [
+                { user: userId },
+                { isCompleted: true },
+                { status: stringConstants.cardState.PENDING },
+              ],
+            },
+            { $set: { status: stringConstants.cardState.SUBMITTED } },
+            { session: session }
+          );
 
-        return res
-          .status(400)
-          .send(
+          // Update transaction
+          transaction.status = stringConstants.piStatus.SUCCEEDED;
+          transaction.desc = "Transaction succeeded";
+          transaction = await transaction.save(session);
+
+          transactionLog = new TransactionLog({
+            transaction: transaction._id,
+            amount: transaction.amount,
+            currency: transaction.currency,
+            status: transaction.status,
+            piId: transaction.piId,
+            desc: transaction.desc,
+            user: transaction.user,
+            cards: transaction.cards,
+          });
+
+          transactionLog = await transactionLog.save(session);
+
+          await session.commitTransaction();
+          session.endSession();
+
+          return res.send(
+            createResObject(
+              true,
+              { cardsUpdated: cards.length },
+              stringConstants.stripeMessages.SUCCEEDED
+            )
+          );
+
+        case stringConstants.piStatus.REQ_PM_METHOD:
+          // Update transaction and create transaction log
+          // Update transaction
+          transaction.status = stringConstants.piStatus.REQ_PM_METHOD;
+          transaction.desc = "Transaction declined";
+          transaction = await transaction.save(session);
+
+          transactionLog = new TransactionLog({
+            transaction: transaction._id,
+            amount: transaction.amount,
+            currency: transaction.currency,
+            status: transaction.status,
+            piId: transaction.piId,
+            desc: transaction.desc,
+            user: transaction.user,
+            cards: transaction.cards,
+          });
+
+          transactionLog = await transactionLog.save(session);
+
+          await session.commitTransaction();
+          session.endSession();
+
+          return res.send(
+            createResObject(false, {}, stringConstants.stripeMessages.FAILED)
+          );
+        default:
+          transaction.status = paymentIntent.status;
+          transaction.desc = "Transaction declined";
+          transaction = await transaction.save(session);
+
+          transactionLog = new TransactionLog({
+            transaction: transaction._id,
+            amount: transaction.amount,
+            currency: transaction.currency,
+            status: transaction.status,
+            piId: transaction.piId,
+            desc: transaction.desc,
+            user: transaction.user,
+            cards: transaction.cards,
+          });
+
+          transactionLog = await transactionLog.save(session);
+
+          await session.commitTransaction();
+          session.endSession();
+
+          return res.send(
             createResObject(
               false,
               {},
-              stringConstants.UNSUSPECTED_ERROR,
-              errorObjects.UNSUSPECTED_ERROR(error.message)
+              stringConstants.stripeMessages.FAILED,
+              errorObjects.STRIPE_ERROR(stringConstants.stripeMessages.FAILED)
             )
           );
       }
-    }
-    return res
-      .status(400)
-      .send(
-        createResObject(
-          false,
-          {},
-          stringConstants.PAYMENT_ERRORED,
-          errorObjects.PAYMENT_ERRORED(
-            `Payment intetn with ID: ${paymentIntent.id} has failed`
+    } catch (error) {
+      SimpleLogger.error(error);
+      // Refund the payment
+      await session.abortTransaction();
+      session.endSession();
+
+      // Try catch block maybe
+      const refund = await stripe.refunds.create({
+        payment_intent: paymentIntent.id,
+      });
+
+      if (transaction) {
+        transaction.status = stringConstants.transactionStatus.REFUNDED;
+        transaction.desc = `${transaction.piId} has been refunded ${refund.id}`;
+
+        transactionLog = new TransactionLog({
+          transaction: transaction._id,
+          amount: transaction.amount,
+          currency: transaction.currency,
+          status: transaction.status,
+          piId: transaction.piId,
+          desc: transaction.desc,
+          user: transaction.user,
+          cards: transaction.cards,
+        });
+
+        transactionLog = await transactionLog.save();
+      }
+
+      return res
+        .status(400)
+        .send(
+          createResObject(
+            false,
+            {},
+            stringConstants.stripeMessages.FAILED,
+            errorObjects.STRIPE_ERROR(stringConstants.stripeMessages.REFUND)
           )
-        )
-      );
+        );
+    }
   }
 );
 

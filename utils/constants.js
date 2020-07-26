@@ -212,10 +212,20 @@ module.exports.stringConstants = {
 
   transactionStatus: {
     CREATED: "created",
-    CANCELLED: "cancelled",
+    CANCELED: "canceled",
     SUCCEEDED: "succeeded",
     ERROR: "error",
     REFUNDED: "refunded",
+  },
+
+  piStatus: {
+    REQ_PM_METHOD: "requires_payment_method",
+    REQ_CONFIRMATION: "requires_confirmation",
+    REQ_ACTION: "requires_action",
+    PROCESSING: "processing",
+    REQ_CAPTURE: "requires_capture",
+    CANCELED: "canceled",
+    SUCCEEDED: "succeeded",
   },
 
   URLS: {
@@ -232,5 +242,11 @@ module.exports.stringConstants = {
     X_RATELIMIT_LIMIT: "X-RateLimit-Limit",
     X_RATELIMIT_REMAINING: "X-RateLimit-Remaining",
     RETRY_AFTER: "Retry-After",
+  },
+
+  stripeMessages: {
+    SUCCEEDED: "You order has been placed",
+    FAILED: "We are sorry, there was an error processing your payment",
+    REFUND: "Error encountered, fund has been issued",
   },
 };

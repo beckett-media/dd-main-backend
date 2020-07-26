@@ -196,7 +196,7 @@ router.post(
       });
     } else {
       const role = user.role;
-
+      // Cannot use this route for admin login
       if (role !== stringConstants.role.USER || role !== user.role) {
         //   Forbidden resource
         return res

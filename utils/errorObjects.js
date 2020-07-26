@@ -223,6 +223,14 @@ module.exports.errorObjects = {
     errorMessage: stringConstants.TOO_MANY_REQUESTS,
   },
 
+  STRIPE_ERROR: (message) => {
+    return {
+      errorCode: 129,
+      errorSubCode: "STRIPE_ERROR",
+      errorMessage: message,
+    };
+  },
+
   REQUEST_VALIDATION_ERROR: (errorMessage) => {
     return {
       errorCode: 301,

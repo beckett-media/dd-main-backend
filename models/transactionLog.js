@@ -52,6 +52,12 @@ const transactionLogSchema = new mongoose.Schema({
     ref: stringConstants.collectionNames.USER_COLLECTION,
     required: true,
   },
+  cards: [
+    {
+      type: mongoose.Types.ObjectId,
+      ref: stringConstants.collectionNames.CARD_COLLECTION,
+    },
+  ],
   createdAt: {
     type: Date,
     default: Date.now(),

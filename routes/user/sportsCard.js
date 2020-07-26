@@ -661,4 +661,41 @@ router.get(
   }
 );
 
+/**
+ * Route to get all cards pending grading for user
+ */
+router.get(
+  "/pending-grading-cards/:pageSize/:pageNumber",
+  [appAuth, auth, valPageSizeNumber],
+  async (req, res) => {
+    const pageSize = parseInt(req.params.pageSize);
+    const pageNumber = parseInt(req.params.pageNumber);
+
+    let cards = await Card.find({
+      $and: [
+        { user: req.user._id },
+        { status: stringConstants.cardState.SUBMITTED },
+      ],
+    }).lean();
+    const numCards = cards.length;
+
+    cards = await Card.find({
+      $and: [
+        { user: req.user._id },
+        { status: stringConstants.cardState.SUBMITTED },
+      ],
+    })
+      .sort({ createdAt: 1 })
+      .skip((pageNumber - 1) * pageSize)
+      .limit(pageSize);
+
+    return res.send(
+      createResObject(
+        true,
+        { cards: cards, numCards },
+        stringConstants.FETCH_SUCESSFUL
+      )
+    );
+  }
+);
 module.exports = router;

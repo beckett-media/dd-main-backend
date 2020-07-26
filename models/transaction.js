@@ -25,7 +25,7 @@ const transactionSchema = new mongoose.Schema(
       type: String,
       enum: [
         stringConstants.transactionStatus.CREATED,
-        stringConstants.transactionStatus.CANCELLED,
+        stringConstants.transactionStatus.CANCELED,
         stringConstants.transactionStatus.SUCCEEDED,
         stringConstants.transactionStatus.ERROR,
         stringConstants.transactionStatus.REFUNDED,
