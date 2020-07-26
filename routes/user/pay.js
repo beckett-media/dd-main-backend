@@ -485,6 +485,7 @@ router.post("/webhook", async (req, res, next) => {
       session.endSession();
 
       // Send notifications
+      return res.send();
     } catch (error) {
       await session.abortTransaction();
       session.endSession();
