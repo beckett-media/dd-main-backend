@@ -226,7 +226,7 @@ router.post(
       });
 
       const { error } = schema.validate(req.body);
-      if (err) {
+      if (error) {
         return res
           .status(400)
           .send(
