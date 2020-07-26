@@ -121,7 +121,7 @@ router.post(
   [wrongSigninLimiter, appAuth, authAppleTokenMiddleware],
   async (req, res, next) => {
     const email = req.payload.email;
-    const userIdetifier = req.payload.sub;
+    const userIdentifier = req.payload.sub;
     const deviceToken = req.body.deviceToken;
     const osType = req.body.osType;
 
@@ -131,7 +131,7 @@ router.post(
 
     if (!email) {
       return next(new Error("Apple sign in email not found in payload"));
-    } else if (!userIdetifier) {
+    } else if (!userIdentifier) {
       return next(
         new Error("Apple sign in user identifier not found in payload")
       );
@@ -158,7 +158,7 @@ router.post(
       // Create a new user
       schema = Joi.object({
         fullName: Joi.string().required().min(2).max(255),
-        userIdetifier: Joi.string().required(), // Already checked in middleware
+        userIdentifier: Joi.string().required(), // Already checked in middleware
         osType: Joi.string()
           .valid(
             stringConstants.osType.ANDROID,
@@ -185,7 +185,7 @@ router.post(
           );
 
       const salt = await bcrypt.genSalt(10);
-      const appleId = await bcrypt.hash(userIdetifier, salt);
+      const appleId = await bcrypt.hash(userIdentifier, salt);
 
       const fullName = req.body.fullName;
       user = new User({
@@ -212,7 +212,7 @@ router.post(
       }
       schema = Joi.object({
         fullName: Joi.string(),
-        userIdetifier: Joi.string().required(), // Already checked in middleware
+        userIdentifier: Joi.string().required(), // Already checked in middleware
         osType: Joi.string()
           .valid(
             stringConstants.osType.ANDROID,
@@ -240,7 +240,7 @@ router.post(
       }
 
       const isValid = await bcrypt.compare(
-        req.body.userIdetifier,
+        req.body.userIdentifier,
         user.appleId ? user.appleId : "default"
       );
 
