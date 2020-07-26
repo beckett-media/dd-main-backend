@@ -409,6 +409,7 @@ router.post("/webhook", async (req, res, next) => {
 
   if (type === stringConstants.piEvents.PI_SUCCEEDED) {
     try {
+      session.startTransaction();
       transaction = await Transaction.findOne({
         $and: [
           { piId: paymentIntent.id },
