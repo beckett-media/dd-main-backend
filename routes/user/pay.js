@@ -450,7 +450,7 @@ router.post("/webhook", async (req, res, next) => {
           user: transaction.user,
           cards: transaction.cards,
         });
-        transactionLog = await transactionLog.save();
+        transactionLog = await transactionLog.save(session);
         return res.send();
       }
       let cards = [];
