@@ -500,6 +500,7 @@ router.post("/webhook", async (req, res, next) => {
       }
       return res.send();
     } catch (error) {
+      SimpleLogger.error(error);
       await session.abortTransaction();
       session.endSession();
 
