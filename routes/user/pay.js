@@ -221,7 +221,7 @@ router.post(
           return res.send(
             createResObject(
               true,
-              { cardsUpdated: cards.length },
+              { clientSecret: null, cardsUpdated: cards.length },
               stringConstants.stripeMessages.SUCCEEDED
             )
           );
@@ -251,7 +251,7 @@ router.post(
           return res.send(
             createResObject(
               true,
-              { paymentIntent },
+              { clientSecret: paymentIntent.client_secret, cardsUpdated: null },
               stringConstants.stripeMessages.REQ_ACTION
             )
           );
@@ -280,7 +280,7 @@ router.post(
           return res.send(
             createResObject(
               true,
-              { paymentIntent },
+              { clientSecret: null, cardsUpdated: null },
               stringConstants.stripeMessages.PROCESSING
             )
           );
@@ -430,7 +430,9 @@ router.post("/webhook", async (req, res, next) => {
             `Transaction with payment intent ID: ${paymentIntent.id} not found!`
           )
         );
-        return res.send();
+        return res.send(
+          `Transaction with payment intent ID: ${paymentIntent.id} not found!`
+        );
       }
 
       // Complete the transaction
@@ -453,10 +455,12 @@ router.post("/webhook", async (req, res, next) => {
           cards: transaction.cards,
         });
         transactionLog = await transactionLog.save(session);
-        return res.send();
+        return res.send(
+          `No cards found under transaction with id: ${transaction._id}`
+        );
       }
       let cards = [];
-      SimpleLogger.info(cardIds);
+
       for (const cardId of cardIds) {
         const card = await Card.findByIdAndUpdate(
           cardId,
@@ -530,19 +534,10 @@ router.post("/webhook", async (req, res, next) => {
         transactionLog = await transactionLog.save();
       }
 
-      return res
-        .status(400)
-        .send(
-          createResObject(
-            false,
-            {},
-            stringConstants.stripeMessages.REFUND,
-            errorObjects.STRIPE_ERROR(stringConstants.stripeMessages.REFUND)
-          )
-        );
+      return res.send(`${transaction.piId} has been refunded ${refund.id}`);
     }
   } else {
-    return res.send();
+    return res.send("Webhook other than payment intent succeeded received.");
   }
 });
 
