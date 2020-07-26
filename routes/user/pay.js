@@ -288,26 +288,28 @@ router.post(
       session.endSession();
 
       // Try catch block maybe
-      const refund = await stripe.refunds.create({
-        payment_intent: paymentIntent.id,
-      });
-
-      if (transaction) {
-        transaction.status = stringConstants.transactionStatus.REFUNDED;
-        transaction.desc = `${transaction.piId} has been refunded ${refund.id}`;
-
-        transactionLog = new TransactionLog({
-          transaction: transaction._id,
-          amount: transaction.amount,
-          currency: transaction.currency,
-          status: transaction.status,
-          piId: transaction.piId,
-          desc: transaction.desc,
-          user: transaction.user,
-          cards: transaction.cards,
+      if (paymentIntent.status === stringConstants.piStatus.SUCCEEDED) {
+        const refund = await stripe.refunds.create({
+          payment_intent: paymentIntent.id,
         });
 
-        transactionLog = await transactionLog.save();
+        if (transaction) {
+          transaction.status = stringConstants.transactionStatus.REFUNDED;
+          transaction.desc = `${transaction.piId} has been refunded ${refund.id}`;
+
+          transactionLog = new TransactionLog({
+            transaction: transaction._id,
+            amount: transaction.amount,
+            currency: transaction.currency,
+            status: transaction.status,
+            piId: transaction.piId,
+            desc: transaction.desc,
+            user: transaction.user,
+            cards: transaction.cards,
+          });
+
+          transactionLog = await transactionLog.save();
+        }
       }
 
       return res
