@@ -252,4 +252,8 @@ module.exports.stringConstants = {
     PROCESSING:
       "Payment being processed, you will get a notification when completed",
   },
+
+  piEvents: {
+    PI_SUCCEEDED: "payment_intent.succeeded",
+  },
 };

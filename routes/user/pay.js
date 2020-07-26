@@ -386,4 +386,139 @@ router.post(
   }
 );
 
+/**
+ * Stripe webhook to listen for async payment processing
+ */
+router.post("/webhook", async (req, res, next) => {
+  // Webhook is specifically for async payment process
+
+  let event, type, paymentIntent, transaction, transactionLog; // Stripe event
+
+  // 1. Parse the stripe event
+  try {
+    event = req.body;
+    type = event.type;
+    paymentIntent = event.data.object;
+  } catch (error) {
+    SimpleLogger.error(error);
+    return res.status(400).send(`Webhook error : ${error.message}`);
+  }
+
+  const session = await mongoose.startSession();
+
+  if (type === stringConstants.piEvents.PI_SUCCEEDED) {
+    try {
+      transaction = await Transaction.findOne({
+        $and: [
+          { piId: paymentIntent.id },
+          {
+            status: {
+              $in: [
+                stringConstants.piStatus.REQ_ACTION,
+                stringConstants.piStatus.PROCESSING,
+              ],
+            },
+          },
+        ],
+      });
+
+      if (!transaction) {
+        SimpleLogger.error(
+          new Error(
+            `Transaction with payment intent ID: ${paymentIntent.id} not found!`
+          )
+        );
+        return res.send();
+      }
+
+      // Complete the transaction
+      const cardIds = transaction.cards;
+      if (!cardIds || cardIds.length < 0) {
+        SimpleLogger.error(
+          new Error(
+            `No cards found under transaction with id: ${transaction._id}`
+          )
+        );
+
+        transactionLog = new TransactionLog({
+          transaction: transaction._id,
+          amount: transaction.amount,
+          currency: transaction.currency,
+          status: transaction.status,
+          piId: transaction.piId,
+          desc: "No cards found in transaction",
+          user: transaction.user,
+          cards: transaction.cards,
+        });
+        transactionLog = await transactionLog.save();
+        return res.send();
+      }
+      let cards = [];
+      for (const cardId in cardIds) {
+        const card = await Card.findByIdAndUpdate(
+          cardId,
+          { $set: { status: stringConstants.cardState.SUBMITTED } },
+          { session: session, new: true }
+        );
+        cards.push(card._id);
+      }
+
+      // Update transaction
+      transaction.status = stringConstants.piStatus.SUCCEEDED;
+      transaction.desc = stringConstants.stripeMessages.SUCCEEDED;
+      transaction.cards = cards;
+      transaction = await transaction.save(session);
+
+      transactionLog = new TransactionLog({
+        transaction: transaction._id,
+        amount: transaction.amount,
+        currency: transaction.currency,
+        status: transaction.status,
+        piId: transaction.piId,
+        desc: transaction.desc,
+        user: transaction.user,
+      });
+
+      transactionLog = await transactionLog.save(session);
+
+      // Send notifications
+    } catch (error) {
+      const refund = await stripe.refunds.create({
+        payment_intent: paymentIntent.id,
+      });
+
+      if (transaction) {
+        transaction.status = stringConstants.transactionStatus.REFUNDED;
+        transaction.desc = `${transaction.piId} has been refunded ${refund.id}`;
+
+        transactionLog = new TransactionLog({
+          transaction: transaction._id,
+          amount: transaction.amount,
+          currency: transaction.currency,
+          status: transaction.status,
+          piId: transaction.piId,
+          desc: transaction.desc,
+          user: transaction.user,
+          cards: transaction.cards,
+        });
+
+        transactionLog = await transactionLog.save();
+      }
+
+      return res
+        .status(400)
+        .send(
+          createResObject(
+            false,
+            {},
+            stringConstants.stripeMessages.REFUND,
+            errorObjects.STRIPE_ERROR(stringConstants.stripeMessages.REFUND)
+          )
+        );
+    }
+  } else {
+    return res.send();
+  }
+});
+
 module.exports = router;
