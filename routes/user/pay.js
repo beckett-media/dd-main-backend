@@ -20,6 +20,7 @@ const { TransactionLog } = require("../../models/transactionLog");
 const config = require("config");
 const stripe = require("stripe")(config.get(stringConstants.STRIPE_TEST_KEY));
 const mongoose = require("mongoose");
+const sendNotifications = require("../../utils/sendNotifications");
 
 router.post(
   "/for-pending-cards",
@@ -484,7 +485,18 @@ router.post("/webhook", async (req, res, next) => {
       await session.commitTransaction();
       session.endSession();
 
+      const user = await User.findById(transaction.user);
       // Send notifications
+      try {
+        await sendNotifications(
+          "Test",
+          "Test",
+          { name: "Test" },
+          user.deviceTokens
+        );
+      } catch (error) {
+        SimpleLogger.error(error);
+      }
       return res.send();
     } catch (error) {
       await session.abortTransaction();

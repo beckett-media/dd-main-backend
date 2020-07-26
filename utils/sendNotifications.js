@@ -15,9 +15,16 @@ module.exports = async function (title, body, data, deviceTokens) {
     tokens: deviceTokens,
   };
 
-  const firebaseResponse = await firebaseAdmin
-    .messaging()
-    .sendMulticast(messageObject);
+  let firebaseResponse;
+  try {
+    firebaseResponse = await firebaseAdmin
+      .messaging()
+      .sendMulticast(messageObject);
+  } catch (error) {
+    console.log(firebaseResponse);
+    throw error;
+  }
+
   console.log(firebaseResponse);
   return { firebaseResponse };
 };
