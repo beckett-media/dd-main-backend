@@ -245,8 +245,11 @@ module.exports.stringConstants = {
   },
 
   stripeMessages: {
-    SUCCEEDED: "You order has been placed",
+    SUCCEEDED: "Payment successful ordere has been placed",
     FAILED: "We are sorry, there was an error processing your payment",
-    REFUND: "Error encountered, fund has been issued",
+    REFUND: "Error encountered, refund has been issued",
+    REQ_ACTION: "Payment being processed, requires action on users part",
+    PROCESSING:
+      "Payment being processed, you will get a notification when completed",
   },
 };

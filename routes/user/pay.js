@@ -198,7 +198,7 @@ router.post(
 
           // Update transaction
           transaction.status = stringConstants.piStatus.SUCCEEDED;
-          transaction.desc = "Transaction succeeded";
+          transaction.desc = stringConstants.stripeMessages.SUCCEEDED;
           transaction = await transaction.save(session);
 
           transactionLog = new TransactionLog({
@@ -222,6 +222,65 @@ router.post(
               true,
               { cardsUpdated: cards.length },
               stringConstants.stripeMessages.SUCCEEDED
+            )
+          );
+
+        case stringConstants.piStatus.REQ_ACTION:
+          // 3D secure
+          transaction.status = stringConstants.piStatus.REQ_ACTION;
+          transaction.desc = stringConstants.stripeMessages.REQ_ACTION;
+          transaction = await transaction.save(session);
+
+          transactionLog = new TransactionLog({
+            transaction: transaction._id,
+            amount: transaction.amount,
+            currency: transaction.currency,
+            status: transaction.status,
+            piId: transaction.piId,
+            desc: transaction.desc,
+            user: transaction.user,
+            cards: transaction.cards,
+          });
+
+          transactionLog = await transactionLog.save(session);
+
+          await session.commitTransaction();
+          session.endSession();
+
+          return res.send(
+            createResObject(
+              true,
+              { paymentIntent },
+              stringConstants.stripeMessages.REQ_ACTION
+            )
+          );
+
+        case stringConstants.piStatus.PROCESSING:
+          transaction.status = stringConstants.piStatus.PROCESSING;
+          transaction.desc = stringConstants.stripeMessages.PROCESSING;
+          transaction = await transaction.save(session);
+
+          transactionLog = new TransactionLog({
+            transaction: transaction._id,
+            amount: transaction.amount,
+            currency: transaction.currency,
+            status: transaction.status,
+            piId: transaction.piId,
+            desc: transaction.desc,
+            user: transaction.user,
+            cards: transaction.cards,
+          });
+
+          transactionLog = await transactionLog.save(session);
+
+          await session.commitTransaction();
+          session.endSession();
+
+          return res.send(
+            createResObject(
+              true,
+              { paymentIntent },
+              stringConstants.stripeMessages.PROCESSING
             )
           );
 
@@ -251,6 +310,7 @@ router.post(
           return res.send(
             createResObject(false, {}, stringConstants.stripeMessages.FAILED)
           );
+
         default:
           transaction.status = paymentIntent.status;
           transaction.desc = "Transaction declined";
@@ -310,18 +370,18 @@ router.post(
 
           transactionLog = await transactionLog.save();
         }
-      }
 
-      return res
-        .status(400)
-        .send(
-          createResObject(
-            false,
-            {},
-            stringConstants.stripeMessages.FAILED,
-            errorObjects.STRIPE_ERROR(stringConstants.stripeMessages.REFUND)
-          )
-        );
+        return res
+          .status(400)
+          .send(
+            createResObject(
+              false,
+              {},
+              stringConstants.stripeMessages.REFUND,
+              errorObjects.STRIPE_ERROR(stringConstants.stripeMessages.REFUND)
+            )
+          );
+      }
     }
   }
 );
