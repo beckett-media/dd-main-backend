@@ -456,7 +456,8 @@ router.post("/webhook", async (req, res, next) => {
         return res.send();
       }
       let cards = [];
-      for (const cardId in cardIds) {
+      SimpleLogger.info(cardIds);
+      for (const cardId of cardIds) {
         const card = await Card.findByIdAndUpdate(
           cardId,
           { $set: { status: stringConstants.cardState.SUBMITTED } },
@@ -498,6 +499,7 @@ router.post("/webhook", async (req, res, next) => {
       } catch (error) {
         SimpleLogger.error(error);
       }
+
       return res.send();
     } catch (error) {
       SimpleLogger.error(error);
