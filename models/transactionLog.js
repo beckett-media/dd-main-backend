@@ -33,6 +33,7 @@ const transactionLogSchema = new mongoose.Schema({
   status: {
     type: String,
     enum: [
+      stringConstants.transactionStatus.CREATED,
       stringConstants.piStatus.CANCELED,
       stringConstants.piStatus.PROCESSING,
       stringConstants.piStatus.REQ_ACTION,
