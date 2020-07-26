@@ -511,6 +511,8 @@ router.post("/webhook", async (req, res, next) => {
         transaction.status = stringConstants.transactionStatus.REFUNDED;
         transaction.desc = `${transaction.piId} has been refunded ${refund.id}`;
 
+        transaction = await transaction.save();
+
         transactionLog = new TransactionLog({
           transaction: transaction._id,
           amount: transaction.amount,
