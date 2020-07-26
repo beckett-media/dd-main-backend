@@ -481,8 +481,14 @@ router.post("/webhook", async (req, res, next) => {
 
       transactionLog = await transactionLog.save(session);
 
+      await session.commitTransaction();
+      session.endSession();
+
       // Send notifications
     } catch (error) {
+      await session.abortTransaction();
+      session.endSession();
+
       const refund = await stripe.refunds.create({
         payment_intent: paymentIntent.id,
       });
