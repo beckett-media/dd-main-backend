@@ -309,7 +309,12 @@ router.post(
           session.endSession();
 
           return res.send(
-            createResObject(false, {}, stringConstants.stripeMessages.FAILED)
+            createResObject(
+              false,
+              {},
+              stringConstants.stripeMessages.FAILED,
+              errorObjects.STRIPE_ERROR(stringConstants.stripeMessages.FAILED)
+            )
           );
 
         default:

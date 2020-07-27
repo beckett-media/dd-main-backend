@@ -7,6 +7,7 @@ const path = require("path");
 const fsPromises = require("fs").promises;
 const _ = require("lodash");
 const currency = require("../../utils/currency");
+const Jimp = require("jimp");
 const { User } = require("../../models/user");
 const { Card } = require("../../models/card");
 const { PendingDeletion } = require("../../models/pendingDeletion");
@@ -497,11 +498,7 @@ router.post(
           SimpleLogger.error(error);
           await new PendingDeletion({
             deletionType: stringConstants.deletionType.FILE,
-            data: path.join(
-              __dirname,
-              "../../public/card_videos/",
-              `${req.file.filename}`
-            ),
+            data: path.join(__dirname, "../../public/", card.video),
           }).save();
         }
       }
@@ -528,6 +525,7 @@ router.post(
   "/add-card-data/:cardId",
   [appAuth, auth, valObjectIdInUrl, valUpdateCardData],
   async (req, res) => {
+    const userId = req.user._id;
     const cardId = req.params.cardId;
     let card = await Card.findById(cardId);
     if (!card)
@@ -553,6 +551,36 @@ router.post(
     card.playerNames = playerNames;
 
     card.isCompleted = card.checkIfCompleted();
+
+    // Save the thumbnail of the card
+    // Resizing card image while maintaining aspect ratio
+    if (card.isCompleted) {
+      let image;
+
+      const cardFront = path.join(__dirname, "../../public/", card.front);
+      const extension = path.extname(card.front).toLowerCase();
+      const thumbnailDest = path.join(
+        __dirname,
+        "../../public/",
+        `${userId}/cards/${card._id}/`,
+        `card_thumbnail${extension}`
+      );
+
+      try {
+        image = await Jimp.read(cardFront);
+        const cardHeight = image.getHeight();
+        // const cardWidth = image.getWidth();
+        const ratio = 200 / cardHeight;
+        image.scale(ratio);
+        await image.write(thumbnailDest);
+        card.thumbnail = path.join(
+          `${userId}/cards/${card._id}/`,
+          `card_thumbnail${extension}`
+        );
+      } catch (error) {
+        SimpleLogger.error(error);
+      }
+    }
 
     card = await card.save();
 
