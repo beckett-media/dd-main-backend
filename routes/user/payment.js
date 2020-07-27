@@ -31,6 +31,7 @@ router.get("/save-card-client-secret", [appAuth, auth], async (req, res) => {
     try {
       customer = await stripe.customers.create({
         email: user.email,
+        description: stringConstants.STRIPE_CUSTOMER_CREATION_DESC,
         metadata: {
           userId: user._id.toString(),
         },
@@ -99,6 +100,7 @@ router.get("/saved-cards", [appAuth, auth], async (req, res) => {
     try {
       customer = await stripe.customers.create({
         email: user.email,
+        description: stringConstants.STRIPE_CUSTOMER_CREATION_DESC,
         metadata: {
           userId: user._id.toString(),
         },

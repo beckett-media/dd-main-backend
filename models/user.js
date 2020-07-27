@@ -125,6 +125,7 @@ userSchema.pre("save", async function (next) {
     if (!this.stripeId) {
       const customer = await stripe.customers.create({
         email: this.email,
+        description: stringConstants.STRIPE_CUSTOMER_CREATION_DESC,
         metadata: {
           userId: this._id.toString(),
         },
@@ -194,7 +195,7 @@ userSchema.methods.generateAuthToken = function () {
   const token = jwt.sign(
     { _id: this._id, role: this.role },
     config.get(stringConstants.JWT_PRIATE_KEY),
-    { expiresIn: "60m" }
+    { expiresIn: "5m" }
   );
 
   return {
@@ -207,11 +208,11 @@ userSchema.methods.generateRefreshToken = function () {
   const refreshToken = jwt.sign(
     { _id: this._id },
     config.get(stringConstants.JWT_REFRESH_KEY),
-    { expiresIn: "30d" }
+    { expiresIn: "15m" }
   );
   return {
     token: refreshToken,
-    expiry: moment.utc(moment(Date.now()).add(30, "days")).format(),
+    expiry: moment.utc(moment(Date.now()).add(15, "minutes")).format(),
   };
 };
 // "_id", "fullName", "email", "profilePicture", "username"

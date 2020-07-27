@@ -134,6 +134,8 @@ module.exports.stringConstants = {
 
   TOO_MANY_REQUESTS: "Too many requests, please try again later",
 
+  STRIPE_CUSTOMER_CREATION_DESC: "Created through DCGS",
+
   collectionNames: {
     USER_COLLECTION: "User",
     PENDING_DELETION: "Pending_Deletion",

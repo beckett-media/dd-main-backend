@@ -1,6 +1,7 @@
 /**
  * All card related routes for admin such as:
  * 1. Grade submitted cards
+ * 2. Submit grading for card
  */
 const express = require("express");
 const router = express.Router();

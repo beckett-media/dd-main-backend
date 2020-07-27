@@ -38,6 +38,7 @@ router.post(
       try {
         customer = await stripe.customers.create({
           email: user.email,
+          description: stringConstants.STRIPE_CUSTOMER_CREATION_DESC,
           metadata: {
             userId: user._id.toString(),
           },
@@ -499,12 +500,13 @@ router.post("/webhook", async (req, res, next) => {
       const user = await User.findById(transaction.user);
       // Send notifications
       try {
-        await sendNotifications(
+        const result = await sendNotifications(
           "Test",
           "Test",
           { name: "Test" },
           user.deviceTokens
         );
+        console.log(result.firebaseResponse);
       } catch (error) {
         SimpleLogger.error(error);
       }
