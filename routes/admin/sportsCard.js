@@ -65,7 +65,9 @@ router.post(
     const cardId = req.body.cardId;
 
     // Add status while finding
-    let card = await Card.findOne({ _id: cardId });
+    let card = await Card.findOne({
+      $and: [{ _id: cardId }, { status: stringConstants.cardState.SUBMITTED }],
+    });
     if (!card)
       return res
         .status(400)
@@ -150,6 +152,7 @@ router.post(
       {
         $set: {
           gradedImage: gradedCardPath,
+          status: stringConstants.cardState.GRADED,
           "grading.signedCeleb": signedCeleb,
           "grading.cornerValue": cornerValue,
           "grading.edgeValue": edgeValue,
