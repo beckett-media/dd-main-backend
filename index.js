@@ -16,8 +16,10 @@ require("express-async-errors");
 require("dotenv").config({ path: path.join(__dirname, "../.env") });
 /**
  * Connect to DB
+ * and add starting data
  */
 require("./startup/databaseConnect")();
+require("./startup/databaseSetup")();
 /**
  * Setup simple logger before we can use it.
  * Create all required directory first

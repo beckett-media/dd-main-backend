@@ -344,4 +344,34 @@ module.exports = {
     }
     return next();
   },
+  valCardGradeReq: (req, res, next) => {
+    const schema = Joi.object({
+      cardId: Joi.objectId().required(),
+      signedCeleb: Joi.number().required().min(0).max(2000),
+      cornerValue: Joi.number().required().min(50).max(600),
+      edgeValue: Joi.number().required().min(-50).max(600),
+      surfaceValue: Joi.number().required().min(0).max(600),
+      eyeAppeal: Joi.number().required().min(-50).max(500),
+      centerFront: Joi.number().required().min(-10).max(100),
+      centerBack: Joi.number().required().min(-20).max(50),
+      cardStains: Joi.number().required().min(-50).max(200),
+      cardSleeving: Joi.number().required().min(-100).max(0),
+      printingDefects: Joi.number().required().min(-600).max(0),
+    });
+
+    const { error } = schema.validate(req.body);
+    if (error) {
+      return res
+        .status(400)
+        .send(
+          createResObject(
+            false,
+            { errorMessage: error.details[0].message },
+            stringConstants.REQUEST_VALIDATION_FAILED,
+            errorObjects.REQUEST_VALIDATION_ERROR(error.details[0].message)
+          )
+        );
+    }
+    return next();
+  },
 };

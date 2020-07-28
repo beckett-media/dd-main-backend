@@ -54,6 +54,20 @@ const cardSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    grading: {
+      signedCeleb: { type: Number },
+      cornerValue: { type: Number },
+      edgeValue: { type: Number },
+      surfaceValue: { type: Number },
+      eyeAppeal: { type: Number },
+      centerFront: { type: Number },
+      centerBack: { type: Number },
+      cardStains: { type: Number },
+      cardSleeving: { type: Number },
+      printingDefects: { type: Number },
+      grade: { type: String },
+      gradeDesc: { type: String },
+    },
   },
   { timestamps: true, toJSON: { getters: true } }
 );

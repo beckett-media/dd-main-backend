@@ -146,6 +146,7 @@ module.exports.stringConstants = {
     JOB: "jobs", // For Agenda package,
     GLOBAL_REQ_RATE_RECORDS: "global_req_rate_records",
     WRONG_SIGNIN_REQ_RECORDS: "wrong_signin_req_records",
+    QUESTIONS_COLLECTION: "Question",
   },
 
   deletionType: {
@@ -257,5 +258,38 @@ module.exports.stringConstants = {
 
   piEvents: {
     PI_SUCCEEDED: "payment_intent.succeeded",
+  },
+
+  gradingQId: {
+    SIGNED_CELEB: "signedCeleb",
+    CORNER_VALUE: "cornerValue",
+    EDGE_VALUE: "edgeValue",
+    SURFACE_VALUE: "surfaceValue",
+    EYE_APPEAL: "eyeAppeal",
+    CENTER_FRONT: "centerFront",
+    CENTER_BACK: "centerBack",
+    CARD_STAINS: "cardStains",
+    CARD_SLEEVING: "cardSleeving",
+    PRINTING_DEFECTS: "printingDefects",
+  },
+  gradeDesc: {
+    GEM_MT_10: "GEM-MT 10",
+    MINT_9: "MINT 9",
+    NEAR_MINT_MINT: "NEAR MINT-MINT",
+    NEAR_MINT: "NEAR MINT",
+    EXCELLENT_MINT: "EXCELLENT MINT",
+    EXCELLENT: "EXCELLENT",
+    VERY_GOOD_EXCELLENT: "VERY GOOD-EXCELLENT",
+    VERY_GOOD: "VERY GOOD",
+    GOOD: "GOOD",
+    FAIR: "FAIR",
+    POOR: "POOR",
+    UNGRADABLE: "UNGRADABLE",
+  },
+  imageAssetNames: {
+    DCGS_LOGO: "dcgs_logo.png",
+    INNER_IMAGE_MASK: "inner_image_mask.png",
+    OUTER_IMAGE_MASK: "outer_image_mask.png",
+    QR_CODE_MASK: "qr_code_mask.png",
   },
 };

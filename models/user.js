@@ -195,12 +195,12 @@ userSchema.methods.generateAuthToken = function () {
   const token = jwt.sign(
     { _id: this._id, role: this.role },
     config.get(stringConstants.JWT_PRIATE_KEY),
-    { expiresIn: "5m" }
+    { expiresIn: "15m" }
   );
 
   return {
     token,
-    expiry: moment.utc(moment(Date.now()).add(60, "minutes")).format(),
+    expiry: moment.utc(moment(Date.now()).add(15, "minutes")).format(),
   };
 };
 
@@ -208,11 +208,11 @@ userSchema.methods.generateRefreshToken = function () {
   const refreshToken = jwt.sign(
     { _id: this._id },
     config.get(stringConstants.JWT_REFRESH_KEY),
-    { expiresIn: "15m" }
+    { expiresIn: "30d" }
   );
   return {
     token: refreshToken,
-    expiry: moment.utc(moment(Date.now()).add(15, "minutes")).format(),
+    expiry: moment.utc(moment(Date.now()).add(30, "days")).format(),
   };
 };
 // "_id", "fullName", "email", "profilePicture", "username"
