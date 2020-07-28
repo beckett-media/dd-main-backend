@@ -24,6 +24,10 @@ const questionSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    minPoints: {
+      type: Number,
+      required: true,
+    },
   },
   { timestamps: true }
 );

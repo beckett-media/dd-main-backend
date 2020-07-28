@@ -80,7 +80,7 @@ describe("INTEG: authenticate.test.js: EndPoint: /authenticate/sign-in-user", fu
       }
     });
 
-    it("Should successfully sign in user successfully", async function () {
+    it("Test 1: Should successfully sign in user successfully", async function () {
       await registerUser();
       let res = await signInUser();
 
@@ -94,7 +94,7 @@ describe("INTEG: authenticate.test.js: EndPoint: /authenticate/sign-in-user", fu
     /**
      * Test with wrong password and should return 400
      */
-    it("Should return 400 error for wrong password", async function () {
+    it("Test 2: Should return 400 error for wrong password", async function () {
       await registerUser();
 
       password = "wrong_password";
@@ -108,7 +108,7 @@ describe("INTEG: authenticate.test.js: EndPoint: /authenticate/sign-in-user", fu
      * Do not register user and try to sign in.
      * It should return 404 for user not found.
      */
-    it("Should return 404 error for user with email not found", async function () {
+    it("Test 3: Should return 404 error for user with email not found", async function () {
       await registerUser();
 
       email = "wrong_email@gmail.com";
@@ -119,7 +119,7 @@ describe("INTEG: authenticate.test.js: EndPoint: /authenticate/sign-in-user", fu
       expect(res.body.success).to.be.false;
     });
 
-    it("Should add the device token to user device tokens", async function () {
+    it("Test 4: Should add the device token to user device tokens", async function () {
       await registerUser();
       const res = await signInUser();
 
@@ -153,7 +153,7 @@ describe("INTEG: authenticate.test.js: Test the sign out route", function () {
     }
   });
 
-  it("Should remove the device token from the user", async function () {
+  it("Test 1: Should remove the device token from the user", async function () {
     const res = await request(server)
       .post("/authenticate/sign-out")
       .send({

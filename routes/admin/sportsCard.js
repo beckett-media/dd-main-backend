@@ -64,9 +64,12 @@ router.post(
   async (req, res) => {
     const cardId = req.body.cardId;
 
-    // Add status while finding
     let card = await Card.findOne({
-      $and: [{ _id: cardId }, { status: stringConstants.cardState.SUBMITTED }],
+      $and: [
+        { _id: cardId },
+        { status: stringConstants.cardState.SUBMITTED },
+        { isCompleted: true },
+      ],
     });
     if (!card)
       return res
@@ -169,6 +172,8 @@ router.post(
       },
       { new: true }
     );
+
+    // Send notification user
 
     return res.send(
       createResObject(true, { card }, stringConstants.UPDATE_SUCCESSFUL)
@@ -351,7 +356,9 @@ async function createGradedImage(card) {
     );
     // Delete the QR image
     fs.unlinkSync(qrCodeImagePath);
+    // Write the image to user card folder
     await blackBg.write(destinationPath);
+    // Return the relative path
     const gradedCardPath = `${card.user}/cards/${card._id}/graded_card.png`;
     return gradedCardPath;
   } catch (error) {

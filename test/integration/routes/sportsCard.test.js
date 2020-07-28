@@ -35,7 +35,7 @@ describe("INTEG: sportsCard.test.js: /sports-card/add-front Sports card route re
     }
   });
 
-  it("Should create a new card and add front to it return 200", async function () {
+  it("Test 1: Should create a new card and add front to it return 200", async function () {
     // const imagePath = path.join(__dirname, "../../assets/test-image-1.jpg");
     // const res = await request(server)
     //   .post("/sports-card/add-front")

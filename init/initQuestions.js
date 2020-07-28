@@ -10,6 +10,7 @@ const signedCeleb = {
     { _id: "highLevelCelebrity", name: "High Level Celebrity", points: 2000 },
   ],
   maxPoints: 2000,
+  minPoints: 0,
 };
 
 const cornerValue = {
@@ -23,6 +24,7 @@ const cornerValue = {
     { _id: "sharpSquared", name: "Sharp Squared", points: 600 },
   ],
   maxPoints: 600,
+  minPoints: 50,
 };
 
 const edgeValue = {
@@ -36,6 +38,7 @@ const edgeValue = {
     { _id: "sharp", name: "Sharp", points: 600 },
   ],
   maxPoints: 600,
+  minPoints: -50,
 };
 
 const surfaceValue = {
@@ -50,6 +53,7 @@ const surfaceValue = {
     { _id: "extremelySmooth", name: "Extremely Smooth", points: 600 },
   ],
   maxPoints: 600,
+  minPoints: 0,
 };
 
 const eyeAppeal = {
@@ -64,6 +68,7 @@ const eyeAppeal = {
     { _id: "outstanding", name: "Outstanding", points: 500 },
   ],
   maxPoints: 500,
+  minPoints: -50,
 };
 
 const centerFront = {
@@ -80,6 +85,7 @@ const centerFront = {
     { _id: "8", name: "8", points: -10 },
   ],
   maxPoints: 100,
+  minPoints: -10,
 };
 
 const centerBack = {
@@ -91,6 +97,7 @@ const centerBack = {
     { _id: "3", name: "3", points: -20 },
   ],
   maxPoints: 50,
+  minPoints: -20,
 };
 
 const cardStains = {
@@ -106,6 +113,7 @@ const cardStains = {
     { _id: "distorted", name: "Distorted", points: -50 },
   ],
   maxPoints: 200,
+  minPoints: -50,
 };
 
 const cardSleeving = {
@@ -119,6 +127,7 @@ const cardSleeving = {
     { _id: "severalCrease", name: "Several Crease", points: -100 },
   ],
   maxPoints: 0,
+  minPoints: -100,
 };
 
 const printingDefects = {
@@ -130,6 +139,7 @@ const printingDefects = {
     { _id: "5star", name: "5 Star", points: -600 },
   ],
   maxPoints: 0,
+  minPoints: -600,
 };
 
 const questionArray = [
@@ -156,6 +166,7 @@ module.exports = async () => {
           desc: question.desc,
           options: question.options,
           maxPoints: question.maxPoints,
+          minPoints: question.minPoints,
         });
         q = await q.save();
       }

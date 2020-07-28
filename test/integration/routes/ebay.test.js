@@ -22,7 +22,7 @@ describe("INTEG: ebay.test.js: Test ebay get oAuth route", function () {
     }
   });
 
-  it("Should return 400 for no ebay code as query parameter", async function () {
+  it("Test 1: Should return 400 for no ebay code as query parameter", async function () {
     const res = await request(server)
       .get("/ebay/ebay-get-oauth")
       .set("Accept", "application/json")
@@ -30,7 +30,7 @@ describe("INTEG: ebay.test.js: Test ebay get oAuth route", function () {
     expect(res.status).to.be.equal(400);
     expect(res.body.success).to.be.false;
   });
-  it("Should return 400 for invalid ebay code", async function () {
+  it("Test 2: Should return 400 for invalid ebay code", async function () {
     const res = await request(server)
       .get("/ebay/ebay-get-oauth?code=test")
       .set("Accept", "application/json")

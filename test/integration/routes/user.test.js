@@ -36,7 +36,7 @@ describe("INTEG: user.test.js INTEG: POST /user", function () {
         await user.remove();
       }
     });
-    it("Should create the user and return _id, fullName, email and auth token plus refresh token in header", async () => {
+    it("Test 1: Should create the user and return _id, fullName, email and auth token plus refresh token in header", async () => {
       let res = await request(server)
         .post("/user/register-user")
         .send({
@@ -82,7 +82,7 @@ describe("INTEG: user.test.js INTEG: POST /user", function () {
      * same email again
      */
 
-    it("Should return error for duplicate email", async function () {
+    it("Test 2: Should return error for duplicate email", async function () {
       let res = await request(server)
         .post("/user/register-user")
         .send({
@@ -125,7 +125,7 @@ describe("INTEG: user.test.js INTEG: POST /user", function () {
     /**
      * Auth token not provided in the request header
      */
-    it("Should return status code 401 if no auth token provided", async function () {
+    it("Test 1: Should return status code 401 if no auth token provided", async function () {
       let res = await request(server)
         .post("/user/add-update-username")
         .send({ username: "test.test" })
@@ -138,7 +138,7 @@ describe("INTEG: user.test.js INTEG: POST /user", function () {
     /**
      * Should successfully be able to update the username
      */
-    it("Should update the username and return _id, fullName, email, profile (if any) and username", async function () {
+    it("Test 2: Should update the username and return _id, fullName, email, profile (if any) and username", async function () {
       // First create the user and get the auth token
       let res = await request(server)
         .post("/user/register-user")
@@ -170,7 +170,7 @@ describe("INTEG: user.test.js INTEG: POST /user", function () {
     /**
      * Should return 400 for username already taken
      */
-    it("Should return 400 for username already taken", async function () {
+    it("Test 3: Should return 400 for username already taken", async function () {
       // First create the user and get the auth token
       let res = await request(server)
         .post("/user/register-user")
@@ -243,7 +243,7 @@ describe("INTEG: user.test.js INTEG: POST /user", function () {
       }
     });
 
-    it("Should update the password successfully", async function () {
+    it("Test 1: Should update the password successfully", async function () {
       const res = await request(server)
         .post("/user/change-password")
         .send({
@@ -257,7 +257,7 @@ describe("INTEG: user.test.js INTEG: POST /user", function () {
       expect(res.status).to.be.equal(200);
       expect(res.body.success).to.be.true;
     });
-    it("Should return 400 for incorrect password", async function () {
+    it("Test 2: Should return 400 for incorrect password", async function () {
       const res = await request(server)
         .post("/user/change-password")
         .send({
@@ -294,7 +294,7 @@ describe("INTEG: user.test.js INTEG: POST /user", function () {
       user = await user.save();
     });
 
-    it("Should return notification setting", async function () {
+    it("Test 1: Should return notification setting", async function () {
       const res = await request(server)
         .get("/user/notification-settings")
         .set("Accept", "application/json")
@@ -306,7 +306,7 @@ describe("INTEG: user.test.js INTEG: POST /user", function () {
       expect(res.body.data).to.be.eql({ notifications: true });
     });
 
-    it("Should toggle notification setting", async function () {
+    it("Test 2: Should toggle notification setting", async function () {
       const res = await request(server)
         .post("/user/toggle-notification-settings")
         .set("Accept", "application/json")
@@ -341,7 +341,7 @@ describe("INTEG: user.test.js INTEG: POST /user", function () {
       }
     });
 
-    it("Should get all user related details", async function () {
+    it("Test 1: Should get all user related details", async function () {
       const res = await request(server)
         .get("/user/user-details")
         .set("Accept", "application/json")

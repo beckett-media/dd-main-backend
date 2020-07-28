@@ -34,7 +34,7 @@ describe("INTEG: payment.test.js: EndPoint /payment", function () {
     /**
      * Should get client secret from stripe
      */
-    it("Should return client secret from stripe", async function () {
+    it("Test 1: Should return client secret from stripe", async function () {
       // Register a user and login
       let res1 = await request(server)
         .post("/user/register-user")
@@ -84,7 +84,7 @@ describe("INTEG: payment.test.js: EndPoint /payment", function () {
     /**
      * Return a list of saved cards from stripe
      */
-    it("Should return a list of saved cards", async function () {
+    it("Test 1: Should return a list of saved cards", async function () {
       // Register a user and login
       let res1 = await request(server)
         .post("/user/register-user")

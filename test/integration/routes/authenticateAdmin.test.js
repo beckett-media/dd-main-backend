@@ -5,7 +5,6 @@ const config = require("config");
 const request = require("supertest");
 const chai = require("chai");
 const expect = chai.expect;
-const sinon = require("sinon");
 
 let server, user;
 
@@ -43,7 +42,7 @@ describe("INTEG: authenticateAdmin.test.js: EndPoint: /admin-auth/sign-in", func
       .set("x-app-token", config.get("appToken"));
   };
 
-  it("Should sign in admin successfully", async function () {
+  it("Test 1: Should sign in admin successfully", async function () {
     const res = await signinAdmin();
 
     expect(res.status).to.be.equal(200);
@@ -64,7 +63,7 @@ describe("INTEG: authenticateAdmin.test.js: EndPoint: /admin-auth/sign-in", func
     );
   });
 
-  it("Should return 403 if user not an admin", async function () {
+  it("Test 2: Should return 403 if user not an admin", async function () {
     await User.findByIdAndUpdate(user._id, {
       $set: { role: stringConstants.role.USER },
     });
@@ -74,7 +73,7 @@ describe("INTEG: authenticateAdmin.test.js: EndPoint: /admin-auth/sign-in", func
     expect(res.status).to.be.equal(403);
   });
 
-  it("Should return 400 if sign up type not in_app", async function () {
+  it("Test 3: Should return 400 if sign up type not in_app", async function () {
     user.metadata.signupType = stringConstants.signupType.APPLE;
 
     user = await user.save();
@@ -84,7 +83,7 @@ describe("INTEG: authenticateAdmin.test.js: EndPoint: /admin-auth/sign-in", func
     expect(res.status).to.be.equal(400);
   });
 
-  it("Should return 400 if no password for user in database", async function () {
+  it("Test 4: Should return 400 if no password for user in database", async function () {
     delete user.password;
     user.metadata.signupType = stringConstants.signupType.APPLE;
 
@@ -95,14 +94,14 @@ describe("INTEG: authenticateAdmin.test.js: EndPoint: /admin-auth/sign-in", func
     expect(res.status).to.be.equal(400);
   });
 
-  it("Should return 400 if password not valid", async function () {
+  it("Test 5: Should return 400 if password not valid", async function () {
     reqBody.password = "something";
 
     const res = await signinAdmin();
 
     expect(res.status).to.be.equal(400);
   });
-  it("Should return 404 for email not found", async function () {
+  it("Test 6: Should return 404 for email not found", async function () {
     reqBody.email = "something@test.com";
 
     const res = await signinAdmin();
