@@ -12,10 +12,12 @@ const path = require("path");
 const fs = require("fs");
 const QRCode = require("qrcode");
 const { Card } = require("../../models/card");
+const { User } = require("../../models/user");
 const { Question } = require("../../models/question");
 const { stringConstants } = require("../../utils/constants");
 const { errorObjects } = require("../../utils/errorObjects");
 const { createResObject, isNumber } = require("../../utils/utilFunctions");
+const { sendNotiToUser } = require("../../utils/sendNotifications");
 const {
   valPageSizeNumber,
   valCardGradeReq,
@@ -173,7 +175,15 @@ router.post(
       { new: true }
     );
 
-    // Send notification user
+    const user = await User.findById(card.user);
+    if (user) {
+      // Send notification user
+      sendNotiToUser(user, {
+        title: "DCGS: Card has been graded",
+        body: "Card has been graded",
+        data: {},
+      });
+    }
 
     return res.send(
       createResObject(true, { card }, stringConstants.UPDATE_SUCCESSFUL)

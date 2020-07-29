@@ -20,7 +20,7 @@ const { TransactionLog } = require("../../models/transactionLog");
 const config = require("config");
 const stripe = require("stripe")(config.get(stringConstants.STRIPE_TEST_KEY));
 const mongoose = require("mongoose");
-const sendNotifications = require("../../utils/sendNotifications");
+const { sendNotiToUser } = require("../../utils/sendNotifications");
 
 router.post(
   "/for-pending-cards",
@@ -499,17 +499,11 @@ router.post("/webhook", async (req, res, next) => {
 
       const user = await User.findById(transaction.user);
       // Send notifications
-      try {
-        const result = await sendNotifications(
-          "Test",
-          "Test",
-          { name: "Test" },
-          user.deviceTokens
-        );
-        console.log(result.firebaseResponse);
-      } catch (error) {
-        SimpleLogger.error(error);
-      }
+      await sendNotiToUser(user, {
+        title: "DCGS: Payment successful",
+        body: "Payment successful, cards have been submnitted for grading",
+        data: {},
+      });
 
       return res.send();
     } catch (error) {

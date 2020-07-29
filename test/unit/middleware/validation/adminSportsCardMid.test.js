@@ -10,15 +10,15 @@ describe("UNIT: adminSportsCardMid.test.js: related tests", async function () {
   let reqBody = {
     cardId: mongoose.Types.ObjectId().toHexString(),
     signedCeleb: 2000,
-    cornerValue: 600,
-    edgeValue: 600,
-    surfaceValue: 600,
-    eyeAppeal: 500,
-    centerFront: 100,
-    centerBack: 50,
-    cardStains: 0,
-    cardSleeving: 0,
-    printingDefects: 0,
+    cornerValue: 400,
+    edgeValue: 100,
+    surfaceValue: 400,
+    eyeAppeal: 400,
+    centerFront: 70,
+    centerBack: 20,
+    cardStains: 160,
+    cardSleeving: -20,
+    printingDefects: -600,
   };
 
   function getRequest() {
