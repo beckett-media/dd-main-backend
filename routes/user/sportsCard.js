@@ -703,6 +703,7 @@ router.get(
       $and: [
         { user: req.user._id },
         { status: stringConstants.cardState.SUBMITTED },
+        { isCompleted: true },
       ],
     }).lean();
     const numCards = cards.length;
@@ -711,6 +712,7 @@ router.get(
       $and: [
         { user: req.user._id },
         { status: stringConstants.cardState.SUBMITTED },
+        { isCompleted: true },
       ],
     })
       .sort({ createdAt: 1 })
@@ -720,7 +722,49 @@ router.get(
     return res.send(
       createResObject(
         true,
-        { cards: cards, numCards },
+        { cards, numCards },
+        stringConstants.FETCH_SUCESSFUL
+      )
+    );
+  }
+);
+
+/**
+ * Get all graded cards for the user
+ */
+router.get(
+  "/graded-cards/:pageSize/:pageNumber",
+  [appAuth, auth, valPageSizeNumber],
+  async (req, res) => {
+    const pageSize = parseInt(req.params.pageSize);
+    const pageNumber = parseInt(req.params.pageNumber);
+    const userId = req.user._id;
+
+    let cards = await Card.find({
+      $and: [
+        { user: userId },
+        { status: stringConstants.cardState.GRADED },
+        { isCompleted: true },
+      ],
+    });
+
+    const numCards = cards.length;
+
+    cards = await Card.find({
+      $and: [
+        { user: req.user._id },
+        { status: stringConstants.cardState.GRADED },
+        { isCompleted: true },
+      ],
+    })
+      .sort({ createdAt: 1 })
+      .skip((pageNumber - 1) * pageSize)
+      .limit(pageSize);
+
+    return res.send(
+      createResObject(
+        true,
+        { cards, numCards },
         stringConstants.FETCH_SUCESSFUL
       )
     );
