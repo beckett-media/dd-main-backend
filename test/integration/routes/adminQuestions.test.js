@@ -6,18 +6,18 @@ const request = require("supertest");
 const { stringConstants } = require("../../../utils/constants");
 const { User } = require("../../../models/user");
 
-let server, user, token, nonAdminUser, nonAdminToken;
+let server, user, nonAdminUser, token, nonAdminToken;
 
-describe("INTEG: adminSportsCard.test.js: Endpoint: /admin-sports-card/pending-grading-cards/10/1", async function () {
+describe("INTEG: adminQuestions.test.js: Endpoint: /admin-questions/grading-questions", async function () {
   this.beforeEach(async function () {
-    server = require("../../../index");
-
     const body = {
       fullName: "Test User",
       password: "test_password",
       email: "test@test.com",
       role: stringConstants.role.ADMIN,
     };
+
+    server = require("../../../index");
 
     const salt = bcrypt.genSaltSync(10);
     body.password = bcrypt.hashSync(body.password, salt);
@@ -26,9 +26,8 @@ describe("INTEG: adminSportsCard.test.js: Endpoint: /admin-sports-card/pending-g
     user = await user.save();
     token = user.generateAuthToken().token;
 
-    body.email = "otheruser@test.com";
     body.role = stringConstants.role.USER;
-
+    body.email = "nonadmin@test.com";
     nonAdminUser = new User(body);
     nonAdminUser = await nonAdminUser.save();
     nonAdminToken = nonAdminUser.generateAuthToken().token;
@@ -40,26 +39,24 @@ describe("INTEG: adminSportsCard.test.js: Endpoint: /admin-sports-card/pending-g
     await nonAdminUser.remove();
   });
 
-  async function getSubmittedCards() {
+  async function getGradingQuestions() {
     return await request(server)
-      .get("/admin-sports-card/pending-grading-cards/10/1")
+      .get("/admin-questions/grading-questions")
       .set("Accept", "application/json")
       .set("x-app-token", config.get("appToken"))
       .set("x-auth-token", token);
   }
 
-  it("Test 1: Should return the submitted cards in array of cards", async function () {
-    const res = await getSubmittedCards();
+  it("Test 1: Should return array of questions", async function () {
+    const res = await getGradingQuestions();
     expect(res.status).to.be.equal(200);
     expect(res.body.success).to.be.true;
-    expect(res.body.data).to.have.property("cards");
-    expect(res.body.data).to.have.property("numCards");
+    expect(res.body.data).to.have.property("questions");
   });
 
-  it("Test 2: Should return 403 is user not admin", async function () {
+  it("Test 2: Should send back 403 if user not admin", async function () {
     token = nonAdminToken;
-    const res = await getSubmittedCards();
+    const res = await getGradingQuestions();
     expect(res.status).to.be.equal(403);
-    expect(res.body.success).to.be.false;
   });
 });

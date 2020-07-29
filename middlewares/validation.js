@@ -467,7 +467,7 @@ module.exports = {
         .max(centerBack.maxPoints),
       cardStains: Joi.number()
         .required()
-        .valid(...cardSleevingAcceptedVals)
+        .valid(...cardStainsAccpetedVals)
         .min(cardStains.minPoints)
         .max(cardStains.maxPoints),
       cardSleeving: Joi.number()
