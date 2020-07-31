@@ -195,6 +195,8 @@ module.exports.stringConstants = {
     TS: ".ts",
     WEBM: ".webm",
     MKV: ".mkv",
+    MOV: ".mov",
+    MFOURV: ".m4v",
   },
 
   currency: {

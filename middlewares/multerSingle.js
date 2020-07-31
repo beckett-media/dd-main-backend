@@ -214,7 +214,9 @@ module.exports.uploadCardVideo = multer({
       ext !== stringConstants.vType.MPFOUR &&
       ext !== stringConstants.vType.TS &&
       ext !== stringConstants.vType.WEBM &&
-      ext !== stringConstants.vType.MKV
+      ext !== stringConstants.vType.MKV &&
+      ext !== stringConstants.vType.MOV &&
+      ext !== stringConstants.vType.MFOURV
     ) {
       return cb(new Error(stringConstants.NOT_A_VALID_FILE_TYPE), false);
     }
