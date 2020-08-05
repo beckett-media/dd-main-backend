@@ -4,7 +4,6 @@ public/
 README.txt
 config/test.json
 config/default.json
-config/development.json
 coverage/
 .snyk
 .nyc_output/
