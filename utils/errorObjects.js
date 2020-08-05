@@ -231,6 +231,18 @@ module.exports.errorObjects = {
     };
   },
 
+  NO_EBAY_TOKEN_FOUND: {
+    errorCode: 130,
+    errorSubCode: "NO_EBAY_TOKEN_FOUND",
+    errorMessage: stringConstants.NO_EBAY_TOKEN_FOUND,
+  },
+
+  NO_EBAY_REFRESH_TOKEN_FOUND: {
+    errorCode: 131,
+    errorSubCode: "NO_EBAY_REFRESH_TOKEN_FOUND",
+    errorMessage: stringConstants.NO_EBAY_REFRESH_TOKEN_FOUND,
+  },
+
   REQUEST_VALIDATION_ERROR: (errorMessage) => {
     return {
       errorCode: 301,

@@ -55,18 +55,21 @@ router.get("/ebay-get-oauth", appAuth, async (req, res) => {
   const token = `Basic ${authorization}`;
 
   try {
-    const { body } = await got.post(stringConstants.URLS.ebayoAuthUrl, {
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-        Authorization: token,
-      },
-      form: {
-        grant_type: "authorization_code",
-        code: code,
-        redirect_uri: "Anurag_Singla-AnuragSi-DCGS-S-sqsppiy",
-      },
-      responseType: "json",
-    });
+    const { body } = await got.post(
+      config.get(stringConstants.ebayUrlNames.EBAY_O_AUTH),
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          Authorization: token,
+        },
+        form: {
+          grant_type: "authorization_code",
+          code: code,
+          redirect_uri: "Anurag_Singla-AnuragSi-DCGS-S-sqsppiy",
+        },
+        responseType: "json",
+      }
+    );
     let returnObject = {};
     res.header(stringConstants.EBAY_ACCESS_TOKEN, body.access_token);
     res.header(stringConstants.EBAY_REFRESH_TOKEN, body.refresh_token);
@@ -76,6 +79,78 @@ router.get("/ebay-get-oauth", appAuth, async (req, res) => {
 
     return res.send(
       createResObject(true, returnObject, stringConstants.FETCH_SUCESSFUL)
+    );
+  } catch (error) {
+    SimpleLogger.error(error);
+    return res
+      .status(400)
+      .send(
+        createResObject(
+          false,
+          {},
+          stringConstants.UNSUSPECTED_ERROR,
+          errorObjects.UNSUSPECTED_ERROR(error.message)
+        )
+      );
+  }
+});
+
+router.get("/ebay-refresh-token", appAuth, async (req, res) => {
+  const ebayAccessToken = req.get(
+    stringConstants.headerNames.EBAY_ACCESS_TOKEN
+  );
+  if (!ebayAccessToken)
+    return res
+      .status(401)
+      .send(
+        createResObject(
+          false,
+          {},
+          stringConstants.NO_EBAY_TOKEN_FOUND,
+          errorObjects.NO_EBAY_TOKEN_FOUND
+        )
+      );
+
+  const ebayRefreshToken = req.get(
+    stringConstants.headerNames.EBAY_REFRESH_TOKEN
+  );
+
+  if (!ebayRefreshToken)
+    return res
+      .status(401)
+      .send(
+        createResObject(
+          false,
+          {},
+          stringConstants.NO_EBAY_REFRESH_TOKEN_FOUND,
+          errorObjects.NO_EBAY_REFRESH_TOKEN_FOUND
+        )
+      );
+
+  const clientId = config.get(stringConstants.EBAY_CLIENT_ID);
+  const clientSecret = config.get(stringConstants.EBAY_CLIENT_SECRET);
+  const authorizationString = `${clientId}:${clientSecret}`;
+  const authorization = Buffer.from(authorizationString).toString("base64");
+  const token = `Basic ${authorization}`;
+
+  try {
+    const { body } = await got.post(
+      config.get(stringConstants.ebayUrlNames.EBAY_REFRESH_TOKEN),
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          Authorization: token,
+        },
+        form: {
+          grant_type: "refresh_token",
+          refresh_token: ebayRefreshToken,
+          scope: "https://api.ebay.com/oauth/api_scope/sell.item.draft",
+        },
+        responseType: "json",
+      }
+    );
+    return res.send(
+      createResObject(true, body, stringConstants.FETCH_SUCESSFUL)
     );
   } catch (error) {
     SimpleLogger.error(error);

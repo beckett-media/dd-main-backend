@@ -136,6 +136,10 @@ module.exports.stringConstants = {
 
   STRIPE_CUSTOMER_CREATION_DESC: "Created through DCGS",
 
+  NO_EBAY_TOKEN_FOUND: "No ebay auth token found",
+
+  NO_EBAY_REFRESH_TOKEN_FOUND: "No ebay refresh token found",
+
   collectionNames: {
     USER_COLLECTION: "User",
     PENDING_DELETION: "Pending_Deletion",
@@ -247,6 +251,8 @@ module.exports.stringConstants = {
     X_RATELIMIT_LIMIT: "X-RateLimit-Limit",
     X_RATELIMIT_REMAINING: "X-RateLimit-Remaining",
     RETRY_AFTER: "Retry-After",
+    EBAY_ACCESS_TOKEN: "ebay-access-token",
+    EBAY_REFRESH_TOKEN: "ebay-refresh-token",
   },
 
   stripeMessages: {
@@ -293,5 +299,11 @@ module.exports.stringConstants = {
     INNER_IMAGE_MASK: "inner_image_mask.png",
     OUTER_IMAGE_MASK: "outer_image_mask.png",
     QR_CODE_MASK: "qr_code_mask.png",
+  },
+
+  ebayUrlNames: {
+    EBAY_O_AUTH: "ebayoAuthUrl",
+    EBAY_GET_USER: "ebayGetUserUrl",
+    EBAY_REFRESH_TOKEN: "ebayGetRefreshToken",
   },
 };

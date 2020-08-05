@@ -304,12 +304,15 @@ router.post(
     const authorizationHeader = `Bearer ${accessToken}`;
 
     try {
-      const { body } = await got(stringConstants.URLS.ebayGetUserUrl, {
-        headers: {
-          Authorization: authorizationHeader,
-        },
-        responseType: "json",
-      });
+      const { body } = await got(
+        config.get(stringConstants.ebayUrlNames.EBAY_GET_USER),
+        {
+          headers: {
+            Authorization: authorizationHeader,
+          },
+          responseType: "json",
+        }
+      );
 
       switch (accountType) {
         case stringConstants.ebayAccType.BUSINESS_ACCOUNT:
