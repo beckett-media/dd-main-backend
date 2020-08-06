@@ -55,36 +55,6 @@ router.get(
 );
 
 /**
- * Route to get all graded cards
- */
-router.get(
-  "/graded-cards/:pageSize/:pageNumber",
-  [appAuth, admin, valPageSizeNumber],
-  async (req, res) => {
-    const pageSize = parseInt(req.params.pageSize);
-    const pageNumber = parseInt(req.params.pageNumber);
-
-    let cards = await Card.find({
-      status: stringConstants.cardState.GRADED,
-    }).lean();
-    const numCards = cards.length;
-
-    cards = await Card.find({ status: stringConstants.cardState.GRADED })
-      .sort({ createdAt: 1 })
-      .skip((pageNumber - 1) * pageSize)
-      .limit(pageSize);
-
-    return res.send(
-      createResObject(
-        true,
-        { cards: cards, numCards },
-        stringConstants.FETCH_SUCESSFUL
-      )
-    );
-  }
-);
-
-/**
  * Post route for admin to post the rating of the card
  */
 router.post(

@@ -11,7 +11,7 @@ const adminAuth = require("../routes/admin/authenticate");
 const adminSportsCard = require("../routes/admin/sportsCard");
 const adminQuestions = require("../routes/admin/questions");
 // Public routes that don't even require app token
-const publicSportsCard = require("../routes/public/sportsCard");
+const publicSportsCard = require("../routes/open/sportsCard");
 
 module.exports = (app) => {
   // Import route and use app.use();
