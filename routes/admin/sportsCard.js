@@ -147,7 +147,7 @@ router.post(
 
     grade = grade.toPrecision(3);
 
-    const gradedCardPath = await createGradedImage(card);
+    const gradedCardPath = await createGradedImage(card, grade, gradDesc);
 
     card = await Card.findByIdAndUpdate(
       cardId,
@@ -188,7 +188,7 @@ router.post(
   }
 );
 
-async function createGradedImage(card) {
+async function createGradedImage(card, grade, gradDesc) {
   try {
     const cardId = card._id;
     // Create the overlay image
@@ -273,30 +273,35 @@ async function createGradedImage(card) {
     let linePadTop = 2;
     let linePadLeft = 10;
     let font = await Jimp.loadFont(anton16WhitePath);
-    // First line
-    blackBg.print(font, logoQrWidth + linePadLeft, linePadTop, "First Line");
-    const lineHeight = Jimp.measureTextHeight(font, "First Line");
-    // Second line
+    // First line: Year
+    const firstLine = card.year;
+    blackBg.print(font, logoQrWidth + linePadLeft, linePadTop, firstLine);
+    const lineHeight = Jimp.measureTextHeight(font, firstLine);
+    // Second line: Brand
+    const secondLine = card.brand;
     blackBg.print(
       font,
       logoQrWidth + linePadLeft,
       linePadTop + lineHeight + linePadTop,
-      "Second Line"
+      secondLine
     );
     // const line2H = Jimp.measureTextHeight(font, "Second Line");
     // Third line
+    const thirdLine = card.cardNumber;
+
     blackBg.print(
       font,
       logoQrWidth + linePadLeft,
       linePadTop + lineHeight + linePadTop + lineHeight + linePadTop,
-      "Third Line"
+      thirdLine
     );
-    // Fourth line
+    // Fourth line: Player names
+    const fourthLine = card.playerNames.join(", ");
     blackBg.print(
       font,
       logoQrWidth + linePadLeft,
       textYPosition(4, linePadTop, lineHeight),
-      "Fourth line"
+      fourthLine
     );
     // Fifth line
     blackBg.print(
@@ -312,11 +317,11 @@ async function createGradedImage(card) {
     );
     // Score of top right corner
     font = await Jimp.loadFont(anton36WhitePath);
-    const scoreWidth = Jimp.measureText(font, "8.5");
-    const scoreHeight = Jimp.measureText(font, "8.5");
-    blackBg.print(font, bgWidth - scoreWidth - 20, 10, "8.5");
+    const scoreWidth = Jimp.measureText(font, grade);
+    const scoreHeight = Jimp.measureText(font, grade);
+    blackBg.print(font, bgWidth - scoreWidth - 20, 10, grade);
     font = await Jimp.loadFont(anton16WhitePath);
-    blackBg.print(font, bgWidth - scoreWidth - 20, scoreHeight + 10, "Mint");
+    blackBg.print(font, bgWidth - scoreWidth - 20, scoreHeight + 10, gradDesc);
 
     // Bottom text
     const anton24WhitePath = path.join(
@@ -325,11 +330,12 @@ async function createGradedImage(card) {
     );
     linePadTop = 10;
     font = await Jimp.loadFont(anton24WhitePath);
+    const serialNumber = "#12345"; // TODO: serial number
     blackBg.print(
       font,
       qrPositionX + logoQrWidth + 10,
       qrPositionY + linePadTop + 10,
-      "#223143"
+      serialNumber
     );
     blackBg.print(
       font,
