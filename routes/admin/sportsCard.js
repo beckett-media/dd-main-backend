@@ -27,9 +27,6 @@ const {
  * Get all the cards that need to be graded
  * After payment has been submitted
  */
-/**
- * Route to get all cards pending grading for user
- */
 router.get(
   "/pending-grading-cards/:pageSize/:pageNumber",
   [appAuth, admin, valPageSizeNumber],
@@ -43,6 +40,36 @@ router.get(
     const numCards = cards.length;
 
     cards = await Card.find({ status: stringConstants.cardState.SUBMITTED })
+      .sort({ createdAt: 1 })
+      .skip((pageNumber - 1) * pageSize)
+      .limit(pageSize);
+
+    return res.send(
+      createResObject(
+        true,
+        { cards: cards, numCards },
+        stringConstants.FETCH_SUCESSFUL
+      )
+    );
+  }
+);
+
+/**
+ * Route to get all graded cards
+ */
+router.get(
+  "/graded-cards/:pageSize/:pageNumber",
+  [appAuth, admin, valPageSizeNumber],
+  async (req, res) => {
+    const pageSize = parseInt(req.params.pageSize);
+    const pageNumber = parseInt(req.params.pageNumber);
+
+    let cards = await Card.find({
+      status: stringConstants.cardState.GRADED,
+    }).lean();
+    const numCards = cards.length;
+
+    cards = await Card.find({ status: stringConstants.cardState.GRADED })
       .sort({ createdAt: 1 })
       .skip((pageNumber - 1) * pageSize)
       .limit(pageSize);
