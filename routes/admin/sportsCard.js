@@ -286,7 +286,7 @@ async function createGradedImage(card, grade, gradDesc) {
       secondLine
     );
     // const line2H = Jimp.measureTextHeight(font, "Second Line");
-    // Third line
+    // Third line: Card number
     const thirdLine = card.cardNumber.toString();
 
     blackBg.print(
@@ -318,10 +318,19 @@ async function createGradedImage(card, grade, gradDesc) {
     // Score of top right corner
     font = await Jimp.loadFont(anton36WhitePath);
     const scoreWidth = Jimp.measureText(font, grade);
-    const scoreHeight = Jimp.measureText(font, grade);
+    const scoreHeight = Jimp.measureTextHeight(font, grade);
     blackBg.print(font, bgWidth - scoreWidth - 20, 10, grade);
+
     font = await Jimp.loadFont(anton16WhitePath);
-    blackBg.print(font, bgWidth - scoreWidth - 20, scoreHeight + 10, gradDesc);
+    const scoreDescWidth = Jimp.measureText(font, gradDesc);
+    const blackBgWidth = blackBg.getWidth();
+    // blackBg.print(font, bgWidth - scoreWidth - 20, scoreHeight + 10, gradDesc);
+    blackBg.print(
+      font,
+      blackBgWidth - 20 - scoreDescWidth,
+      scoreHeight + 10,
+      gradDesc
+    );
 
     // Bottom text
     const anton24WhitePath = path.join(
