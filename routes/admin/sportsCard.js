@@ -147,6 +147,9 @@ router.post(
 
     grade = grade.toPrecision(3);
 
+    card.cornerValue = cornerValue;
+    card.centerFront = centerFront;
+
     const gradedCardPath = await createGradedImage(card, grade, gradDesc);
 
     card = await Card.findByIdAndUpdate(
