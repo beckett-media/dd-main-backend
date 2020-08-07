@@ -303,12 +303,13 @@ async function createGradedImage(card, grade, gradDesc) {
       textYPosition(4, linePadTop, lineHeight),
       fourthLine
     );
-    // Fifth line
+    // Fifth line: Centering and corners
+    const fifthLine = `Centering ${card.centerFront}  Corner ${card.cornerValue}`;
     blackBg.print(
       font,
       logoQrWidth + linePadLeft,
       textYPosition(5, linePadTop, lineHeight) + 5,
-      "Centering Point And Cornering Point"
+      fifthLine
     );
 
     const anton36WhitePath = path.join(
