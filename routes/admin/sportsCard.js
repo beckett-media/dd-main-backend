@@ -274,7 +274,7 @@ async function createGradedImage(card, grade, gradDesc) {
     let linePadLeft = 10;
     let font = await Jimp.loadFont(anton16WhitePath);
     // First line: Year
-    const firstLine = card.year;
+    const firstLine = card.year.toString();
     blackBg.print(font, logoQrWidth + linePadLeft, linePadTop, firstLine);
     const lineHeight = Jimp.measureTextHeight(font, firstLine);
     // Second line: Brand
@@ -287,7 +287,7 @@ async function createGradedImage(card, grade, gradDesc) {
     );
     // const line2H = Jimp.measureTextHeight(font, "Second Line");
     // Third line
-    const thirdLine = card.cardNumber;
+    const thirdLine = card.cardNumber.toString();
 
     blackBg.print(
       font,
