@@ -114,7 +114,8 @@ router.get("/renew-auth-token", appAuth, async (req, res) => {
         createResObject(
           false,
           {},
-          stringConstants.REFRESH_TOKEN_INVALID_OR_EXPIRED,
+          stringConstants.REFRESH_TOKEN_INVALID_OR_EXPIRED +
+            "(Refresh token does not match saved token or ID in refresh token does not match user ID)",
           errorObjects.REFRESH_TOKEN_INVALID_OR_EXPIRED
         )
       );

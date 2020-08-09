@@ -197,7 +197,6 @@ userSchema.methods.generateAuthToken = function () {
     config.get(stringConstants.JWT_PRIATE_KEY),
     { expiresIn: "15m" }
   );
-
   return {
     token,
     expiry: moment.utc(moment(Date.now()).add(15, "minutes")).format(),
