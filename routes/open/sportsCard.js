@@ -56,6 +56,10 @@ router.get(
       .skip((pageNumber - 1) * pageSize)
       .limit(pageSize);
 
+    cards = cards.map((card) => {
+      return card.getCardDetailsWithGrading();
+    });
+
     return res.send(
       createResObject(
         true,

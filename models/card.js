@@ -114,6 +114,38 @@ cardSchema.methods.getCardDetails = function () {
   };
 };
 /**
+ * Schema method to return card details with grading
+ */
+cardSchema.methods.getCardDetailsWithGrading = function () {
+  const id = this._id || null;
+  const front = this.front || null;
+  const back = this.back || null;
+  const video = this.video || null;
+  const thumbnail = this.thumbnail || null;
+  const gradedImage = this.gradedImage || null;
+  const year = this.year || null;
+  const brand = this.brand || null;
+  const cardNumber = this.cardNumber || null;
+  const playerNames = this.playerNames || null;
+  const grading = this.grading || null;
+  const status = this.status || null;
+
+  return {
+    id,
+    front,
+    back,
+    video,
+    thumbnail,
+    gradedImage,
+    year,
+    brand,
+    cardNumber,
+    playerNames,
+    grading,
+    status,
+  };
+};
+/**
  * Pre hook to clean card data
  */
 cardSchema.pre("remove", async function () {

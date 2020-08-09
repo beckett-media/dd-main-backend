@@ -190,7 +190,9 @@ userSchema.pre("remove", async function (next) {
 
   next();
 });
-
+/**
+ * Schema method to generate auth token for user
+ */
 userSchema.methods.generateAuthToken = function () {
   const token = jwt.sign(
     { _id: this._id, role: this.role },
@@ -203,6 +205,9 @@ userSchema.methods.generateAuthToken = function () {
   };
 };
 
+/**
+ * Schema method to generate refresh token for user
+ */
 userSchema.methods.generateRefreshToken = function () {
   const refreshToken = jwt.sign(
     { _id: this._id },
@@ -214,6 +219,9 @@ userSchema.methods.generateRefreshToken = function () {
     expiry: moment.utc(moment(Date.now()).add(30, "days")).format(),
   };
 };
+/**
+ * Schema method to get basic user info
+ */
 // "_id", "fullName", "email", "profilePicture", "username"
 userSchema.methods.getUserBasicInfo = function () {
   const id = this._id || null;
@@ -231,7 +239,9 @@ userSchema.methods.getUserBasicInfo = function () {
     signupType: signupType,
   };
 };
-
+/**
+ * Schema method to get user details
+ */
 userSchema.methods.getUserDetails = function () {
   const id = this._id || null;
   const fullName = this.fullName || null;
@@ -253,13 +263,19 @@ userSchema.methods.getUserDetails = function () {
     signupType: signupType,
   };
 };
-
+/**
+ * Checks to see if user basic info is complete
+ */
 userSchema.methods.isBasicInfoCompleted = function () {
   return (
     !!this.fullName && !!this.email && !!this.profilePicture && !!this.username
   );
 };
 
+/**
+ * Schema function to add token to user's token array
+ * Only adds token if it does not already exists
+ */
 userSchema.methods.addDeviceToken = function (deviceToken) {
   if (this.deviceTokens.indexOf(deviceToken) === -1) {
     this.deviceTokens.push(deviceToken);
@@ -267,6 +283,9 @@ userSchema.methods.addDeviceToken = function (deviceToken) {
   return this.deviceTokens;
 };
 
+/**
+ * Removes device token from user's device token array
+ */
 userSchema.methods.removeToken = function (deviceToken) {
   const index = this.deviceTokens.indexOf(deviceToken);
   if (index > -1) {

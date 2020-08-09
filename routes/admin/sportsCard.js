@@ -43,6 +43,10 @@ router.get(
       .sort({ createdAt: 1 })
       .skip((pageNumber - 1) * pageSize)
       .limit(pageSize);
+    // Transform card object
+    cards = cards.map((card) => {
+      return card.getCardDetailsWithGrading();
+    });
 
     return res.send(
       createResObject(
@@ -186,7 +190,11 @@ router.post(
     }
 
     return res.send(
-      createResObject(true, { card }, stringConstants.UPDATE_SUCCESSFUL)
+      createResObject(
+        true,
+        { card: card.getCardDetailsWithGrading() },
+        stringConstants.UPDATE_SUCCESSFUL
+      )
     );
   }
 );
