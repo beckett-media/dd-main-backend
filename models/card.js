@@ -129,7 +129,7 @@ cardSchema.methods.getCardDetailsWithGrading = function () {
   const cardNumber = this.cardNumber || null;
   const playerNames = this.playerNames || null;
   const status = this.status || null;
-  const grading = _.isEmpty(this.grading) ? null : this.grading;
+  const grading = gradingEmpty(this.grading) ? null : this.grading;
 
   return {
     id,
@@ -172,5 +172,22 @@ const Card = mongoose.model(
   stringConstants.collectionNames.CARD_COLLECTION,
   cardSchema
 );
+
+function gradingEmpty(grading) {
+  return (
+    !grading.gradeDesc &&
+    !grading.grade &&
+    !grading.signedCeleb &&
+    !grading.cornerValue &&
+    !grading.edgeValue &&
+    !grading.surfaceValue &&
+    !grading.eyeAppeal &&
+    !grading.centerFront &&
+    !grading.centerBack &&
+    !grading.cardStains &&
+    !grading.cardSleeving &&
+    !grading.printingDefects
+  );
+}
 
 module.exports.Card = Card;

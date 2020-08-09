@@ -12,8 +12,6 @@ const adminSportsCard = require("../routes/admin/sportsCard");
 const adminQuestions = require("../routes/admin/questions");
 // Public routes that don't even require app token
 const publicSportsCard = require("../routes/open/sportsCard");
-// Test route
-const testUser = require("../routes/admin/user");
 
 module.exports = (app) => {
   // Import route and use app.use();
@@ -32,6 +30,4 @@ module.exports = (app) => {
   app.use("/admin-questions", adminQuestions);
   // Public routes
   app.use("/public-cards", publicSportsCard);
-  // Test Route to be delete in production
-  app.use("/test", testUser);
 };
