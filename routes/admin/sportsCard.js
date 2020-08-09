@@ -257,7 +257,10 @@ async function createGradedImage(card, grade, gradDesc) {
       __dirname,
       `../../assets/card_overlay/${cardId}_qr_code.png`
     );
-    await QRCode.toFile(qrCodeImagePath, "test");
+    await QRCode.toFile(
+      qrCodeImagePath,
+      `https://api.simpledev.solutions/cards/${cardId}`
+    );
 
     const qrCodeImage = await Jimp.read(qrCodeImagePath);
     qrCodeImage.resize(logoQrWidth, logoQrHeight);
