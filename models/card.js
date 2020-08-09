@@ -131,7 +131,7 @@ cardSchema.methods.getCardDetailsWithGrading = function () {
   const status = this.status || null;
   let grading = this.grading || null;
 
-  if (this.grading && _.isEmpty(this.grading)) {
+  if (!this.grading && _.isEmpty(this.grading)) {
     grading = null;
   }
 
