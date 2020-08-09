@@ -4,6 +4,7 @@ const path = require("path");
 const fsPromises = require("fs").promises;
 const SimpleLogger = require("../utils/simpleLogger");
 const rimraf = require("rimraf");
+const _ = require("lodash");
 const { PendingDeletion } = require("./pendingDeletion");
 const { stringConstants } = require("../utils/constants");
 
@@ -127,8 +128,12 @@ cardSchema.methods.getCardDetailsWithGrading = function () {
   const brand = this.brand || null;
   const cardNumber = this.cardNumber || null;
   const playerNames = this.playerNames || null;
-  const grading = this.grading || null;
   const status = this.status || null;
+  let grading = this.grading || null;
+
+  if (this.grading && _.isEmpty(this.grading)) {
+    grading = null;
+  }
 
   return {
     id,
