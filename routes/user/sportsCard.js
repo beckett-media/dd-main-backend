@@ -114,7 +114,7 @@ router.post("/add-front", [appAuth, auth], async (req, res, next) => {
 
     card.front = path.join(`${userId}/cards/${cardId}/`, req.file.filename);
     card = await card.save();
-    card = card.getCardDetails();
+    card = card.getCardDetailsWithGrading();
 
     return res.send(
       createResObject(true, { card }, stringConstants.UPDATE_SUCCESSFUL)
@@ -240,7 +240,7 @@ router.post(
 
       card.front = path.join(`${userId}/cards/${cardId}/`, req.file.filename);
       card = await card.save();
-      card = card.getCardDetails();
+      card = card.getCardDetailsWithGrading();
 
       return res.send(
         createResObject(true, { card }, stringConstants.UPDATE_SUCCESSFUL)
@@ -368,7 +368,7 @@ router.post(
       card.back = path.join(`${userId}/cards/${cardId}/`, req.file.filename);
       card = await card.save();
 
-      card = card.getCardDetails();
+      card = card.getCardDetailsWithGrading();
 
       return res.send(
         createResObject(true, { card }, stringConstants.UPDATE_SUCCESSFUL)
@@ -508,7 +508,7 @@ router.post(
       );
       card = await card.save();
 
-      card = card.getCardDetails();
+      card = card.getCardDetailsWithGrading();
 
       return res.send(
         createResObject(true, { card }, stringConstants.UPDATE_SUCCESSFUL)
@@ -584,7 +584,7 @@ router.post(
 
     card = await card.save();
 
-    card = card.getCardDetails();
+    card = card.getCardDetailsWithGrading();
 
     return res.send(
       createResObject(true, { card }, stringConstants.UPDATE_SUCCESSFUL)
@@ -628,7 +628,11 @@ router.delete(
     card = await card.remove();
 
     return res.send(
-      createResObject(true, { card }, stringConstants.DELETED_SUCCESSFULLY)
+      createResObject(
+        true,
+        { card: card.getCardDetailsWithGrading() },
+        stringConstants.DELETED_SUCCESSFULLY
+      )
     );
   }
 );

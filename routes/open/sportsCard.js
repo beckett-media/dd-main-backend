@@ -29,7 +29,7 @@ router.get("/card-details/:id", valObjectIdInUrl, async (req, res) => {
         )
       );
 
-  card = card.getCardDetails();
+  card = card.getCardDetailsWithGrading();
 
   return res.send(
     createResObject(false, { card }, stringConstants.FETCH_SUCESSFUL)
