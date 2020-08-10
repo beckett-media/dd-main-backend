@@ -6,88 +6,122 @@ const Joi = require("@hapi/joi");
 const got = require("got");
 const config = require("config");
 const fs = require("fs");
-const SimpleLogger = require("../utils/simpleLogger");
-const appAuth = require("../middlewares/appAuth");
-const auth = require("../middlewares/authenticateRequest");
-const authAppleTokenMiddleware = require("../middlewares/authenticateAppleToken");
-const { User } = require("../models/user");
-const { stringConstants } = require("../utils/constants");
-const { errorObjects } = require("../utils/errorObjects");
-const { createResObject } = require("../utils/utilFunctions");
+const SimpleLogger = require("../../utils/simpleLogger");
+const appAuth = require("../../middlewares/authenticateApp");
+const auth = require("../../middlewares/authenticateUser");
+const authAppleTokenMiddleware = require("../../middlewares/authenticateAppleToken");
+const { User } = require("../../models/user");
+const { stringConstants } = require("../../utils/constants");
+const { errorObjects } = require("../../utils/errorObjects");
+const { createResObject } = require("../../utils/utilFunctions");
 const {
   valSignInRequest,
   valSignInWithEbay,
   valSignOutReq,
-} = require("../middlewares/validation");
-const stripe = require("stripe")(config.get(stringConstants.STRIPE_TEST_KEY));
+} = require("../../middlewares/validation");
+const { wrongSigninLimiter } = require("../../middlewares/rateLimiter");
 
-router.post("/sign-in-user", [appAuth, valSignInRequest], async (req, res) => {
-  const email = req.body.email.toLowerCase();
-  const deviceToken = req.body.deviceToken;
-  const osType = req.body.osType;
-  let firstSignin = false;
-  let user = await User.findOne({ email });
-  if (!user)
-    return res
-      .status(404)
-      .send(
-        createResObject(
-          false,
-          {},
-          stringConstants.USER_EMAIL_NOT_FOUND,
-          errorObjects.USER_EMAIL_NOT_FOUND
-        )
-      );
+router.post(
+  "/sign-in-user",
+  [appAuth, wrongSigninLimiter, valSignInRequest],
+  async (req, res) => {
+    const email = req.body.email.toLowerCase();
+    const deviceToken = req.body.deviceToken;
+    const osType = req.body.osType;
+    let firstSignin = false;
+    let user = await User.findOne({ email });
+    if (!user)
+      return res
+        .status(404)
+        .send(
+          createResObject(
+            false,
+            {},
+            stringConstants.USER_EMAIL_NOT_FOUND,
+            errorObjects.USER_EMAIL_NOT_FOUND
+          )
+        );
 
-  const valid = await bcrypt.compare(req.body.password, user.password);
-  if (!valid)
-    return res
-      .status(400)
-      .send(
-        createResObject(
-          false,
-          {},
-          stringConstants.INCORRECT_PASSWORD,
-          errorObjects.INCORRECT_PASSWORD
-        )
-      );
+    const role = user.role;
 
-  const authToken = user.generateAuthToken();
-  const refreshToken = user.generateRefreshToken();
+    if (role !== stringConstants.role.USER || role !== user.role) {
+      //   Forbidden resource
+      return res
+        .status(403)
+        .send(
+          createResObject(
+            false,
+            {},
+            stringConstants.FORBIDDEN_RESOURCE,
+            errorObjects.FORBIDDEN_RESOURCE
+          )
+        );
+    }
 
-  res.header(stringConstants.AUTH_TOKEN_STRING, authToken.token);
-  res.header(stringConstants.REFRESH_TOKEN_STRING, refreshToken.token);
+    if (!user.password)
+      return res
+        .status(400)
+        .send(
+          createResObject(
+            false,
+            {},
+            stringConstants.USER_ALREADY_SIGNED_UP_WITH_DIFFERENT_METHOD,
+            errorObjects.USER_ALREADY_SIGNED_UP_WITH_DIFFERENT_METHOD(
+              user.metadata.signupType
+            )
+          )
+        );
 
-  user.refreshToken = refreshToken.token;
-  user.metadata.osType = osType;
-  user.addDeviceToken(deviceToken);
-  user = await user.save();
+    const isValid = await bcrypt.compare(req.body.password, user.password);
+    if (!isValid)
+      return res
+        .status(400)
+        .send(
+          createResObject(
+            false,
+            {},
+            stringConstants.INCORRECT_PASSWORD,
+            errorObjects.INCORRECT_PASSWORD
+          )
+        );
 
-  const returnObject = {
-    ...user.getUserBasicInfo(),
-    authTokenExpiry: authToken.expiry,
-    refreshTokenExpiry: refreshToken.expiry,
-    firstSignin,
-  };
+    const authToken = user.generateAuthToken();
+    const refreshToken = user.generateRefreshToken();
 
-  return res.send(
-    createResObject(
-      true,
-      { user: returnObject },
-      stringConstants.SIGN_IN_SUCCESSFUL
-    )
-  );
-});
+    res.header(stringConstants.AUTH_TOKEN_STRING, authToken.token);
+    res.header(stringConstants.REFRESH_TOKEN_STRING, refreshToken.token);
+
+    user.refreshToken = refreshToken.token;
+    user.metadata.osType = osType;
+    user.addDeviceToken(deviceToken);
+    user = await user.save();
+
+    const returnObject = {
+      ...user.getUserBasicInfo(),
+      authTokenExpiry: authToken.expiry,
+      refreshTokenExpiry: refreshToken.expiry,
+      firstSignin,
+    };
+
+    return res.send(
+      createResObject(
+        true,
+        { user: returnObject },
+        stringConstants.SIGN_IN_SUCCESSFUL
+      )
+    );
+  }
+);
 
 /**
  * Route to sign in user using Apple ID
  */
 router.post(
   "/sign-in-with-apple",
-  [appAuth, authAppleTokenMiddleware],
+  [wrongSigninLimiter, appAuth, authAppleTokenMiddleware],
   async (req, res, next) => {
     const email = req.payload.email;
-    const userIdetifier = req.payload.sub;
+    const userIdentifier = req.payload.sub;
     const deviceToken = req.body.deviceToken;
     const osType = req.body.osType;
 
@@ -97,7 +131,7 @@ router.post(
 
     if (!email) {
       return next(new Error("Apple sign in email not found in payload"));
-    } else if (!userIdetifier) {
+    } else if (!userIdentifier) {
       return next(
         new Error("Apple sign in user identifier not found in payload")
       );
@@ -124,7 +158,7 @@ router.post(
       // Create a new user
       schema = Joi.object({
         fullName: Joi.string().required().min(2).max(255),
-        userIdetifier: Joi.string().required(), // Already checked in middleware
+        userIdentifier: Joi.string().required(), // Already checked in middleware
         osType: Joi.string()
           .valid(
             stringConstants.osType.ANDROID,
@@ -151,7 +185,7 @@ router.post(
           );
 
       const salt = await bcrypt.genSalt(10);
-      const appleId = await bcrypt.hash(userIdetifier, salt);
+      const appleId = await bcrypt.hash(userIdentifier, salt);
 
       const fullName = req.body.fullName;
       user = new User({
@@ -161,9 +195,24 @@ router.post(
         "metadata.signupType": stringConstants.signupType.APPLE,
       });
     } else {
+      const role = user.role;
+      // Cannot use this route for admin login
+      if (role !== stringConstants.role.USER || role !== user.role) {
+        //   Forbidden resource
+        return res
+          .status(403)
+          .send(
+            createResObject(
+              false,
+              {},
+              stringConstants.FORBIDDEN_RESOURCE,
+              errorObjects.FORBIDDEN_RESOURCE
+            )
+          );
+      }
       schema = Joi.object({
         fullName: Joi.string(),
-        userIdetifier: Joi.string().required(), // Already checked in middleware
+        userIdentifier: Joi.string().required(), // Already checked in middleware
         osType: Joi.string()
           .valid(
             stringConstants.osType.ANDROID,
@@ -177,7 +226,7 @@ router.post(
       });
 
       const { error } = schema.validate(req.body);
-      if (err) {
+      if (error) {
         return res
           .status(400)
           .send(
@@ -191,7 +240,7 @@ router.post(
       }
 
       const isValid = await bcrypt.compare(
-        req.body.userIdetifier,
+        req.body.userIdentifier,
         user.appleId ? user.appleId : "default"
       );
 
@@ -242,7 +291,7 @@ router.post(
  */
 router.post(
   "/sign-in-with-ebay",
-  [appAuth, valSignInWithEbay],
+  [wrongSigninLimiter, appAuth, valSignInWithEbay],
   async (req, res) => {
     const accessToken = req.header(stringConstants.EBAY_ACCESS_TOKEN);
     const reqFullName = req.body.fullName;
@@ -255,12 +304,15 @@ router.post(
     const authorizationHeader = `Bearer ${accessToken}`;
 
     try {
-      const { body } = await got(stringConstants.URLS.ebayGetUserUrl, {
-        headers: {
-          Authorization: authorizationHeader,
-        },
-        responseType: "json",
-      });
+      const { body } = await got(
+        config.get(stringConstants.ebayUrlNames.EBAY_GET_USER),
+        {
+          headers: {
+            Authorization: authorizationHeader,
+          },
+          responseType: "json",
+        }
+      );
 
       switch (accountType) {
         case stringConstants.ebayAccType.BUSINESS_ACCOUNT:
@@ -348,6 +400,22 @@ router.post(
         "metadata.osType": osType,
         "metadata.signupType": stringConstants.signupType.EBAY,
       });
+    } else {
+      const role = user.role;
+
+      if (role !== stringConstants.role.USER || role !== user.role) {
+        //   Forbidden resource
+        return res
+          .status(403)
+          .send(
+            createResObject(
+              false,
+              {},
+              stringConstants.FORBIDDEN_RESOURCE,
+              errorObjects.FORBIDDEN_RESOURCE
+            )
+          );
+      }
     }
 
     const authToken = user.generateAuthToken();

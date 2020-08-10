@@ -113,7 +113,7 @@ module.exports.stringConstants = {
   NO_STRIPE_ID_FOUND_FOR_USER: "No stripe ID found for user: ",
 
   PENDING_AMOUNT_AND_AMOUNT_DO_NOT_MATCH:
-    "Pending amount for cards do not match amount sent by clients",
+    "Pending amount for cards do not match amount sent by client application",
 
   PAYMENT_SUCCEEDED: "Payment succeeded",
 
@@ -125,6 +125,21 @@ module.exports.stringConstants = {
     "User has already signed up with a different method",
 
   SIGNED_OUT_SUCCESSFULLY: "Signed out successfully",
+
+  FORBIDDEN_RESOURCE: "Forbidden resource!",
+
+  INVALID_SIGN_UP_METHOD: "Invalid sign up method for admin",
+
+  NEEDS_TO_BE_INTEGER: "need to be Integer",
+
+  TOO_MANY_REQUESTS: "Too many requests, please try again later",
+
+  STRIPE_CUSTOMER_CREATION_DESC: "Created through DCGS",
+
+  NO_EBAY_TOKEN_FOUND: "No ebay auth token found",
+
+  NO_EBAY_REFRESH_TOKEN_FOUND: "No ebay refresh token found",
+
   collectionNames: {
     USER_COLLECTION: "User",
     PENDING_DELETION: "Pending_Deletion",
@@ -132,7 +147,10 @@ module.exports.stringConstants = {
     TRANSACTION_COLLECTION: "Transaction",
     TRANSACTION_LOG_COLLECTION: "Transaction_log",
     SCHEDULE_COLLECTION: "Schedule",
-    JOB: "jobs", // For Agenda package
+    JOB: "jobs", // For Agenda package,
+    GLOBAL_REQ_RATE_RECORDS: "global_req_rate_records",
+    WRONG_SIGNIN_REQ_RECORDS: "wrong_signin_req_records",
+    QUESTIONS_COLLECTION: "Question",
   },
 
   deletionType: {
@@ -181,6 +199,8 @@ module.exports.stringConstants = {
     TS: ".ts",
     WEBM: ".webm",
     MKV: ".mkv",
+    MOV: ".mov",
+    MFOURV: ".m4v",
   },
 
   currency: {
@@ -201,19 +221,90 @@ module.exports.stringConstants = {
 
   transactionStatus: {
     CREATED: "created",
-    CANCELLED: "cancelled",
+    CANCELED: "canceled",
     SUCCEEDED: "succeeded",
     ERROR: "error",
     REFUNDED: "refunded",
   },
 
+  piStatus: {
+    REQ_PM_METHOD: "requires_payment_method",
+    REQ_CONFIRMATION: "requires_confirmation",
+    REQ_ACTION: "requires_action",
+    PROCESSING: "processing",
+    REQ_CAPTURE: "requires_capture",
+    CANCELED: "canceled",
+    SUCCEEDED: "succeeded",
+  },
+
   URLS: {
     ebayoAuthUrl: "https://api.sandbox.ebay.com/identity/v1/oauth2/token",
     ebayGetUserUrl: "https://apiz.sandbox.ebay.com/commerce/identity/v1/user/",
+    qrBaseUrl: "qrBaseUrl", // Mapped to config
   },
 
   ebayAccType: {
     BUSINESS_ACCOUNT: "businessAccount",
     INDIVIDUAL_ACCOUNT: "individualAccount",
+  },
+
+  headerNames: {
+    X_RATELIMIT_LIMIT: "X-RateLimit-Limit",
+    X_RATELIMIT_REMAINING: "X-RateLimit-Remaining",
+    RETRY_AFTER: "Retry-After",
+    EBAY_ACCESS_TOKEN: "ebay-access-token",
+    EBAY_REFRESH_TOKEN: "ebay-refresh-token",
+  },
+
+  stripeMessages: {
+    SUCCEEDED: "Payment successful ordere has been placed",
+    FAILED: "We are sorry, there was an error processing your payment",
+    REFUND: "Error encountered, refund has been issued",
+    REQ_ACTION: "Payment being processed, requires action on users part",
+    PROCESSING:
+      "Payment being processed, you will get a notification when completed",
+  },
+
+  piEvents: {
+    PI_SUCCEEDED: "payment_intent.succeeded",
+  },
+
+  gradingQId: {
+    SIGNED_CELEB: "signedCeleb",
+    CORNER_VALUE: "cornerValue",
+    EDGE_VALUE: "edgeValue",
+    SURFACE_VALUE: "surfaceValue",
+    EYE_APPEAL: "eyeAppeal",
+    CENTER_FRONT: "centerFront",
+    CENTER_BACK: "centerBack",
+    CARD_STAINS: "cardStains",
+    CARD_SLEEVING: "cardSleeving",
+    PRINTING_DEFECTS: "printingDefects",
+  },
+  gradeDesc: {
+    GEM_MT_10: "GEM-MT 10",
+    MINT_9: "MINT 9",
+    NEAR_MINT_MINT: "NEAR MINT-MINT",
+    NEAR_MINT: "NEAR MINT",
+    EXCELLENT_MINT: "EXCELLENT MINT",
+    EXCELLENT: "EXCELLENT",
+    VERY_GOOD_EXCELLENT: "VERY GOOD-EXCELLENT",
+    VERY_GOOD: "VERY GOOD",
+    GOOD: "GOOD",
+    FAIR: "FAIR",
+    POOR: "POOR",
+    UNGRADABLE: "UNGRADABLE",
+  },
+  imageAssetNames: {
+    DCGS_LOGO: "dcgs_logo.png",
+    INNER_IMAGE_MASK: "inner_image_mask.png",
+    OUTER_IMAGE_MASK: "outer_image_mask.png",
+    QR_CODE_MASK: "qr_code_mask.png",
+  },
+
+  ebayUrlNames: {
+    EBAY_O_AUTH: "ebayoAuthUrl",
+    EBAY_GET_USER: "ebayGetUserUrl",
+    EBAY_REFRESH_TOKEN: "ebayGetRefreshToken",
   },
 };

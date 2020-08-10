@@ -1,5 +1,6 @@
 const express = require("express");
 const app = express();
+require("./startup/corsSetup")(app);
 const path = require("path");
 const errorMid = require("./middlewares/errorHandler");
 require("./startup/directoryCreator")();
@@ -15,8 +16,10 @@ require("express-async-errors");
 require("dotenv").config({ path: path.join(__dirname, "../.env") });
 /**
  * Connect to DB
+ * and add starting data
  */
 require("./startup/databaseConnect")();
+require("./startup/databaseSetup")();
 /**
  * Setup simple logger before we can use it.
  * Create all required directory first

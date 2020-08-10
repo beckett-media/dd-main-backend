@@ -1,9 +1,9 @@
 const jwt = require("jsonwebtoken");
-const config = require("config");
 const SimpleLogger = require("../utils/simpleLogger");
+const config = require("config");
 const { User } = require("../models/user");
-const { createResObject } = require("../utils/utilFunctions");
 const { stringConstants } = require("../utils/constants");
+const { createResObject } = require("../utils/utilFunctions");
 const { errorObjects } = require("../utils/errorObjects");
 
 module.exports = async (req, res, next) => {
@@ -25,8 +25,18 @@ module.exports = async (req, res, next) => {
       token,
       config.get(stringConstants.JWT_PRIATE_KEY)
     );
-    // Check if user exists in the database, if not return from here itself
-    const user = await User.findById(decoded._id);
+    /**
+     * We will use the info in the token to verify
+     * If any of the two is not defined. The token
+     * is invalid and it will caught using the catch
+     * block
+     */
+    const id = decoded._id;
+    const role = decoded.role;
+    /**
+     * Checking is the user exists
+     */
+    const user = await User.findById(id);
     if (!user)
       return res
         .status(404)
@@ -38,10 +48,24 @@ module.exports = async (req, res, next) => {
             errorObjects.USER_ID_DOEST_NOT_EXISTS
           )
         );
-    req.user = decoded;
+
+    if (role !== stringConstants.role.ADMIN || role !== user.role) {
+      //   Forbidden resource
+      return res
+        .status(403)
+        .send(
+          createResObject(
+            false,
+            {},
+            stringConstants.FORBIDDEN_RESOURCE,
+            errorObjects.FORBIDDEN_RESOURCE
+          )
+        );
+    }
+    //   Everything went well
     return next();
-  } catch (ex) {
-    SimpleLogger.error(ex);
+  } catch (error) {
+    SimpleLogger.error(error);
     return res
       .status(401)
       .send(

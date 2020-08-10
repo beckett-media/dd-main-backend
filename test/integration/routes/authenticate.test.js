@@ -4,8 +4,6 @@ const request = require("supertest");
 const chai = require("chai");
 const expect = chai.expect;
 const config = require("config");
-const rimraf = require("rimraf");
-const path = require("path");
 let server;
 
 /**
@@ -45,7 +43,7 @@ describe("INTEG: authenticate.test.js: EndPoint: /authenticate/sign-in-user", fu
           deviceToken,
         })
         .set("Accept", "application/json")
-        .set("x-app-token", config.get("appToken"));
+        .set(stringConstants.APP_TOKEN_STRING, config.get("appToken"));
     };
 
     const signInUser = async function () {
@@ -58,7 +56,7 @@ describe("INTEG: authenticate.test.js: EndPoint: /authenticate/sign-in-user", fu
           deviceToken,
         })
         .set("Accept", "application/json")
-        .set("x-app-token", config.get("appToken"));
+        .set(stringConstants.APP_TOKEN_STRING, config.get("appToken"));
     };
 
     beforeEach(function () {
@@ -74,19 +72,29 @@ describe("INTEG: authenticate.test.js: EndPoint: /authenticate/sign-in-user", fu
      * credentials. It should successfully sign the
      * user in this the happy path
      */
-    it("Should successfully sign in user successfully", async function () {
+
+    this.afterEach(async function () {
+      const users = await User.find({});
+      for (const user of users) {
+        await user.remove();
+      }
+    });
+
+    it("Test 1: Should successfully sign in user successfully", async function () {
       await registerUser();
       let res = await signInUser();
 
       expect(res.status).to.be.equal(200);
       expect(res.body.success).to.be.true;
-      expect(res.headers).to.have.property("x-auth-token");
-      expect(res.headers).to.have.property("x-refresh-token");
+      expect(res.headers).to.have.property(stringConstants.AUTH_TOKEN_STRING);
+      expect(res.headers).to.have.property(
+        stringConstants.REFRESH_TOKEN_STRING
+      );
     });
     /**
      * Test with wrong password and should return 400
      */
-    it("Should return 400 error for wrong password", async function () {
+    it("Test 2: Should return 400 error for wrong password", async function () {
       await registerUser();
 
       password = "wrong_password";
@@ -100,7 +108,7 @@ describe("INTEG: authenticate.test.js: EndPoint: /authenticate/sign-in-user", fu
      * Do not register user and try to sign in.
      * It should return 404 for user not found.
      */
-    it("Should return 404 error for user with email not found", async function () {
+    it("Test 3: Should return 404 error for user with email not found", async function () {
       await registerUser();
 
       email = "wrong_email@gmail.com";
@@ -110,5 +118,53 @@ describe("INTEG: authenticate.test.js: EndPoint: /authenticate/sign-in-user", fu
       expect(res.status).to.be.equal(404);
       expect(res.body.success).to.be.false;
     });
+
+    it("Test 4: Should add the device token to user device tokens", async function () {
+      await registerUser();
+      const res = await signInUser();
+
+      const userId = res.body.data.user.id;
+
+      const databaseUser = await User.findById(userId);
+      expect(databaseUser.deviceTokens).to.be.eql(["test"]);
+    });
+  });
+});
+
+describe("INTEG: authenticate.test.js: Test the sign out route", function () {
+  let server, user, token;
+  this.beforeEach(async function () {
+    server = require("../../../index");
+
+    user = new User({
+      fullName: "Test User",
+      email: "test@test.com",
+      deviceTokens: ["test"],
+    });
+    user = await user.save();
+
+    token = user.generateAuthToken().token;
+  });
+  this.afterEach(async function () {
+    await server.close();
+    const users = await User.find({});
+    for (const user of users) {
+      await user.remove();
+    }
+  });
+
+  it("Test 1: Should remove the device token from the user", async function () {
+    const res = await request(server)
+      .post("/authenticate/sign-out")
+      .send({
+        deviceToken: "test",
+      })
+      .set("Accept", "application/json")
+      .set(stringConstants.APP_TOKEN_STRING, config.get("appToken"))
+      .set(stringConstants.AUTH_TOKEN_STRING, token);
+
+    user = await User.findById(user._id);
+    expect(res.status).to.be.equal(200);
+    expect(user.deviceTokens).to.be.eql([]);
   });
 });

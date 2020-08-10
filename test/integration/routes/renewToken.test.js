@@ -36,7 +36,7 @@ describe("Integ: renewToken.test.js: EndPoint: /auth-token", function () {
     /**
      * Should return 400 when no auth token found in request header
      */
-    it("Should return 400 for no auth token found in request header", async function () {
+    it("Test 1: Should return 400 for no auth token found in request header", async function () {
       const res = await request(server)
         .get("/auth-token/renew-auth-token")
         .set("Accept", "application/json")
@@ -47,7 +47,7 @@ describe("Integ: renewToken.test.js: EndPoint: /auth-token", function () {
     /**
      * Should return 400 when no refresh token found in request header
      */
-    it("Should return 400 for no auth token found in request header", async function () {
+    it("Test 2: Should return 400 for no auth token found in request header", async function () {
       const res = await request(server)
         .get("/auth-token/renew-auth-token")
         .set({ Accept: "application/json", "x-auth-token": "test" })
@@ -61,7 +61,7 @@ describe("Integ: renewToken.test.js: EndPoint: /auth-token", function () {
      * Should return new auth token when valid auth and refresh token in request
      * headers
      */
-    it("Should return renewed auth token and refresh token", async function () {
+    it("Test 3: Should return renewed auth token and refresh token", async function () {
       let res = await request(server)
         .post("/user/register-user")
         .send({
@@ -104,7 +104,7 @@ describe("Integ: renewToken.test.js: EndPoint: /auth-token", function () {
     /**
      * Should return 401 for invalid auth token
      */
-    it("Should return renewed auth token and refresh token", async function () {
+    it("Test 4: Should return renewed auth token and refresh token", async function () {
       let res = await request(server)
         .post("/user/register-user")
         .send({
@@ -143,7 +143,7 @@ describe("Integ: renewToken.test.js: EndPoint: /auth-token", function () {
     /**
      * Should return 401 for invalid refresh token
      */
-    it("Should return renewed auth token and refresh token", async function () {
+    it("Test 5: Should return renewed auth token and refresh token", async function () {
       let res = await request(server)
         .post("/user/register-user")
         .send({
@@ -182,7 +182,7 @@ describe("Integ: renewToken.test.js: EndPoint: /auth-token", function () {
     /**
      * Should return 401 for user ID different in auth and refresh token
      */
-    it("Should return 401 for different user ID in auth and refresh token", async function () {
+    it("Test 6: Should return 401 for different user ID in auth and refresh token", async function () {
       let res1 = await request(server)
         .post("/user/register-user")
         .send({
@@ -239,7 +239,7 @@ describe("Integ: renewToken.test.js: EndPoint: /auth-token", function () {
     /**
      * Return 400 for when token not set in request headers
      */
-    it("Should throw 400 for auth token not found in request header", async function () {
+    it("Test 1: Should throw 400 for auth token not found in request header", async function () {
       const res = await request(server)
         .get("/auth-token/check-auth-token")
         .send({})
@@ -252,7 +252,7 @@ describe("Integ: renewToken.test.js: EndPoint: /auth-token", function () {
     /**
      * Should return 401 for invalid auth token
      */
-    it("Should throw 401 for auth token not valid", async function () {
+    it("Test 2: Should throw 401 for auth token not valid", async function () {
       const res = await request(server)
         .get("/auth-token/check-auth-token")
         .send({})
@@ -266,7 +266,7 @@ describe("Integ: renewToken.test.js: EndPoint: /auth-token", function () {
     /**
      * Should return 200 for valid auth token
      */
-    it("Should send 200 for valid auth token", async function () {
+    it("Test 3: Should send 200 for valid auth token", async function () {
       const res1 = await request(server)
         .post("/user/register-user")
         .send({

@@ -2,12 +2,12 @@ const express = require("express");
 const router = express.Router();
 const jwt = require("jsonwebtoken");
 const config = require("config");
-const appAuth = require("../middlewares/appAuth");
-const { stringConstants } = require("../utils/constants");
-const { createResObject } = require("../utils/utilFunctions");
-const { errorObjects } = require("../utils/errorObjects");
-const { User } = require("../models/user");
-const SimpleLogger = require("../utils/simpleLogger");
+const appAuth = require("../../middlewares/authenticateApp");
+const { stringConstants } = require("../../utils/constants");
+const { createResObject } = require("../../utils/utilFunctions");
+const { errorObjects } = require("../../utils/errorObjects");
+const { User } = require("../../models/user");
+const SimpleLogger = require("../../utils/simpleLogger");
 
 router.get("/renew-auth-token", appAuth, async (req, res) => {
   let user, token, refreshToken, refreshDecoded;
@@ -114,7 +114,8 @@ router.get("/renew-auth-token", appAuth, async (req, res) => {
         createResObject(
           false,
           {},
-          stringConstants.REFRESH_TOKEN_INVALID_OR_EXPIRED,
+          stringConstants.REFRESH_TOKEN_INVALID_OR_EXPIRED +
+            "(Refresh token does not match saved token or ID in refresh token does not match user ID)",
           errorObjects.REFRESH_TOKEN_INVALID_OR_EXPIRED
         )
       );
@@ -126,8 +127,12 @@ router.get("/renew-auth-token", appAuth, async (req, res) => {
   res.header(stringConstants.AUTH_TOKEN_STRING, token.token);
   res.header(stringConstants.REFRESH_TOKEN_STRING, refreshToken.token);
 
-  user.refreshToken = refreshToken.token;
-  await user.save();
+  const userId = user._id;
+  user = await User.findByIdAndUpdate(
+    userId,
+    { $set: { refreshToken: refreshToken.token } },
+    { new: true }
+  );
 
   return res.send(
     createResObject(

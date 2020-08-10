@@ -13,6 +13,8 @@ module.exports = function (req, res, next) {
       SimpleLogger.info(JSON.stringify(req.body));
     if (req.params && !_.isEmpty(req.params))
       SimpleLogger.info(JSON.stringify(req.params));
+    if (req.headers && !_.isEmpty(req.headers))
+      SimpleLogger.info("Headers: ", JSON.stringify(req.headers));
   }
 
   SimpleLogger.info(req.protocol, req.hostname, req.originalUrl);

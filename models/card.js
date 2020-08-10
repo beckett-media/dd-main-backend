@@ -4,6 +4,7 @@ const path = require("path");
 const fsPromises = require("fs").promises;
 const SimpleLogger = require("../utils/simpleLogger");
 const rimraf = require("rimraf");
+const _ = require("lodash");
 const { PendingDeletion } = require("./pendingDeletion");
 const { stringConstants } = require("../utils/constants");
 
@@ -16,6 +17,12 @@ const cardSchema = new mongoose.Schema(
       type: String,
     },
     video: {
+      type: String,
+    },
+    thumbnail: {
+      type: String,
+    },
+    gradedImage: {
       type: String,
     },
     year: {
@@ -48,8 +55,22 @@ const cardSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    grading: {
+      signedCeleb: { type: Number },
+      cornerValue: { type: Number },
+      edgeValue: { type: Number },
+      surfaceValue: { type: Number },
+      eyeAppeal: { type: Number },
+      centerFront: { type: Number },
+      centerBack: { type: Number },
+      cardStains: { type: Number },
+      cardSleeving: { type: Number },
+      printingDefects: { type: Number },
+      grade: { type: String },
+      gradeDesc: { type: String },
+    },
   },
-  { timestamps: true }
+  { timestamps: true, toJSON: { getters: true } }
 );
 /**
  * Static method to check if card complete
@@ -72,21 +93,65 @@ cardSchema.methods.getCardDetails = function () {
   const id = this._id || null;
   const front = this.front || null;
   const back = this.back || null;
-  const video = this.back || null;
+  const video = this.video || null;
+  const thumbnail = this.thumbnail || null;
+  const gradedImage = this.gradedImage || null;
   const year = this.year || null;
   const brand = this.brand || null;
   const cardNumber = this.cardNumber || null;
   const playerNames = this.playerNames || null;
+  const createdAt = this.createdAt || null;
+  const updatedAt = this.updatedAt || null;
 
   return {
-    id: this._id,
-    front: this.front,
-    back: this.back,
-    video: this.video,
-    year: this.year,
-    brand: this.brand,
-    cardNumber: this.cardNumber,
-    playerNames: this.playerNames,
+    id,
+    front,
+    back,
+    video,
+    thumbnail,
+    gradedImage,
+    year,
+    brand,
+    cardNumber,
+    playerNames,
+    createdAt,
+    updatedAt,
+  };
+};
+/**
+ * Schema method to return card details with grading
+ */
+cardSchema.methods.getCardDetailsWithGrading = function () {
+  const id = this._id || null;
+  const front = this.front || null;
+  const back = this.back || null;
+  const video = this.video || null;
+  const thumbnail = this.thumbnail || null;
+  const gradedImage = this.gradedImage || null;
+  const year = this.year || null;
+  const brand = this.brand || null;
+  const cardNumber = this.cardNumber || null;
+  const playerNames = this.playerNames || null;
+  const status = this.status || null;
+  const grading = gradingEmpty(this.grading) ? null : this.grading;
+  const createdAt = this.createdAt || null;
+  const updatedAt = this.updatedAt || null;
+
+  return {
+    id,
+    front,
+    back,
+    video,
+    thumbnail,
+    gradedImage,
+    year,
+    brand,
+    cardNumber,
+    playerNames,
+    grading,
+    status,
+    createdAt,
+    updatedAt,
   };
 };
 /**
@@ -115,5 +180,22 @@ const Card = mongoose.model(
   stringConstants.collectionNames.CARD_COLLECTION,
   cardSchema
 );
+
+function gradingEmpty(grading) {
+  return (
+    !grading.gradeDesc &&
+    !grading.grade &&
+    !grading.signedCeleb &&
+    !grading.cornerValue &&
+    !grading.edgeValue &&
+    !grading.surfaceValue &&
+    !grading.eyeAppeal &&
+    !grading.centerFront &&
+    !grading.centerBack &&
+    !grading.cardStains &&
+    !grading.cardSleeving &&
+    !grading.printingDefects
+  );
+}
 
 module.exports.Card = Card;

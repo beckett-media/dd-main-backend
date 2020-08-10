@@ -189,6 +189,60 @@ module.exports.errorObjects = {
     };
   },
 
+  FORBIDDEN_RESOURCE: {
+    errorCode: 125,
+    errorSubCode: getKey(stringConstants, stringConstants.FORBIDDEN_RESOURCE),
+    errorMessage: stringConstants.FORBIDDEN_RESOURCE,
+  },
+
+  INVALID_SIGN_UP_METHOD: (method) => {
+    return {
+      errorCode: 126,
+      errorSubCode: getKey(
+        stringConstants,
+        stringConstants.INVALID_SIGN_UP_METHOD
+      ),
+      errorMessage: `${stringConstants.INVALID_SIGN_UP_METHOD}. Needs to be ${method}`,
+    };
+  },
+
+  NEEDS_TO_BE_INTEGER: (valueName) => {
+    return {
+      errorCode: 127,
+      errorSubCode: getKey(
+        stringConstants,
+        stringConstants.NEEDS_TO_BE_INTEGER
+      ),
+      errorMessage: `${valueName} ${stringConstants.NEEDS_TO_BE_INTEGER}`,
+    };
+  },
+
+  TOO_MANY_REQUESTS: {
+    errorCode: 128,
+    errorSubCode: "TOO_MANY_REQUESTS",
+    errorMessage: stringConstants.TOO_MANY_REQUESTS,
+  },
+
+  STRIPE_ERROR: (message) => {
+    return {
+      errorCode: 129,
+      errorSubCode: "STRIPE_ERROR",
+      errorMessage: message,
+    };
+  },
+
+  NO_EBAY_TOKEN_FOUND: {
+    errorCode: 130,
+    errorSubCode: "NO_EBAY_TOKEN_FOUND",
+    errorMessage: stringConstants.NO_EBAY_TOKEN_FOUND,
+  },
+
+  NO_EBAY_REFRESH_TOKEN_FOUND: {
+    errorCode: 131,
+    errorSubCode: "NO_EBAY_REFRESH_TOKEN_FOUND",
+    errorMessage: stringConstants.NO_EBAY_REFRESH_TOKEN_FOUND,
+  },
+
   REQUEST_VALIDATION_ERROR: (errorMessage) => {
     return {
       errorCode: 301,

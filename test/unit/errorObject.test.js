@@ -240,4 +240,47 @@ describe("Unit: errorObject.test.js: Error object fucntion tests", function () {
         stringConstants.USER_ALREADY_SIGNED_UP_WITH_DIFFERENT_METHOD + ": test",
     });
   });
+
+  it("Should return error object with error code 125", function () {
+    const result = errorObjects.FORBIDDEN_RESOURCE;
+
+    expect(result).to.be.eql({
+      errorCode: 125,
+      errorSubCode: "FORBIDDEN_RESOURCE",
+      errorMessage: stringConstants.FORBIDDEN_RESOURCE,
+    });
+  });
+
+  it("Should return error object with error code 126", function () {
+    const result = errorObjects.INVALID_SIGN_UP_METHOD(
+      stringConstants.signupType.IN_APP
+    );
+
+    expect(result).to.be.eql({
+      errorCode: 126,
+      errorSubCode: "INVALID_SIGN_UP_METHOD",
+      errorMessage: `${stringConstants.INVALID_SIGN_UP_METHOD}. Needs to be ${stringConstants.signupType.IN_APP}`,
+    });
+  });
+
+  it("Should return error object with error code 127", function () {
+    const valueName = "Page number";
+    const result = errorObjects.NEEDS_TO_BE_INTEGER(valueName);
+
+    expect(result).to.be.eql({
+      errorCode: 127,
+      errorSubCode: "NEEDS_TO_BE_INTEGER",
+      errorMessage: `${valueName} ${stringConstants.NEEDS_TO_BE_INTEGER}`,
+    });
+  });
+
+  it("should return error object with error code 128", function () {
+    const result = errorObjects.TOO_MANY_REQUESTS;
+
+    expect(result).to.be.eql({
+      errorCode: 128,
+      errorSubCode: "TOO_MANY_REQUESTS",
+      errorMessage: stringConstants.TOO_MANY_REQUESTS,
+    });
+  });
 });

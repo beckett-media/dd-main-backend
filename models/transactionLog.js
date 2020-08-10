@@ -34,10 +34,14 @@ const transactionLogSchema = new mongoose.Schema({
     type: String,
     enum: [
       stringConstants.transactionStatus.CREATED,
-      stringConstants.transactionStatus.CANCELLED,
-      stringConstants.transactionStatus.SUCCEEDED,
-      stringConstants.transactionStatus.ERROR,
       stringConstants.transactionStatus.REFUNDED,
+      stringConstants.piStatus.CANCELED,
+      stringConstants.piStatus.PROCESSING,
+      stringConstants.piStatus.REQ_ACTION,
+      stringConstants.piStatus.REQ_CAPTURE,
+      stringConstants.piStatus.REQ_CONFIRMATION,
+      stringConstants.piStatus.REQ_PM_METHOD,
+      stringConstants.piStatus.SUCCEEDED,
     ],
   },
   piId: {
@@ -52,6 +56,12 @@ const transactionLogSchema = new mongoose.Schema({
     ref: stringConstants.collectionNames.USER_COLLECTION,
     required: true,
   },
+  cards: [
+    {
+      type: mongoose.Types.ObjectId,
+      ref: stringConstants.collectionNames.CARD_COLLECTION,
+    },
+  ],
   createdAt: {
     type: Date,
     default: Date.now(),

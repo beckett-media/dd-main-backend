@@ -2,6 +2,7 @@ const {
   getRandomIntInclusive,
   createResObject,
   getKey,
+  isNumber,
 } = require("../../utils/utilFunctions");
 const { stringConstants } = require("../../utils/constants");
 const chai = require("chai");
@@ -45,7 +46,7 @@ describe("Unit: utilFunction.test.js: Create res object:", () => {
   });
 });
 
-describe("Unit: utilFunction.test.js: Get key from value in object", () => {
+describe("Unit: utilFunction.test.js: Get key from value in object", function () {
   it("Should return key", () => {
     const result = getKey(stringConstants, stringConstants.AUTH_TOKEN_STRING);
     expect(result).to.be.eql("AUTH_TOKEN_STRING");
@@ -53,6 +54,23 @@ describe("Unit: utilFunction.test.js: Get key from value in object", () => {
 
   it("Should return undefined", () => {
     const result = getKey(stringConstants, "test");
+    expect(result).to.be.undefined;
+  });
+});
+
+describe("UNIT: utilFunction.test.js: check if number", function () {
+  it("Should return number", function () {
+    const result = isNumber(12);
+    expect(result).to.be.eql(12);
+  });
+
+  it("Should return undefined if not a number", function () {
+    const result = isNumber("twelve");
+    expect(result).to.be.undefined;
+  });
+
+  it("Should return undefined when input is undefined", function () {
+    const result = isNumber(undefined);
     expect(result).to.be.undefined;
   });
 });

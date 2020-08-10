@@ -25,3 +25,11 @@ module.exports.getRandomIntInclusive = (min, max) => {
   max = Math.floor(max);
   return Math.floor(Math.random() * (max - min + 1)) + min;
 };
+
+module.exports.isNumber = (value) => {
+  const number = parseInt(value);
+  if (isNaN(number)) {
+    return undefined;
+  }
+  return number;
+};

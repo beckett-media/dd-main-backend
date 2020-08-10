@@ -1,28 +1,29 @@
 const express = require("express");
 const router = express.Router();
-const auth = require("../middlewares/authenticateRequest");
-const appAuth = require("../middlewares/appAuth");
-const SimpleLogger = require("../utils/simpleLogger");
+const auth = require("../../middlewares/authenticateUser");
+const appAuth = require("../../middlewares/authenticateApp");
+const SimpleLogger = require("../../utils/simpleLogger");
 const path = require("path");
 const fsPromises = require("fs").promises;
 const _ = require("lodash");
-const currency = require("../utils/currency");
-const { User } = require("../models/user");
-const { Card } = require("../models/card");
-const { PendingDeletion } = require("../models/pendingDeletion");
-const { stringConstants } = require("../utils/constants");
-const { errorObjects } = require("../utils/errorObjects");
-const { createResObject } = require("../utils/utilFunctions");
+const currency = require("../../utils/currency");
+const Jimp = require("jimp");
+const { User } = require("../../models/user");
+const { Card } = require("../../models/card");
+const { PendingDeletion } = require("../../models/pendingDeletion");
+const { stringConstants } = require("../../utils/constants");
+const { errorObjects } = require("../../utils/errorObjects");
+const { createResObject } = require("../../utils/utilFunctions");
 const {
   uploadCardFront,
   uploadCardBack,
   uploadCardVideo,
-} = require("../middlewares/multerSingle");
+} = require("../../middlewares/multerSingle");
 const {
   valObjectIdInUrl,
   valUpdateCardData,
   valPageSizeNumber,
-} = require("../middlewares/validation");
+} = require("../../middlewares/validation");
 
 /**
  * Step 1: Create a new card and upload card front
@@ -47,6 +48,7 @@ router.post("/add-front", [appAuth, auth], async (req, res, next) => {
   });
   const cardId = card._id;
 
+  // Send card ID to multer
   req.cardId = cardId;
 
   uploadCardFront(req, res, async function (err) {
@@ -85,7 +87,7 @@ router.post("/add-front", [appAuth, auth], async (req, res, next) => {
     if (req.file.size <= 0) {
       const cardDestination = path.join(
         __dirname,
-        "../public/",
+        "../../public/",
         `${userId}/cards/${cardId}/`,
         `${req.file.filename}`
       );
@@ -112,7 +114,7 @@ router.post("/add-front", [appAuth, auth], async (req, res, next) => {
 
     card.front = path.join(`${userId}/cards/${cardId}/`, req.file.filename);
     card = await card.save();
-    card = card.getCardDetails();
+    card = card.getCardDetailsWithGrading();
 
     return res.send(
       createResObject(true, { card }, stringConstants.UPDATE_SUCCESSFUL)
@@ -194,7 +196,7 @@ router.post(
       if (req.file.size <= 0) {
         const cardDestination = path.join(
           __dirname,
-          "../public/",
+          "../../public/",
           `${userId}/cards/${cardId}/`,
           `${req.file.filename}`
         );
@@ -220,7 +222,11 @@ router.post(
       }
       // All the check completed delete the old card and update the new
       if (card.front) {
-        const pathToCardFront = path.join(__dirname, "../public/", card.front);
+        const pathToCardFront = path.join(
+          __dirname,
+          "../../public/",
+          card.front
+        );
         try {
           await fsPromises.unlink(pathToCardFront);
         } catch (error) {
@@ -234,7 +240,7 @@ router.post(
 
       card.front = path.join(`${userId}/cards/${cardId}/`, req.file.filename);
       card = await card.save();
-      card = card.getCardDetails();
+      card = card.getCardDetailsWithGrading();
 
       return res.send(
         createResObject(true, { card }, stringConstants.UPDATE_SUCCESSFUL)
@@ -318,7 +324,7 @@ router.post(
       if (req.file.size <= 0) {
         const cardDestination = path.join(
           __dirname,
-          "../public/",
+          "../../public/",
           `${userId}/cards/${cardId}/`,
           `${req.file.filename}`
         );
@@ -345,7 +351,7 @@ router.post(
       // Delete previous picture if any
       if (card.back) {
         try {
-          const cardBackPath = path.join(__dirname, "../public/", card.back);
+          const cardBackPath = path.join(__dirname, "../../public/", card.back);
           await fsPromises.unlink(cardBackPath);
         } catch (error) {
           SimpleLogger.error(error);
@@ -353,7 +359,7 @@ router.post(
             deletionType: stringConstants.deletionType.FILE,
             data: path.join(
               __dirname,
-              "../public/card_backs/",
+              "../../public/card_backs/",
               `${req.file.filename}`
             ),
           }).save();
@@ -362,7 +368,7 @@ router.post(
       card.back = path.join(`${userId}/cards/${cardId}/`, req.file.filename);
       card = await card.save();
 
-      card = card.getCardDetails();
+      card = card.getCardDetailsWithGrading();
 
       return res.send(
         createResObject(true, { card }, stringConstants.UPDATE_SUCCESSFUL)
@@ -458,7 +464,7 @@ router.post(
       if (req.file.size <= 0) {
         const cardDestination = path.join(
           __dirname,
-          "../public/",
+          "../../public/",
           `${userId}/cards/${cardId}/`,
           `${req.file.filename}`
         );
@@ -486,17 +492,13 @@ router.post(
       // Check if already has card video if yes the delete the old and replace with new
       if (card.video) {
         try {
-          const videoPath = path.join(__dirname, "../public/", card.video);
+          const videoPath = path.join(__dirname, "../../public/", card.video);
           await fsPromises.unlink(videoPath);
         } catch (error) {
           SimpleLogger.error(error);
           await new PendingDeletion({
             deletionType: stringConstants.deletionType.FILE,
-            data: path.join(
-              __dirname,
-              "../public/card_videos/",
-              `${req.file.filename}`
-            ),
+            data: path.join(__dirname, "../../public/", card.video),
           }).save();
         }
       }
@@ -506,7 +508,7 @@ router.post(
       );
       card = await card.save();
 
-      card = card.getCardDetails();
+      card = card.getCardDetailsWithGrading();
 
       return res.send(
         createResObject(true, { card }, stringConstants.UPDATE_SUCCESSFUL)
@@ -523,6 +525,7 @@ router.post(
   "/add-card-data/:cardId",
   [appAuth, auth, valObjectIdInUrl, valUpdateCardData],
   async (req, res) => {
+    const userId = req.user._id;
     const cardId = req.params.cardId;
     let card = await Card.findById(cardId);
     if (!card)
@@ -549,9 +552,39 @@ router.post(
 
     card.isCompleted = card.checkIfCompleted();
 
+    // Save the thumbnail of the card
+    // Resizing card image while maintaining aspect ratio
+    if (card.isCompleted) {
+      let image;
+
+      const cardFront = path.join(__dirname, "../../public/", card.front);
+      const extension = path.extname(card.front).toLowerCase();
+      const thumbnailDest = path.join(
+        __dirname,
+        "../../public/",
+        `${userId}/cards/${card._id}/`,
+        `card_thumbnail${extension}`
+      );
+
+      try {
+        image = await Jimp.read(cardFront);
+        const cardHeight = image.getHeight();
+        // const cardWidth = image.getWidth();
+        const ratio = 200 / cardHeight;
+        image.scale(ratio);
+        await image.write(thumbnailDest);
+        card.thumbnail = path.join(
+          `${userId}/cards/${card._id}/`,
+          `card_thumbnail${extension}`
+        );
+      } catch (error) {
+        SimpleLogger.error(error);
+      }
+    }
+
     card = await card.save();
 
-    card = card.getCardDetails();
+    card = card.getCardDetailsWithGrading();
 
     return res.send(
       createResObject(true, { card }, stringConstants.UPDATE_SUCCESSFUL)
@@ -595,7 +628,11 @@ router.delete(
     card = await card.remove();
 
     return res.send(
-      createResObject(true, { card }, stringConstants.DELETED_SUCCESSFULLY)
+      createResObject(
+        true,
+        { card: card.getCardDetailsWithGrading() },
+        stringConstants.DELETED_SUCCESSFULLY
+      )
     );
   }
 );
@@ -617,7 +654,7 @@ router.get(
         { isCompleted: true },
         { status: stringConstants.cardState.PENDING },
       ],
-    });
+    }).lean();
     /**
      * Card pricing:
      * $4.99 for <= 100
@@ -646,6 +683,10 @@ router.get(
       .skip((pageNumber - 1) * pageSize)
       .limit(pageSize);
 
+    cards = cards.map((card) => {
+      return card.getCardDetailsWithGrading();
+    });
+
     return res.send(
       createResObject(
         true,
@@ -656,4 +697,93 @@ router.get(
   }
 );
 
+/**
+ * Route to get all cards pending grading for user
+ */
+router.get(
+  "/pending-grading-cards/:pageSize/:pageNumber",
+  [appAuth, auth, valPageSizeNumber],
+  async (req, res) => {
+    const pageSize = parseInt(req.params.pageSize);
+    const pageNumber = parseInt(req.params.pageNumber);
+
+    let cards = await Card.find({
+      $and: [
+        { user: req.user._id },
+        { status: stringConstants.cardState.SUBMITTED },
+        { isCompleted: true },
+      ],
+    }).lean();
+    const numCards = cards.length;
+
+    cards = await Card.find({
+      $and: [
+        { user: req.user._id },
+        { status: stringConstants.cardState.SUBMITTED },
+        { isCompleted: true },
+      ],
+    })
+      .sort({ createdAt: 1 })
+      .skip((pageNumber - 1) * pageSize)
+      .limit(pageSize);
+
+    cards = cards.map((card) => {
+      return card.getCardDetailsWithGrading();
+    });
+
+    return res.send(
+      createResObject(
+        true,
+        { cards, numCards },
+        stringConstants.FETCH_SUCESSFUL
+      )
+    );
+  }
+);
+
+/**
+ * Get all graded cards for the user
+ */
+router.get(
+  "/graded-cards/:pageSize/:pageNumber",
+  [appAuth, auth, valPageSizeNumber],
+  async (req, res) => {
+    const pageSize = parseInt(req.params.pageSize);
+    const pageNumber = parseInt(req.params.pageNumber);
+    const userId = req.user._id;
+
+    let cards = await Card.find({
+      $and: [
+        { user: userId },
+        { status: stringConstants.cardState.GRADED },
+        { isCompleted: true },
+      ],
+    });
+
+    const numCards = cards.length;
+
+    cards = await Card.find({
+      $and: [
+        { user: req.user._id },
+        { status: stringConstants.cardState.GRADED },
+        { isCompleted: true },
+      ],
+    })
+      .sort({ createdAt: 1 })
+      .skip((pageNumber - 1) * pageSize)
+      .limit(pageSize);
+
+    cards = cards.map((card) => {
+      return card.getCardDetailsWithGrading();
+    });
+
+    return res.send(
+      createResObject(
+        true,
+        { cards, numCards },
+        stringConstants.FETCH_SUCESSFUL
+      )
+    );
+  }
+);
 module.exports = router;

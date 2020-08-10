@@ -1,6 +1,6 @@
 const { User } = require("../../../models/user");
-const auth = require("../../../middlewares/authenticateRequest");
-const request = require("supertest");
+const { stringConstants } = require("../../../utils/constants");
+const auth = require("../../../middlewares/authenticateUser");
 const httpMocks = require("node-mocks-http");
 const chai = require("chai");
 const expect = chai.expect;
@@ -8,6 +8,7 @@ const sinon = require("sinon");
 
 let body, token;
 describe("Unit: auth.test.js: Auth middleware", function () {
+  let user;
   /**
    * Testing the authentication middleware
    */
@@ -18,13 +19,13 @@ describe("Unit: auth.test.js: Auth middleware", function () {
       password: "test123!",
       fullName: "test_user",
     };
-    let user = new User(body);
+    user = new User(body);
     user = await user.save();
     token = user.generateAuthToken().token;
   });
 
   this.afterEach(async function () {
-    await User.remove({});
+    user = await user.remove();
   });
 
   function getRequest() {

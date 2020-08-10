@@ -1,0 +1,6 @@
+{
+  "ebayoAuthUrl": "https://api.sandbox.ebay.com/identity/v1/oauth2/token",
+  "ebayGetUserUrl": "https://apiz.sandbox.ebay.com/commerce/identity/v1/user/",
+  "ebayGetRefreshToken": "https://api.sandbox.ebay.com/identity/v1/oauth2/token",
+  "qrBaseUrl": "https://api.simpledev.solutions/cards/"
+}
