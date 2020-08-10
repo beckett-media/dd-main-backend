@@ -100,6 +100,8 @@ cardSchema.methods.getCardDetails = function () {
   const brand = this.brand || null;
   const cardNumber = this.cardNumber || null;
   const playerNames = this.playerNames || null;
+  const createdAt = this.createdAt || null;
+  const updatedAt = this.updatedAt || null;
 
   return {
     id,
@@ -112,6 +114,8 @@ cardSchema.methods.getCardDetails = function () {
     brand,
     cardNumber,
     playerNames,
+    createdAt,
+    updatedAt,
   };
 };
 /**
@@ -130,6 +134,8 @@ cardSchema.methods.getCardDetailsWithGrading = function () {
   const playerNames = this.playerNames || null;
   const status = this.status || null;
   const grading = gradingEmpty(this.grading) ? null : this.grading;
+  const createdAt = this.createdAt || null;
+  const updatedAt = this.updatedAt || null;
 
   return {
     id,
@@ -144,6 +150,8 @@ cardSchema.methods.getCardDetailsWithGrading = function () {
     playerNames,
     grading,
     status,
+    createdAt,
+    updatedAt,
   };
 };
 /**
