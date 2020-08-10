@@ -11,6 +11,7 @@ const Jimp = require("jimp");
 const path = require("path");
 const fs = require("fs");
 const QRCode = require("qrcode");
+const config = require("config");
 const { Card } = require("../../models/card");
 const { User } = require("../../models/user");
 const { Question } = require("../../models/question");
@@ -257,10 +258,8 @@ async function createGradedImage(card, grade, gradDesc) {
       __dirname,
       `../../assets/card_overlay/${cardId}_qr_code.png`
     );
-    await QRCode.toFile(
-      qrCodeImagePath,
-      `https://api.simpledev.solutions/cards/${cardId}`
-    );
+    const qrBaseUrl = config.get(stringConstants.URLS.qrBaseUrl);
+    await QRCode.toFile(qrCodeImagePath, `${qrBaseUrl}${cardId}`);
 
     const qrCodeImage = await Jimp.read(qrCodeImagePath);
     qrCodeImage.resize(logoQrWidth, logoQrHeight);

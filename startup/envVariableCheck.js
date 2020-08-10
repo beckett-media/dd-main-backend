@@ -15,6 +15,7 @@ module.exports = () => {
     config.get(stringConstants.EBAY_CLIENT_SECRET);
     config.get(stringConstants.ebayUrlNames.EBAY_O_AUTH);
     config.get(stringConstants.ebayUrlNames.EBAY_GET_USER);
+    config.get(stringConstants.URLS.qrBaseUrl);
   } catch (ex) {
     SimpleLogger.error(ex, true);
   }

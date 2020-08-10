@@ -240,6 +240,7 @@ module.exports.stringConstants = {
   URLS: {
     ebayoAuthUrl: "https://api.sandbox.ebay.com/identity/v1/oauth2/token",
     ebayGetUserUrl: "https://apiz.sandbox.ebay.com/commerce/identity/v1/user/",
+    qrBaseUrl: "qrBaseUrl", // Mapped to config
   },
 
   ebayAccType: {
