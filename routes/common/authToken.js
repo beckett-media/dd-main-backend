@@ -108,6 +108,10 @@ router.get("/renew-auth-token", appAuth, async (req, res) => {
     savedRefreshToken !== refreshToken ||
     user._id.toString() !== refreshDecoded._id
   ) {
+    SimpleLogger.debug("Saved Token", savedRefreshToken);
+    SimpleLogger.debug("Refresh Token", refreshToken);
+    SimpleLogger.debug("User ID", user._id.toString());
+    SimpleLogger.debug("Decoded User ID", refreshDecoded._id);
     return res
       .status(401)
       .send(

@@ -21,7 +21,7 @@ class SimpleLogger {
   static debug(...messages) {
     for (const message of messages) {
       const date = this.getDate();
-      if (process.env.NODE_ENV === "development") {
+      if (process.env.NODE_ENV !== "production") {
         this.writeToFile(`${date}: Debug: ${message}`, false);
       }
       console.log(`${date}: Debug: ${message}`.yellow);
@@ -32,7 +32,7 @@ class SimpleLogger {
     for (const message of messages) {
       const date = this.getDate();
       this.writeToFile(`${date}: Info: ${message}`, false);
-      if (process.env.NODE_ENV === "development")
+      if (process.env.NODE_ENV !== "production")
         console.log(`${date}: Info: ${message}`.green);
     }
   }
@@ -41,7 +41,7 @@ class SimpleLogger {
     for (const message of messages) {
       const date = this.getDate();
       this.writeToFile(`${date}: ** WARNING ** ${message}`, false);
-      if (process.env.NODE_ENV === "development")
+      if (process.env.NODE_ENV !== "production")
         console.log(`${date}: ** WARNING ** ${message}`.blue);
     }
   }
