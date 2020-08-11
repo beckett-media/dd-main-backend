@@ -160,6 +160,9 @@ router.post(
 
       // Save the profile to user document and return user document
       // Before that check if profile picture already exists and replace if it does
+      /*
+      ** Since profile pic name is same everytime multer automatically replaces the existing
+      ** picture
       if (user.profilePicture) {
         const absolutePath = path.join(
           __dirname,
@@ -176,6 +179,7 @@ router.post(
           }).save();
         }
       }
+      */
 
       const profilePicPath = path.join(
         `${userId}/profile_pictures/`,
