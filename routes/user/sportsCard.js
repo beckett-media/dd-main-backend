@@ -221,6 +221,7 @@ router.post(
           );
       }
       // All the check completed delete the old card and update the new
+      /*
       if (card.front) {
         const pathToCardFront = path.join(
           __dirname,
@@ -237,6 +238,7 @@ router.post(
           }).save();
         }
       }
+      */
 
       card.front = path.join(`${userId}/cards/${cardId}/`, req.file.filename);
       card = await card.save();
@@ -349,6 +351,7 @@ router.post(
           );
       }
       // Delete previous picture if any
+      /*
       if (card.back) {
         try {
           const cardBackPath = path.join(__dirname, "../../public/", card.back);
@@ -365,6 +368,7 @@ router.post(
           }).save();
         }
       }
+      */
       card.back = path.join(`${userId}/cards/${cardId}/`, req.file.filename);
       card = await card.save();
 
@@ -490,6 +494,7 @@ router.post(
       }
 
       // Check if already has card video if yes the delete the old and replace with new
+      /*
       if (card.video) {
         try {
           const videoPath = path.join(__dirname, "../../public/", card.video);
@@ -502,6 +507,7 @@ router.post(
           }).save();
         }
       }
+      */
       card.video = path.join(
         `${userId}/cards/${cardId}/`,
         `${req.file.filename}`
