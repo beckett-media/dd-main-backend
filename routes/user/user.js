@@ -158,28 +158,11 @@ router.post(
           );
       }
 
-      // Save the profile to user document and return user document
-      // Before that check if profile picture already exists and replace if it does
-      /*
-      ** Since profile pic name is same everytime multer automatically replaces the existing
-      ** picture
-      if (user.profilePicture) {
-        const absolutePath = path.join(
-          __dirname,
-          `../../public`,
-          `${user.profilePicture}`
-        );
-        try {
-          await fsPromises.unlink(absolutePath);
-        } catch (err) {
-          SimpleLogger.error(err);
-          await new PendingDeletion({
-            deletionType: stringConstants.deletionType.FILE,
-            data: absolutePath,
-          }).save();
-        }
-      }
-      */
+      /**
+       * Since all profile pictures for a particular User
+       * have the same name. Multer will automatically
+       * replace the existing profile picture.
+       */
 
       const profilePicPath = path.join(
         `${userId}/profile_pictures/`,
