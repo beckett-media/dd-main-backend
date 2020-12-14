@@ -35,6 +35,44 @@ const profilePicStorage = multer.diskStorage({
     cb(null, fileName);
   },
 });
+
+/**
+ * Storage for card grading
+ */
+const cardGradingStorage = multer.diskStorage({
+  destination: async function (req, file, cb) {
+    const cardId = req.cardId;
+    const userId = req.user._id;
+    if (!cardId) cb(new Error(stringConstants.CARD_ID_NOT_FOUND), false);
+    if (!userId)
+      cb(new Error(stringConstants.USER_ID_NOT_FOUND_IN_REQUEST), false);
+    const parentDir = path.join(__dirname, `../public/${userId}/cards/`);
+    const fileDestination = path.join(
+      __dirname,
+      `../public/${userId}/cards/${cardId}/`
+    );
+    const dirs = [parentDir, fileDestination];
+    try {
+      for (const dir of dirs) {
+        const exists = fs.existsSync(dir);
+        if (!exists) fs.mkdirSync(dir);
+      }
+    } catch (error) {
+      return cb(error, false);
+    }
+
+    cb(null, fileDestination);
+  },
+  filename: function (req, file, cb) {
+    const dateTime = Date.now();
+    const extension = path.extname(file.originalname).toLowerCase();
+    const rand = getRandomIntInclusive(100, 999);
+    // const fileName = `${dateTime}${rand}_card_grade${extension}`;
+    const fileName = `card_grade${extension}`;
+    cb(null, fileName);
+  }
+});
+
 /**
  * Storage for game card front
  */
@@ -166,6 +204,27 @@ module.exports.uploadProfilePic = multer({
     cb(null, true);
   },
 }).single("profilePicture");
+
+
+/**
+ * Multer function for upload card grading
+ */
+module.exports.uploadCardGrading = multer({
+  storage: cardGradingStorage,
+  fileFilter: function (req, file, cb) {
+    const ext = path.extname(file.originalname).toLowerCase();
+    if (
+      ext !== stringConstants.iType.PNG &&
+      ext !== stringConstants.iType.JPG &&
+      ext !== stringConstants.iType.GIF &&
+      ext !== stringConstants.iType.JPEG
+    ) {
+      return cb(new Error(stringConstants.NOT_A_VALID_FILE_TYPE), false);
+    }
+    cb(null, true);
+  },
+}).single("cardGrading");
+
 /**
  * Multer function for upload front of game card
  */

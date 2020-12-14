@@ -57,6 +57,8 @@ module.exports.stringConstants = {
 
   UPDATE_SUCCESSFUL: "Update successful",
 
+  GRADING_COMPLETED: "Grading Completed",
+
   AUTH_TOKEN_VALID: "Auth token valid",
 
   NO_FILE_FOUND: "No file found, please check request",
