@@ -236,9 +236,12 @@ router.post(
 
           centerGrading(onlyCardId, filePath, (centerGrade) => {
             cornerGrading(onlyCardId, filePath, async (cornerGrade) => {
+              console.log('centerGrade---------------', centerGrade);
+              console.log('cornerGrade---------------', cornerGrade);
               const cen = centerGrade > 0 ? centerGrade / 2 : 0;
               const cor = cornerGrade > 0 ? cornerGrade / 2 : 0;
               const grading = cen + cor;
+              console.log('grading-----------', grading);
               const updatedCard = await Card.findByIdAndUpdate(
                 onlyCardId,
                 { $set: { status: stringConstants.cardState.GRADED, grading } }
