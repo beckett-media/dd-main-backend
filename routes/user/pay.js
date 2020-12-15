@@ -222,17 +222,29 @@ router.post(
           await session.commitTransaction();
           session.endSession();
 
-          console.log('*******************payment success********************', cards);
+          console.log('*******************payment success********************');
 
           // grading of card
           const [onlyCard = {}] = cards;
           const { _id: onlyCardId = '' } = onlyCard; // for demo purpose we are expecting only 1 cardId
+          console.log('onlyCardId-------------', onlyCardId);
           const onlyCardDetails = await Card.find({
             _id: onlyCardId
           })
             .lean();
+          console.log('onlyCardDetails------------', onlyCardDetails);
+          const cardData = await Card.find({
+            $and: [
+              { user: userId },
+              { isCompleted: true }
+            ],
+          })
+            .lean()
+            .select("front");
 
-          const { front: filePath = '' } = onlyCardDetails;
+          console.log('cardData------------', cardData);
+          const [filePath = ''] = cardData;
+          console.log('filePath-----------', filePath);
 
           centerGrading(onlyCardId, filePath, (centerGrade) => {
             cornerGrading(onlyCardId, filePath, async (cornerGrade) => {
