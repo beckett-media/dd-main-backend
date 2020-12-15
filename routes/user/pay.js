@@ -232,19 +232,13 @@ router.post(
             _id: onlyCardId
           })
             .lean();
-          console.log('onlyCardDetails------------', onlyCardDetails);
-          const cardData = await Card.find({
-            $and: [
-              { user: userId },
-              { isCompleted: true },
-              { status: stringConstants.cardState.PENDING }
-            ],
-          })
-            .lean()
-            .select("front");
 
-          console.log('cardData------------', cardData);
-          const [filePath = ''] = cardData;
+          console.log('onlyCardDetails------------', onlyCardDetails);
+
+          const [firstData = {}] = onlyCardDetails;
+          console.log('firstData-------------', firstData);
+          const { front: filePath = '' } = firstData;
+
           console.log('filePath-----------', filePath);
 
           centerGrading(onlyCardId, filePath, (centerGrade) => {
