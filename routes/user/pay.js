@@ -236,7 +236,8 @@ router.post(
           const cardData = await Card.find({
             $and: [
               { user: userId },
-              { isCompleted: true }
+              { isCompleted: true },
+              { status: stringConstants.cardState.PENDING }
             ],
           })
             .lean()
