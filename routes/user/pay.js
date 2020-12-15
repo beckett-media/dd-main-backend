@@ -247,11 +247,12 @@ router.post(
               console.log('cornerGrade---------------', cornerGrade);
               const cen = centerGrade > 0 ? centerGrade / 2 : 0;
               const cor = cornerGrade > 0 ? cornerGrade / 2 : 0;
-              const grading = cen + cor;
+              let grading = cen + cor;
+              grading = `${grading}`;
               console.log('grading-----------', grading);
               const updatedCard = await Card.findByIdAndUpdate(
                 onlyCardId,
-                { $set: { status: stringConstants.cardState.GRADED, grading: { grade: `${grading}` } } }
+                { $set: { status: stringConstants.cardState.GRADED, grading: { grade: grading } } }
               );
               console.log('*******************updatedCard value*******************', updatedCard);
               return res.send(
