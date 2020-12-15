@@ -251,7 +251,7 @@ router.post(
               console.log('grading-----------', grading);
               const updatedCard = await Card.findByIdAndUpdate(
                 onlyCardId,
-                { $set: { status: stringConstants.cardState.GRADED, grading } }
+                { $set: { status: stringConstants.cardState.GRADED, grading: { grade: `${grading}` } } }
               );
               console.log('*******************updatedCard value*******************', updatedCard);
               return res.send(
