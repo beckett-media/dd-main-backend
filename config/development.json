@@ -3,7 +3,7 @@
   "ebayGetUserUrl": "https://apiz.sandbox.ebay.com/commerce/identity/v1/user/",
   "ebayGetRefreshToken": "https://api.sandbox.ebay.com/identity/v1/oauth2/token",
   "qrBaseUrl": "https://api.simpledev.solutions/cards/",
-  "dbConnectionString": "mongodb://localhost:27017/snap_grade_test",
+  "dbConnectionString": "mongodb://localhost:27017/snap_grade_test?retryWrites=false",
   "snapGradeJwtPrivateKey": "SNAP_GRADE_JWT_PRIVATE_KEY",
   "snapGradeJwtRefreshKey": "SNAP_GRADE_JWT_REFRESH_KEY",
   "snapGradeJwtAppKey": "SNAP_GRADE_JWT_APP_KEY",
