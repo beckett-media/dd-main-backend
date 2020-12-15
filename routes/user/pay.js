@@ -21,6 +21,8 @@ const config = require("config");
 const stripe = require("stripe")(config.get(stringConstants.STRIPE_TEST_KEY));
 const mongoose = require("mongoose");
 const { sendNotiToUser } = require("../../utils/sendNotifications");
+const centerGrading = require('./../../grading/centerGrading');
+const cornerGrading = require('./../../grading/cornerGrading');
 
 router.post(
   "/for-pending-cards",
@@ -219,13 +221,35 @@ router.post(
           await session.commitTransaction();
           session.endSession();
 
-          return res.send(
-            createResObject(
-              true,
-              { clientSecret: null, cardsUpdated: cards.length },
-              stringConstants.stripeMessages.SUCCEEDED
-            )
-          );
+          // grading of card
+          const [onlyCard = {}] = cards;
+          const { _id: onlyCardId = '' } = onlyCard; // for demo purpose we are expecting only 1 cardId
+          const onlyCardDetails = await Card.find({
+            _id: onlyCardId
+          })
+            .lean();
+
+          const { front: filePath = '' } = onlyCardDetails;
+
+          centerGrading(onlyCardId, filePath, (centerGrade) => {
+            cornerGrading(onlyCardId, filePath, (cornerGrade) => {
+              const cen = centerGrade > 0 ? centerGrade / 2 : 0;
+              const cor = cornerGrade > 0 ? cornerGrade / 2 : 0;
+              const grading = cen + cor;
+              await Card.findByIdAndUpdate(
+                onlyCardId,
+                { $set: { status: stringConstants.cardState.GRADED, grading } }
+              );
+              return res.send(
+                createResObject(
+                  true,
+                  { clientSecret: null, cardsUpdated: cards.length },
+                  stringConstants.stripeMessages.SUCCEEDED
+                )
+              );
+            })
+          });
+          break;
 
         case stringConstants.piStatus.REQ_ACTION:
           // 3D secure
