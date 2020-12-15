@@ -377,6 +377,7 @@ router.post(
           );
       }
     } catch (error) {
+      console.log('error--------------', error);
       SimpleLogger.error(error);
       // Refund the payment
       await session.abortTransaction();
