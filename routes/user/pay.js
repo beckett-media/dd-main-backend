@@ -232,7 +232,7 @@ router.post(
           const { front: filePath = '' } = onlyCardDetails;
 
           centerGrading(onlyCardId, filePath, (centerGrade) => {
-            cornerGrading(onlyCardId, filePath, (cornerGrade) => {
+            cornerGrading(onlyCardId, filePath, async (cornerGrade) => {
               const cen = centerGrade > 0 ? centerGrade / 2 : 0;
               const cor = cornerGrade > 0 ? cornerGrade / 2 : 0;
               const grading = cen + cor;
