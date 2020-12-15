@@ -891,8 +891,11 @@ router.post("/add-grading", [appAuth, auth], async (req, res, next) => {
 
     centerGrading(id, filePath, (centerGrade) => {
       cornerGrading(id, filePath, (cornerGrade) => {
+        const cen = centerGrade > 0 ? centerGrade / 2 : 0;
+        const cor = cornerGrade > 0 ? cornerGrade / 2 : 0;
+        const grading = cen + cor;
         return res.send(
-          createResObject(true, { ...card, centerGrade, cornerGrade }, stringConstants.GRADING_COMPLETED)
+          createResObject(true, { ...card, grading }, stringConstants.GRADING_COMPLETED)
         );
       })
     });
