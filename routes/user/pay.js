@@ -222,7 +222,7 @@ router.post(
           await session.commitTransaction();
           session.endSession();
 
-          console.log('*******************payment success********************');
+          console.log('*******************payment success********************', cards);
 
           // grading of card
           const [onlyCard = {}] = cards;
