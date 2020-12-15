@@ -28,6 +28,7 @@ router.post(
   "/for-pending-cards",
   [appAuth, auth, valPayPenReq],
   async (req, res) => {
+    console.log('*******************cards payment has been called********************');
     const userId = req.user._id;
     const amount = currency(req.body.amount).intValue;
     const paymentMethod = req.body.paymentMethod;
@@ -221,6 +222,8 @@ router.post(
           await session.commitTransaction();
           session.endSession();
 
+          console.log('*******************payment success********************');
+
           // grading of card
           const [onlyCard = {}] = cards;
           const { _id: onlyCardId = '' } = onlyCard; // for demo purpose we are expecting only 1 cardId
@@ -236,10 +239,11 @@ router.post(
               const cen = centerGrade > 0 ? centerGrade / 2 : 0;
               const cor = cornerGrade > 0 ? cornerGrade / 2 : 0;
               const grading = cen + cor;
-              await Card.findByIdAndUpdate(
+              const updatedCard = await Card.findByIdAndUpdate(
                 onlyCardId,
                 { $set: { status: stringConstants.cardState.GRADED, grading } }
               );
+              console.log('*******************updatedCard value*******************', updatedCard);
               return res.send(
                 createResObject(
                   true,

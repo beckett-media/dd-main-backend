@@ -800,6 +800,7 @@ router.get(
  * Step 1: Create a new card and upload card front
  */
 router.post("/add-grading", [appAuth, auth], async (req, res, next) => {
+  console.log('*************************add grading has been called*******************************');
   const userId = req.user._id;
   const user = await User.findById(userId);
   if (!user)
