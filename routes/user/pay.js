@@ -228,7 +228,7 @@ router.post(
 
           console.log('filePath-----------', filePath);
 
-          let cenCorGrade = await centerCornerGrading(id, filePath) || {};
+          let cenCorGrade = await centerCornerGrading(onlyCardId, filePath) || {};
           let grading = 0;
 
           try {
