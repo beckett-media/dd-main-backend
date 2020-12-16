@@ -241,33 +241,27 @@ router.post(
 
           console.log('filePath-----------', filePath);
 
-          centerGrading(onlyCardId, filePath, (centerGrade) => {
-            cornerGrading(onlyCardId, filePath, async (cornerGrade) => {
-              console.log('centerGrade---------------', centerGrade);
-              console.log('cornerGrade---------------', cornerGrade);
-              const cen = centerGrade > 0 ? centerGrade / 2 : 0;
-              const cor = cornerGrade > 0 ? cornerGrade / 2 : 0;
-              let grading = cen + cor;
-              grading = `${grading}`;
-              console.log('grading-----------', grading);
-              const updatedCard = await Card.findByIdAndUpdate(
-                onlyCardId,
-                { $set: { status: stringConstants.cardState.GRADED, grading: { grade: grading } } }
-              );
-              console.log('*******************updatedCard value*******************', updatedCard);
-              return res.send(
-                createResObject(
-                  true,
-                  { clientSecret: null, cardsUpdated: cards.length },
-                  stringConstants.stripeMessages.SUCCEEDED
-                )
-              );
-            })
-          });
-        }
-          console.log('*******************outside the case*******************');
-          break;
+          const centerGrade = await centerGrading(onlyCardId, filePath);
+          const cornerGrade = await cornerGrading(onlyCardId, filePath);
 
+          const cen = centerGrade > 0 ? centerGrade / 2 : 0;
+          const cor = cornerGrade > 0 ? cornerGrade / 2 : 0;
+          let grading = cen + cor;
+          grading = `${grading}`;
+          console.log('grading-----------', grading);
+          const updatedCard = await Card.findByIdAndUpdate(
+            onlyCardId,
+            { $set: { status: stringConstants.cardState.GRADED, grading: { grade: grading } } }
+          );
+          console.log('*******************updatedCard value*******************', updatedCard);
+          return res.send(
+            createResObject(
+              true,
+              { clientSecret: null, cardsUpdated: cards.length },
+              stringConstants.stripeMessages.SUCCEEDED
+            )
+          );
+        }
         case stringConstants.piStatus.REQ_ACTION:
           // 3D secure
           transaction.status = stringConstants.piStatus.REQ_ACTION;

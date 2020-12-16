@@ -4,7 +4,7 @@ const path = require('path');
 const { cornerGrading = {} } = require('./apiconfig');
 const { url = '', point = '' } = cornerGrading;
 
-const cornerGrade = async (name, imagePath, cb) => {
+const cornerGrade = (name, imagePath) => {
     const options = {
         method: 'POST',
         url: `${url}/${point}`,
@@ -17,26 +17,30 @@ const cornerGrade = async (name, imagePath, cb) => {
         }
     };
 
-    request(options, function (err, res, body) {
-        if (err) {
-            console.log(err);
-            cb(0);
-        } else {
-            const { formData = {} } = options;
-            const { name = '' } = formData;
-            const fileDestination = path.join(
-                __dirname,
-                `../public/${point}`
-            );
-            const exists = fs.existsSync(fileDestination);
-            if (!exists) fs.mkdirSync(fileDestination);
-            const writeStream = fs.createWriteStream(`${fileDestination}/${name}`);
-            writeStream.write(body);
-            writeStream.end();
-            const result = parseInt(body, 10);
-            cb(result);
-        }
+    const promise = new Promise((resolve, reject) => {
+        request(options, function (err, res, body) {
+            if (err) {
+                console.log(err);
+                resolve(0);
+            } else {
+                const { formData = {} } = options;
+                const { name = '' } = formData;
+                const fileDestination = path.join(
+                    __dirname,
+                    `../public/${point}`
+                );
+                const exists = fs.existsSync(fileDestination);
+                if (!exists) fs.mkdirSync(fileDestination);
+                const writeStream = fs.createWriteStream(`${fileDestination}/${name}`);
+                writeStream.write(body);
+                writeStream.end();
+                const result = parseInt(body, 10);
+                resolve(result);
+            }
+        });
     });
+
+    return promise;
 }
 
 module.exports = cornerGrade;
