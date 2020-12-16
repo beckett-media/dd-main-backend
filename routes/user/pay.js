@@ -188,7 +188,7 @@ router.post(
       transactionLog = await transactionLog.save(session);
 
       switch (paymentIntent.status) {
-        case stringConstants.piStatus.SUCCEEDED:
+        case stringConstants.piStatus.SUCCEEDED: {
           await Card.updateMany(
             {
               $and: [
@@ -264,6 +264,8 @@ router.post(
               );
             })
           });
+        }
+          console.log('*******************outside the case*******************');
           break;
 
         case stringConstants.piStatus.REQ_ACTION:
