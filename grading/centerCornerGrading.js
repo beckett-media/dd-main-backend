@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const { url = '', point = '' } = require('./apiconfig');
 
-const centerGrade = (name, imagePath) => {
+const centerCornerGrading = (name, imagePath) => {
     const options = {
         method: 'POST',
         url: `${url}/${point}`,
@@ -33,12 +33,11 @@ const centerGrade = (name, imagePath) => {
                 const writeStream = fs.createWriteStream(`${fileDestination}/${name}`);
                 writeStream.write(body);
                 writeStream.end();
-                const result = parseInt(body, 10);
-                resolve(result);
+                resolve(body);
             }
         });
     });
     return promise;
 }
 
-module.exports = centerGrade;
+module.exports = centerCornerGrading;

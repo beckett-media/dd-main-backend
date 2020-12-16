@@ -228,12 +228,18 @@ router.post(
 
           console.log('filePath-----------', filePath);
 
-          const cenCorGrade = await centerCornerGrading(onlyCardId, filePath);
-          const { centering = 0, corners = 0 } = cenCorGrade;
+          let cenCorGrade = await centerCornerGrading(id, filePath) || {};
+          let grading = 0;
 
-          const cen = centering > 0 ? centering / 2 : 0;
-          const cor = corners > 0 ? corners / 2 : 0;
-          let grading = cen + cor;
+          try {
+            cenCorGrade = typeof cenCorGrade === 'string' ? JSON.parse(cenCorGrade) : cenCorGrade;
+            const { centering = 0, corners = 0 } = cenCorGrade || {};
+            const cen = centering > 0 ? centering / 2 : 0;
+            const cor = corners > 0 ? corners / 2 : 0;
+            grading = cen + cor;
+          } catch (e) {
+            console.log(e);
+          }
           grading = `${grading}`;
           console.log('grading-----------', grading);
           const updatedCard = await Card.findByIdAndUpdate(
