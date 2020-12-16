@@ -1,10 +1,9 @@
 const request = require('request');
 const fs = require('fs');
 const path = require('path');
-const { cornerGrading = {} } = require('./apiconfig');
-const { url = '', point = '' } = cornerGrading;
+const { url = '', point = '' } = require('./apiconfig');
 
-const cornerGrade = (name, imagePath) => {
+const centerGrade = (name, imagePath) => {
     const options = {
         method: 'POST',
         url: `${url}/${point}`,
@@ -21,7 +20,7 @@ const cornerGrade = (name, imagePath) => {
         request(options, function (err, res, body) {
             if (err) {
                 console.log(err);
-                resolve(0);
+                resolve({});
             } else {
                 const { formData = {} } = options;
                 const { name = '' } = formData;
@@ -39,8 +38,7 @@ const cornerGrade = (name, imagePath) => {
             }
         });
     });
-
     return promise;
 }
 
-module.exports = cornerGrade;
+module.exports = centerGrade;

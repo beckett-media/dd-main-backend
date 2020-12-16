@@ -25,8 +25,7 @@ const {
   valUpdateCardData,
   valPageSizeNumber,
 } = require("../../middlewares/validation");
-const centerGrading = require('./../../grading/centerGrading');
-const cornerGrading = require('./../../grading/cornerGrading');
+const centerCornerGrading = require('./../../grading/centerCornerGrading');
 
 /**
  * Step 1: Create a new card and upload card front
@@ -800,7 +799,6 @@ router.get(
  * Step 1: Create a new card and upload card front
  */
 router.post("/add-grading", [appAuth, auth], async (req, res, next) => {
-  console.log('*************************add grading has been called*******************************');
   const userId = req.user._id;
   const user = await User.findById(userId);
   if (!user)
@@ -890,11 +888,11 @@ router.post("/add-grading", [appAuth, auth], async (req, res, next) => {
 
     const { id = '' } = card;
 
-    const centerGrade = await centerGrading(id, filePath);
-    const cornerGrade = await cornerGrading(id, filePath);
+    const cenCorGrade = await centerCornerGrading(id, filePath);
+    const { centering = 0, corners = 0 } = cenCorGrade;
 
-    const cen = centerGrade > 0 ? centerGrade / 2 : 0;
-    const cor = cornerGrade > 0 ? cornerGrade / 2 : 0;
+    const cen = centering > 0 ? centering / 2 : 0;
+    const cor = corners > 0 ? corners / 2 : 0;
     const grading = cen + cor;
     return res.send(
       createResObject(true, { ...card, grading }, stringConstants.GRADING_COMPLETED)

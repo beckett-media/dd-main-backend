@@ -21,8 +21,7 @@ const config = require("config");
 const stripe = require("stripe")(config.get(stringConstants.STRIPE_TEST_KEY));
 const mongoose = require("mongoose");
 const { sendNotiToUser } = require("../../utils/sendNotifications");
-const centerGrading = require('./../../grading/centerGrading');
-const cornerGrading = require('./../../grading/cornerGrading');
+const centerCornerGrading = require('../../grading/centerCornerGrading');
 
 router.post(
   "/for-pending-cards",
@@ -229,11 +228,11 @@ router.post(
 
           console.log('filePath-----------', filePath);
 
-          const centerGrade = await centerGrading(onlyCardId, filePath);
-          const cornerGrade = await cornerGrading(onlyCardId, filePath);
+          const cenCorGrade = await centerCornerGrading(onlyCardId, filePath);
+          const { centering = 0, corners = 0 } = cenCorGrade;
 
-          const cen = centerGrade > 0 ? centerGrade / 2 : 0;
-          const cor = cornerGrade > 0 ? cornerGrade / 2 : 0;
+          const cen = centering > 0 ? centering / 2 : 0;
+          const cor = corners > 0 ? corners / 2 : 0;
           let grading = cen + cor;
           grading = `${grading}`;
           console.log('grading-----------', grading);
