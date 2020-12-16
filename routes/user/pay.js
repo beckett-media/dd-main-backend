@@ -189,18 +189,6 @@ router.post(
 
       switch (paymentIntent.status) {
         case stringConstants.piStatus.SUCCEEDED:
-          await Card.updateMany(
-            {
-              $and: [
-                { user: userId },
-                { isCompleted: true },
-                { status: stringConstants.cardState.PENDING },
-              ],
-            },
-            { $set: { status: stringConstants.cardState.SUBMITTED } },
-            { session: session }
-          );
-
           // Update transaction
           transaction.status = stringConstants.piStatus.SUCCEEDED;
           transaction.desc = stringConstants.stripeMessages.SUCCEEDED;
@@ -254,6 +242,18 @@ router.post(
             { $set: { status: stringConstants.cardState.GRADED, grading: { grade: grading } } }
           );
           console.log('*******************updatedCard value*******************', updatedCard);
+          await Card.updateMany(
+            {
+              $and: [
+                { user: userId },
+                { isCompleted: true },
+                { status: stringConstants.cardState.PENDING },
+              ],
+            },
+            { $set: { status: stringConstants.cardState.SUBMITTED } },
+            { session: session }
+          );
+
           return res.send(
             createResObject(
               true,
