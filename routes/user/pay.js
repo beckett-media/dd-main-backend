@@ -188,7 +188,7 @@ router.post(
       transactionLog = await transactionLog.save(session);
 
       switch (paymentIntent.status) {
-        case stringConstants.piStatus.SUCCEEDED: {
+        case stringConstants.piStatus.SUCCEEDED:
           await Card.updateMany(
             {
               $and: [
@@ -261,7 +261,7 @@ router.post(
               stringConstants.stripeMessages.SUCCEEDED
             )
           );
-        }
+
         case stringConstants.piStatus.REQ_ACTION:
           // 3D secure
           transaction.status = stringConstants.piStatus.REQ_ACTION;
