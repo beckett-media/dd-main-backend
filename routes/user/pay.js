@@ -372,51 +372,50 @@ router.post(
 
       const data = await Promise.all(promises);
       return data;
-    }
 
     } catch (error) {
-  console.log('error--------------', error);
-  SimpleLogger.error(error);
-  // Refund the payment
-  await session.abortTransaction();
-  session.endSession();
+      console.log('error--------------', error);
+      SimpleLogger.error(error);
+      // Refund the payment
+      await session.abortTransaction();
+      session.endSession();
 
-  // Try catch block maybe
-  if (paymentIntent.status === stringConstants.piStatus.SUCCEEDED) {
-    const refund = await stripe.refunds.create({
-      payment_intent: paymentIntent.id,
-    });
+      // Try catch block maybe
+      if (paymentIntent.status === stringConstants.piStatus.SUCCEEDED) {
+        const refund = await stripe.refunds.create({
+          payment_intent: paymentIntent.id,
+        });
 
-    if (transaction) {
-      transaction.status = stringConstants.transactionStatus.REFUNDED;
-      transaction.desc = `${transaction.piId} has been refunded ${refund.id}`;
+        if (transaction) {
+          transaction.status = stringConstants.transactionStatus.REFUNDED;
+          transaction.desc = `${transaction.piId} has been refunded ${refund.id}`;
 
-      transactionLog = new TransactionLog({
-        transaction: transaction._id,
-        amount: transaction.amount,
-        currency: transaction.currency,
-        status: transaction.status,
-        piId: transaction.piId,
-        desc: transaction.desc,
-        user: transaction.user,
-        cards: transaction.cards,
-      });
+          transactionLog = new TransactionLog({
+            transaction: transaction._id,
+            amount: transaction.amount,
+            currency: transaction.currency,
+            status: transaction.status,
+            piId: transaction.piId,
+            desc: transaction.desc,
+            user: transaction.user,
+            cards: transaction.cards,
+          });
 
-      transactionLog = await transactionLog.save();
+          transactionLog = await transactionLog.save();
+        }
+
+        return res
+          .status(400)
+          .send(
+            createResObject(
+              false,
+              {},
+              stringConstants.stripeMessages.REFUND,
+              errorObjects.STRIPE_ERROR(stringConstants.stripeMessages.REFUND)
+            )
+          );
+      }
     }
-
-    return res
-      .status(400)
-      .send(
-        createResObject(
-          false,
-          {},
-          stringConstants.stripeMessages.REFUND,
-          errorObjects.STRIPE_ERROR(stringConstants.stripeMessages.REFUND)
-        )
-      );
-  }
-}
   }
 );
 
