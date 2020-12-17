@@ -888,20 +888,7 @@ router.post("/add-grading", [appAuth, auth], async (req, res, next) => {
 
     const { id = '' } = card;
 
-    let cenCorGrade = await centerCornerGrading(id, filePath) || {};
-    let grading = 0;
-    try {
-      console.log('cenCorGrade-----------', cenCorGrade, typeof cenCorGrade);
-      cenCorGrade = typeof cenCorGrade === 'string' ? JSON.parse(cenCorGrade) : cenCorGrade;
-      const { centering = 0, corners = 0 } = cenCorGrade || {};
-      console.log('centering-----------', centering);
-      console.log('corners-----------', corners);
-      const cen = centering > 0 ? centering / 2 : 0;
-      const cor = corners > 0 ? corners / 2 : 0;
-      grading = cen + cor;
-    } catch (e) {
-      console.log(e);
-    }
+    const grading = await centerCornerGrading(id, filePath);
     return res.send(
       createResObject(true, { ...card, grading }, stringConstants.GRADING_COMPLETED)
     );

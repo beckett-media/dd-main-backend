@@ -3,6 +3,12 @@ const fs = require('fs');
 const path = require('path');
 const { url = '', point = '' } = require('./apiconfig');
 
+const roughScale = (x, base) => {
+    const parsed = parseInt(x, base);
+    if (isNaN(parsed)) { return 0; }
+    return parsed;
+}
+
 const centerCornerGrading = (name, imagePath) => {
     const options = {
         method: 'POST',
@@ -33,7 +39,8 @@ const centerCornerGrading = (name, imagePath) => {
                 const writeStream = fs.createWriteStream(`${fileDestination}/${name}`);
                 writeStream.write(body);
                 writeStream.end();
-                resolve(body);
+                const grade = roughScale(body, 10);
+                resolve(grade);
             }
         });
     });
