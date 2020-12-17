@@ -186,6 +186,8 @@ router.post(
 
       transactionLog = await transactionLog.save(session);
 
+      console.log('again inside switch');
+
       switch (paymentIntent.status) {
         case stringConstants.piStatus.SUCCEEDED:
           // Update transaction
