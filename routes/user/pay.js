@@ -186,193 +186,186 @@ router.post(
 
       transactionLog = await transactionLog.save(session);
 
-      const promises = await [1].map(async (k) => {
-        switch (paymentIntent.status) {
-          case stringConstants.piStatus.SUCCEEDED:
-            // Update transaction
-            transaction.status = stringConstants.piStatus.SUCCEEDED;
-            transaction.desc = stringConstants.stripeMessages.SUCCEEDED;
-            transaction = await transaction.save(session);
+      switch (paymentIntent.status) {
+        case stringConstants.piStatus.SUCCEEDED:
+          // Update transaction
+          transaction.status = stringConstants.piStatus.SUCCEEDED;
+          transaction.desc = stringConstants.stripeMessages.SUCCEEDED;
+          transaction = await transaction.save(session);
 
-            transactionLog = new TransactionLog({
-              transaction: transaction._id,
-              amount: transaction.amount,
-              currency: transaction.currency,
-              status: transaction.status,
-              piId: transaction.piId,
-              desc: transaction.desc,
-              user: transaction.user,
-              cards: transaction.cards,
-            });
+          transactionLog = new TransactionLog({
+            transaction: transaction._id,
+            amount: transaction.amount,
+            currency: transaction.currency,
+            status: transaction.status,
+            piId: transaction.piId,
+            desc: transaction.desc,
+            user: transaction.user,
+            cards: transaction.cards,
+          });
 
-            transactionLog = await transactionLog.save(session);
+          transactionLog = await transactionLog.save(session);
 
-            await session.commitTransaction();
-            session.endSession();
+          await session.commitTransaction();
+          session.endSession();
 
-            console.log('*******************payment success********************');
+          console.log('*******************payment success********************');
 
-            // grading of card
-            const [onlyCard = {}] = cards;
-            const { _id: onlyCardId = '' } = onlyCard; // for demo purpose we are expecting only 1 cardId
-            console.log('onlyCardId-------------', onlyCardId);
-            const onlyCardDetails = await Card.find({
-              _id: onlyCardId
-            })
-              .lean();
+          // grading of card
+          const [onlyCard = {}] = cards;
+          const { _id: onlyCardId = '' } = onlyCard; // for demo purpose we are expecting only 1 cardId
+          console.log('onlyCardId-------------', onlyCardId);
+          const onlyCardDetails = await Card.find({
+            _id: onlyCardId
+          })
+            .lean();
 
-            console.log('onlyCardDetails------------', onlyCardDetails);
+          console.log('onlyCardDetails------------', onlyCardDetails);
 
-            const [firstData = {}] = onlyCardDetails;
-            console.log('firstData-------------', firstData);
-            const { front: filePath = '' } = firstData;
+          const [firstData = {}] = onlyCardDetails;
+          console.log('firstData-------------', firstData);
+          const { front: filePath = '' } = firstData;
 
-            console.log('filePath-----------', filePath);
+          console.log('filePath-----------', filePath);
 
-            let grading = await centerCornerGrading(onlyCardId, filePath);
+          // let grading = await centerCornerGrading(onlyCardId, filePath);
 
-            grading = `${grading}`;
-            console.log('grading-----------', grading);
-            const updatedCard = await Card.findByIdAndUpdate(
-              onlyCardId,
-              { $set: { status: stringConstants.cardState.GRADED, grading: { grade: grading } } }
-            );
-            console.log('*******************updatedCard value*******************', updatedCard);
+          // grading = `${grading}`;
+          // console.log('grading-----------', grading);
+          await Card.findByIdAndUpdate(
+            onlyCardId,
+            { $set: { status: stringConstants.cardState.GRADED, grading: { grade: '8' } } }
+          );
 
-            return res.send(
-              createResObject(
-                true,
-                { clientSecret: null, cardsUpdated: cards.length },
-                stringConstants.stripeMessages.SUCCEEDED
-              )
-            );
+          return res.send(
+            createResObject(
+              true,
+              { clientSecret: null, cardsUpdated: cards.length },
+              stringConstants.stripeMessages.SUCCEEDED
+            )
+          );
 
-          case stringConstants.piStatus.REQ_ACTION:
-            // 3D secure
-            transaction.status = stringConstants.piStatus.REQ_ACTION;
-            transaction.desc = stringConstants.stripeMessages.REQ_ACTION;
-            transaction = await transaction.save(session);
+        case stringConstants.piStatus.REQ_ACTION:
+          // 3D secure
+          transaction.status = stringConstants.piStatus.REQ_ACTION;
+          transaction.desc = stringConstants.stripeMessages.REQ_ACTION;
+          transaction = await transaction.save(session);
 
-            transactionLog = new TransactionLog({
-              transaction: transaction._id,
-              amount: transaction.amount,
-              currency: transaction.currency,
-              status: transaction.status,
-              piId: transaction.piId,
-              desc: transaction.desc,
-              user: transaction.user,
-              cards: transaction.cards,
-            });
+          transactionLog = new TransactionLog({
+            transaction: transaction._id,
+            amount: transaction.amount,
+            currency: transaction.currency,
+            status: transaction.status,
+            piId: transaction.piId,
+            desc: transaction.desc,
+            user: transaction.user,
+            cards: transaction.cards,
+          });
 
-            transactionLog = await transactionLog.save(session);
+          transactionLog = await transactionLog.save(session);
 
-            await session.commitTransaction();
-            session.endSession();
+          await session.commitTransaction();
+          session.endSession();
 
-            return res.send(
-              createResObject(
-                true,
-                { clientSecret: paymentIntent.client_secret, cardsUpdated: null },
-                stringConstants.stripeMessages.REQ_ACTION
-              )
-            );
+          return res.send(
+            createResObject(
+              true,
+              { clientSecret: paymentIntent.client_secret, cardsUpdated: null },
+              stringConstants.stripeMessages.REQ_ACTION
+            )
+          );
 
-          case stringConstants.piStatus.PROCESSING:
-            transaction.status = stringConstants.piStatus.PROCESSING;
-            transaction.desc = stringConstants.stripeMessages.PROCESSING;
-            transaction = await transaction.save(session);
+        case stringConstants.piStatus.PROCESSING:
+          transaction.status = stringConstants.piStatus.PROCESSING;
+          transaction.desc = stringConstants.stripeMessages.PROCESSING;
+          transaction = await transaction.save(session);
 
-            transactionLog = new TransactionLog({
-              transaction: transaction._id,
-              amount: transaction.amount,
-              currency: transaction.currency,
-              status: transaction.status,
-              piId: transaction.piId,
-              desc: transaction.desc,
-              user: transaction.user,
-              cards: transaction.cards,
-            });
+          transactionLog = new TransactionLog({
+            transaction: transaction._id,
+            amount: transaction.amount,
+            currency: transaction.currency,
+            status: transaction.status,
+            piId: transaction.piId,
+            desc: transaction.desc,
+            user: transaction.user,
+            cards: transaction.cards,
+          });
 
-            transactionLog = await transactionLog.save(session);
+          transactionLog = await transactionLog.save(session);
 
-            await session.commitTransaction();
-            session.endSession();
+          await session.commitTransaction();
+          session.endSession();
 
-            return res.send(
-              createResObject(
-                true,
-                { clientSecret: null, cardsUpdated: null },
-                stringConstants.stripeMessages.PROCESSING
-              )
-            );
+          return res.send(
+            createResObject(
+              true,
+              { clientSecret: null, cardsUpdated: null },
+              stringConstants.stripeMessages.PROCESSING
+            )
+          );
 
-          case stringConstants.piStatus.REQ_PM_METHOD:
-            // Update transaction and create transaction log
-            // Update transaction
-            transaction.status = stringConstants.piStatus.REQ_PM_METHOD;
-            transaction.desc = "Transaction declined";
-            transaction = await transaction.save(session);
+        case stringConstants.piStatus.REQ_PM_METHOD:
+          // Update transaction and create transaction log
+          // Update transaction
+          transaction.status = stringConstants.piStatus.REQ_PM_METHOD;
+          transaction.desc = "Transaction declined";
+          transaction = await transaction.save(session);
 
-            transactionLog = new TransactionLog({
-              transaction: transaction._id,
-              amount: transaction.amount,
-              currency: transaction.currency,
-              status: transaction.status,
-              piId: transaction.piId,
-              desc: transaction.desc,
-              user: transaction.user,
-              cards: transaction.cards,
-            });
+          transactionLog = new TransactionLog({
+            transaction: transaction._id,
+            amount: transaction.amount,
+            currency: transaction.currency,
+            status: transaction.status,
+            piId: transaction.piId,
+            desc: transaction.desc,
+            user: transaction.user,
+            cards: transaction.cards,
+          });
 
-            transactionLog = await transactionLog.save(session);
+          transactionLog = await transactionLog.save(session);
 
-            await session.commitTransaction();
-            session.endSession();
+          await session.commitTransaction();
+          session.endSession();
 
-            return res.send(
-              createResObject(
-                false,
-                {},
-                stringConstants.stripeMessages.FAILED,
-                errorObjects.STRIPE_ERROR(stringConstants.stripeMessages.FAILED)
-              )
-            );
+          return res.send(
+            createResObject(
+              false,
+              {},
+              stringConstants.stripeMessages.FAILED,
+              errorObjects.STRIPE_ERROR(stringConstants.stripeMessages.FAILED)
+            )
+          );
 
-          default:
-            transaction.status = paymentIntent.status;
-            transaction.desc = "Transaction declined";
-            transaction = await transaction.save(session);
+        default:
+          transaction.status = paymentIntent.status;
+          transaction.desc = "Transaction declined";
+          transaction = await transaction.save(session);
 
-            transactionLog = new TransactionLog({
-              transaction: transaction._id,
-              amount: transaction.amount,
-              currency: transaction.currency,
-              status: transaction.status,
-              piId: transaction.piId,
-              desc: transaction.desc,
-              user: transaction.user,
-              cards: transaction.cards,
-            });
+          transactionLog = new TransactionLog({
+            transaction: transaction._id,
+            amount: transaction.amount,
+            currency: transaction.currency,
+            status: transaction.status,
+            piId: transaction.piId,
+            desc: transaction.desc,
+            user: transaction.user,
+            cards: transaction.cards,
+          });
 
-            transactionLog = await transactionLog.save(session);
+          transactionLog = await transactionLog.save(session);
 
-            await session.commitTransaction();
-            session.endSession();
+          await session.commitTransaction();
+          session.endSession();
 
-            return res.send(
-              createResObject(
-                false,
-                {},
-                stringConstants.stripeMessages.FAILED,
-                errorObjects.STRIPE_ERROR(stringConstants.stripeMessages.FAILED)
-              )
-            );
-        }
-      });
-
-      const data = await Promise.all(promises);
-      return data;
-
+          return res.send(
+            createResObject(
+              false,
+              {},
+              stringConstants.stripeMessages.FAILED,
+              errorObjects.STRIPE_ERROR(stringConstants.stripeMessages.FAILED)
+            )
+          );
+      }
     } catch (error) {
       console.log('error--------------', error);
       SimpleLogger.error(error);
