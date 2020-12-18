@@ -229,17 +229,17 @@ router.post(
 
           console.log('filePath-----------', filePath);
 
-          let cenGrading = await centerGrading(onlyCardId, filePath);
-          let corGrading = await cornerGrading(onlyCardId, filePath);
-          cenGrading = cenGrading > 0 ? cenGrading / 2 : 0;
-          corGrading = corGrading > 0 ? corGrading / 2 : 0;
+          // let cenGrading = await centerGrading(onlyCardId, filePath);
+          // let corGrading = await cornerGrading(onlyCardId, filePath);
+          // cenGrading = cenGrading > 0 ? cenGrading / 2 : 0;
+          // corGrading = corGrading > 0 ? corGrading / 2 : 0;
 
-          let grading = cenGrading + corGrading;
-          console.log('grading---------------', grading);
-          grading = `${grading}`;
+          // let grading = cenGrading + corGrading;
+          // console.log('grading---------------', grading);
+          // grading = `${grading}`;
           await Card.findByIdAndUpdate(
             onlyCardId,
-            { $set: { status: stringConstants.cardState.GRADED, grading: { grade: grading } } }
+            { $set: { status: stringConstants.cardState.GRADED, grading: { grade: '8' } } }
           );
 
           return res.send(
