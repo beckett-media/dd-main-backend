@@ -187,39 +187,6 @@ router.post(
 
       transactionLog = await transactionLog.save(session);
 
-      if (stringConstants.piStatus.SUCCEEDED) {
-        // grading of card
-        const [onlyCard = {}] = cards;
-        const { _id: onlyCardId = '' } = onlyCard; // for demo purpose we are expecting only 1 cardId
-        console.log('onlyCardId-------------', onlyCardId);
-        const onlyCardDetails = await Card.find({
-          _id: onlyCardId
-        })
-          .lean();
-
-        console.log('onlyCardDetails------------', onlyCardDetails);
-
-        const [firstData = {}] = onlyCardDetails;
-        console.log('firstData-------------', firstData);
-        const { front: filePath = '' } = firstData;
-
-        console.log('filePath-----------', filePath);
-
-        let cenGrading = await centerGrading(onlyCardId, filePath);
-        let corGrading = await cornerGrading(onlyCardId, filePath);
-        cenGrading = cenGrading > 0 ? cenGrading / 2 : 0;
-        corGrading = corGrading > 0 ? corGrading / 2 : 0;
-
-        let grading = cenGrading + corGrading;
-        console.log('grading---------------', grading);
-        grading = `${grading}`;
-        await Card.findByIdAndUpdate(
-          onlyCardId,
-          { $set: { status: stringConstants.cardState.GRADED, grading: { grade: grading } } }
-        );
-
-      }
-
       switch (paymentIntent.status) {
         case stringConstants.piStatus.SUCCEEDED:
           // Update transaction
@@ -244,6 +211,36 @@ router.post(
           session.endSession();
 
           console.log('*******************payment success********************');
+
+          // grading of card
+          const [onlyCard = {}] = cards;
+          const { _id: onlyCardId = '' } = onlyCard; // for demo purpose we are expecting only 1 cardId
+          console.log('onlyCardId-------------', onlyCardId);
+          const onlyCardDetails = await Card.find({
+            _id: onlyCardId
+          })
+            .lean();
+
+          console.log('onlyCardDetails------------', onlyCardDetails);
+
+          const [firstData = {}] = onlyCardDetails;
+          console.log('firstData-------------', firstData);
+          const { front: filePath = '' } = firstData;
+
+          console.log('filePath-----------', filePath);
+
+          let cenGrading = await centerGrading(onlyCardId, filePath);
+          let corGrading = await cornerGrading(onlyCardId, filePath);
+          cenGrading = cenGrading > 0 ? cenGrading / 2 : 0;
+          corGrading = corGrading > 0 ? corGrading / 2 : 0;
+
+          let grading = cenGrading + corGrading;
+          console.log('grading---------------', grading);
+          grading = `${grading}`;
+          await Card.findByIdAndUpdate(
+            onlyCardId,
+            { $set: { status: stringConstants.cardState.GRADED, grading: { grade: grading } } }
+          );
 
           return res.send(
             createResObject(
