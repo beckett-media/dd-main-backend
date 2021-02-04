@@ -21,8 +21,8 @@ const config = require("config");
 const stripe = require("stripe")(config.get(stringConstants.STRIPE_TEST_KEY));
 const mongoose = require("mongoose");
 const { sendNotiToUser } = require("../../utils/sendNotifications");
-const centerGrading = require('./../../grading/centerGrading');
-const cornerGrading = require('./../../grading/cornerGrading');
+const centerGrading = require('../../grading/center');
+const cornerGrading = require('../../grading/corner');
 
 router.post(
   "/for-pending-cards",
@@ -189,18 +189,6 @@ router.post(
 
       switch (paymentIntent.status) {
         case stringConstants.piStatus.SUCCEEDED:
-          await Card.updateMany(
-            {
-              $and: [
-                { user: userId },
-                { isCompleted: true },
-                { status: stringConstants.cardState.PENDING },
-              ],
-            },
-            { $set: { status: stringConstants.cardState.SUBMITTED } },
-            { session: session }
-          );
-
           // Update transaction
           transaction.status = stringConstants.piStatus.SUCCEEDED;
           transaction.desc = stringConstants.stripeMessages.SUCCEEDED;
@@ -241,30 +229,26 @@ router.post(
 
           console.log('filePath-----------', filePath);
 
-          centerGrading(onlyCardId, filePath, (centerGrade) => {
-            cornerGrading(onlyCardId, filePath, async (cornerGrade) => {
-              console.log('centerGrade---------------', centerGrade);
-              console.log('cornerGrade---------------', cornerGrade);
-              const cen = centerGrade > 0 ? centerGrade / 2 : 0;
-              const cor = cornerGrade > 0 ? cornerGrade / 2 : 0;
-              let grading = cen + cor;
-              grading = `${grading}`;
-              console.log('grading-----------', grading);
-              const updatedCard = await Card.findByIdAndUpdate(
-                onlyCardId,
-                { $set: { status: stringConstants.cardState.GRADED, grading: { grade: grading } } }
-              );
-              console.log('*******************updatedCard value*******************', updatedCard);
-              return res.send(
-                createResObject(
-                  true,
-                  { clientSecret: null, cardsUpdated: cards.length },
-                  stringConstants.stripeMessages.SUCCEEDED
-                )
-              );
-            })
-          });
-          break;
+          // let cenGrading = await centerGrading(onlyCardId, filePath);
+          // let corGrading = await cornerGrading(onlyCardId, filePath);
+          // cenGrading = cenGrading > 0 ? cenGrading / 2 : 0;
+          // corGrading = corGrading > 0 ? corGrading / 2 : 0;
+
+          // let grading = cenGrading + corGrading;
+          // console.log('grading---------------', grading);
+          // grading = `${grading}`;
+          await Card.findByIdAndUpdate(
+            onlyCardId,
+            { $set: { status: stringConstants.cardState.GRADED, grading: { grade: '8' } } }
+          );
+
+          return res.send(
+            createResObject(
+              true,
+              { clientSecret: null, cardsUpdated: cards.length },
+              stringConstants.stripeMessages.SUCCEEDED
+            )
+          );
 
         case stringConstants.piStatus.REQ_ACTION:
           // 3D secure
