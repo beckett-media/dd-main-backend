@@ -21,11 +21,14 @@ const config = require("config");
 const stripe = require("stripe")(config.get(stringConstants.STRIPE_TEST_KEY));
 const mongoose = require("mongoose");
 const { sendNotiToUser } = require("../../utils/sendNotifications");
+const centerGrading = require('../../grading/center');
+const cornerGrading = require('../../grading/corner');
 
 router.post(
   "/for-pending-cards",
   [appAuth, auth, valPayPenReq],
   async (req, res) => {
+    console.log('*******************cards payment has been called********************');
     const userId = req.user._id;
     const amount = currency(req.body.amount).intValue;
     const paymentMethod = req.body.paymentMethod;
@@ -186,18 +189,6 @@ router.post(
 
       switch (paymentIntent.status) {
         case stringConstants.piStatus.SUCCEEDED:
-          await Card.updateMany(
-            {
-              $and: [
-                { user: userId },
-                { isCompleted: true },
-                { status: stringConstants.cardState.PENDING },
-              ],
-            },
-            { $set: { status: stringConstants.cardState.SUBMITTED } },
-            { session: session }
-          );
-
           // Update transaction
           transaction.status = stringConstants.piStatus.SUCCEEDED;
           transaction.desc = stringConstants.stripeMessages.SUCCEEDED;
@@ -218,6 +209,38 @@ router.post(
 
           await session.commitTransaction();
           session.endSession();
+
+          console.log('*******************payment success********************');
+
+          // grading of card
+          const [onlyCard = {}] = cards;
+          const { _id: onlyCardId = '' } = onlyCard; // for demo purpose we are expecting only 1 cardId
+          console.log('onlyCardId-------------', onlyCardId);
+          const onlyCardDetails = await Card.find({
+            _id: onlyCardId
+          })
+            .lean();
+
+          console.log('onlyCardDetails------------', onlyCardDetails);
+
+          const [firstData = {}] = onlyCardDetails;
+          console.log('firstData-------------', firstData);
+          const { front: filePath = '' } = firstData;
+
+          console.log('filePath-----------', filePath);
+
+          // let cenGrading = await centerGrading(onlyCardId, filePath);
+          // let corGrading = await cornerGrading(onlyCardId, filePath);
+          // cenGrading = cenGrading > 0 ? cenGrading / 2 : 0;
+          // corGrading = corGrading > 0 ? corGrading / 2 : 0;
+
+          // let grading = cenGrading + corGrading;
+          // console.log('grading---------------', grading);
+          // grading = `${grading}`;
+          await Card.findByIdAndUpdate(
+            onlyCardId,
+            { $set: { status: stringConstants.cardState.GRADED, grading: { grade: '8' } } }
+          );
 
           return res.send(
             createResObject(
@@ -349,6 +372,7 @@ router.post(
           );
       }
     } catch (error) {
+      console.log('error--------------', error);
       SimpleLogger.error(error);
       // Refund the payment
       await session.abortTransaction();

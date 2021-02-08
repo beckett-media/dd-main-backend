@@ -18,12 +18,15 @@ const {
   uploadCardFront,
   uploadCardBack,
   uploadCardVideo,
+  uploadCardGrading
 } = require("../../middlewares/multerSingle");
 const {
   valObjectIdInUrl,
   valUpdateCardData,
   valPageSizeNumber,
 } = require("../../middlewares/validation");
+const centerGrading = require('../../grading/center');
+const cornerGrading = require('../../grading/corner');
 
 /**
  * Step 1: Create a new card and upload card front
@@ -751,4 +754,111 @@ router.get(
     );
   }
 );
+
+/**
+ * Step 1: Create a new card and upload card front
+ */
+router.post("/add-grading", [appAuth, auth], async (req, res, next) => {
+  const userId = req.user._id;
+  const user = await User.findById(userId);
+  if (!user)
+    return res
+      .status(404)
+      .send(
+        createResObject(
+          false,
+          {},
+          stringConstants.USER_ID_DOEST_NOT_EXISTS,
+          errorObjects.USER_ID_DOEST_NOT_EXISTS
+        )
+      );
+  // Create a new card
+  let card = new Card({
+    user: userId,
+  });
+  const cardId = card._id;
+
+  // Send card ID to multer
+  req.cardId = cardId;
+
+  uploadCardGrading(req, res, async function (err) {
+    if (err) {
+      SimpleLogger.error(err);
+      // If file type error return relavent message
+      if (err.message === stringConstants.NOT_A_VALID_FILE_TYPE) {
+        return res
+          .status(415)
+          .send(
+            createResObject(
+              false,
+              {},
+              stringConstants.FILE_TYPE_NOT_ACCEPTED,
+              errorObjects.FILE_TYPE_NOT_ACCEPTED
+            )
+          );
+      }
+      // Otherwise return unsuspected error
+      return next(err);
+    }
+
+    // Check file exists
+    if (!req.file)
+      return res
+        .status(400)
+        .send(
+          createResObject(
+            false,
+            {},
+            stringConstants.NO_FILE_FOUND,
+            errorObjects.NO_FILE_FOUND
+          )
+        );
+    // Check file size if corrupt delete the uploaded file
+    if (req.file.size <= 0) {
+      const cardDestination = path.join(
+        __dirname,
+        "../../public/",
+        `${userId}/cards/${cardId}/`,
+        `${req.file.filename}`
+      );
+      try {
+        await fsPromises.unlink(cardDestination);
+      } catch (err) {
+        SimpleLogger.error(err);
+        await new PendingDeletion({
+          deletionType: stringConstants.deletionType.FILE,
+          data: cardDestination,
+        }).save();
+      }
+      return res
+        .status(400)
+        .send(
+          createResObject(
+            true,
+            {},
+            stringConstants.FILE_CORRUPTED,
+            errorObjects.FILE_CORRUPTED
+          )
+        );
+    }
+
+    const filePath = path.join(`${userId}/cards/${cardId}/`, req.file.filename);
+    card = await card.save();
+    card = card.getCardDetailsWithGrading();
+
+    const { id = '' } = card;
+
+    let cenGrading = await centerGrading(id, filePath);
+    let corGrading = await cornerGrading(id, filePath);
+    cenGrading = cenGrading > 0 ? cenGrading / 2 : 0;
+    corGrading = corGrading > 0 ? corGrading / 2 : 0;
+
+    const grading = cenGrading + corGrading;
+    return res.send(
+      createResObject(true, { ...card, grading }, stringConstants.GRADING_COMPLETED)
+    );
+  });
+});
+
+
 module.exports = router;

@@ -8,6 +8,7 @@ const { errorObjects } = require("../utils/errorObjects");
 
 module.exports = function (err, req, res, next) {
   const errorKey = SimpleLogger.error(err);
+  console.log('err--------------', err);
   res
     .status(500)
     .send(

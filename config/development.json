@@ -2,5 +2,14 @@
   "ebayoAuthUrl": "https://api.sandbox.ebay.com/identity/v1/oauth2/token",
   "ebayGetUserUrl": "https://apiz.sandbox.ebay.com/commerce/identity/v1/user/",
   "ebayGetRefreshToken": "https://api.sandbox.ebay.com/identity/v1/oauth2/token",
-  "qrBaseUrl": "https://api.simpledev.solutions/cards/"
+  "qrBaseUrl": "https://api.simpledev.solutions/cards/",
+  "dbConnectionString": "mongodb://localhost:27017/snap_grade_test",
+  "snapGradeJwtPrivateKey": "SNAP_GRADE_JWT_PRIVATE_KEY",
+  "snapGradeJwtRefreshKey": "SNAP_GRADE_JWT_REFRESH_KEY",
+  "snapGradeJwtAppKey": "SNAP_GRADE_JWT_APP_KEY",
+  "stripeTestKey": "sk_test_51HDEqSDZO5dpgj2Kt2kjlMl4nD5PVtm7XvL342Gwd3z5VthcoECSH1MRd2GIoMvRClZnGov7UzYpjwL0nlRgr7Sg00qK3Gngrr",
+  "stripeKey": "",
+  "googleApplicationCredentials": "GOOGLE_APPLICATION_CREDENTIALS",
+  "eBayClientId": "DCGS_EBAY_CLIENT_ID",
+  "eBayClientSecret": "DCGS_EBAY_CLIENT_SECRET"
 }
