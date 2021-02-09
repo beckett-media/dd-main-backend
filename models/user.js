@@ -73,10 +73,12 @@ const userSchema = new mongoose.Schema(
     },
     subscription: {
       subId: {
-        type: String
+        type: String,
+        default: ''
       },
       cardsLeft: {
-        type: Number
+        type: Number,
+        default: 0
       }
     },
     metadata: {

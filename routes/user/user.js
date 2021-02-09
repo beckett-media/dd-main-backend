@@ -395,4 +395,21 @@ router.delete("/delete-user", async (req, res) => {
   );
 });
 
+/**
+ * GET user subscription
+ */
+router.get("/user-subscription", [appAuth, auth], async (req, res) => {
+  const user = await User.findById(req.user._id);
+  const { subscription = {} } = user;
+  const { cardsLeft = 0 } = subscription;
+
+  return res.send(
+    createResObject(
+      true,
+      { cardsLeft },
+      stringConstants.FETCH_SUCESSFUL
+    )
+  );
+});
+
 module.exports = router;
