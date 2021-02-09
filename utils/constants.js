@@ -153,6 +153,7 @@ module.exports.stringConstants = {
     GLOBAL_REQ_RATE_RECORDS: "global_req_rate_records",
     WRONG_SIGNIN_REQ_RECORDS: "wrong_signin_req_records",
     QUESTIONS_COLLECTION: "Question",
+    SUBSCRIPTION_COLLECTION: "Subscription"
   },
 
   deletionType: {
@@ -309,4 +310,5 @@ module.exports.stringConstants = {
     EBAY_GET_USER: "ebayGetUserUrl",
     EBAY_REFRESH_TOKEN: "ebayGetRefreshToken",
   },
+  AMOUNT_MISMATCH: 'AMOUNT_MISMATCH'
 };

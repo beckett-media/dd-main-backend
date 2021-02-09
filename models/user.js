@@ -71,6 +71,14 @@ const userSchema = new mongoose.Schema(
         default: true,
       },
     },
+    subscription: {
+      subId: {
+        type: String
+      },
+      cardsLeft: {
+        type: Number
+      }
+    },
     metadata: {
       signupType: {
         type: String,

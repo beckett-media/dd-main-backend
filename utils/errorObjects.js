@@ -160,6 +160,15 @@ module.exports.errorObjects = {
     errorMessage: stringConstants.NO_PEDNING_CARDS_FOUND_FOR_USER,
   },
 
+  AMOUNT_MISMATCH: {
+    errorCode: 134,
+    errorSubCode: getKey(
+      stringConstants,
+      stringConstants.AMOUNT_MISMATCH
+    ),
+    errorMessage: stringConstants.AMOUNT_MISMATCH,
+  },
+
   PENDING_AMOUNT_AND_AMOUNT_DO_NOT_MATCH: {
     errorCode: 122,
     errorSubCode: getKey(
