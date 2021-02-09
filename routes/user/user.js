@@ -412,4 +412,35 @@ router.get("/user-subscription", [appAuth, auth], async (req, res) => {
   );
 });
 
+/**
+ * GET cancel user subscription
+ */
+router.get("/cancel-subscription", [appAuth, auth], async (req, res) => {
+  const user = await User.findById(req.user._id);
+  const { subscription = {} } = user;
+  const { subId = '' } = subscription;
+  if (subId) {
+    const userId = req.user._id;
+    let user = await User.findByIdAndUpdate(
+      userId,
+      {
+        $set: {
+          subscription: {
+            subId: '',
+            cardsLeft: 0
+          }
+        }
+      }
+    );
+    return res.send(
+      createResObject(
+        true,
+        { user },
+        'Subscription Cancelled'
+      )
+    );
+  }
+  return res.send(createResObject(false, {}, 'No Subscription taken'));
+});
+
 module.exports = router;
