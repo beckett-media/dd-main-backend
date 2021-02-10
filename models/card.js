@@ -79,7 +79,6 @@ cardSchema.methods.checkIfCompleted = function () {
   return (
     !!this.front &&
     !!this.back &&
-    !!this.video &&
     !!this.year &&
     !!this.brand &&
     !!this.cardNumber &&
