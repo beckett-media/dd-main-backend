@@ -519,7 +519,7 @@ router.post("/webhook", async (req, res, next) => {
       // Send notifications
       await sendNotiToUser(user, {
         title: "DCGS: Payment successful",
-        body: "Payment successful, cards have been submnitted for grading",
+        body: "Payment successful, subscription is now active",
         data: {},
       });
 

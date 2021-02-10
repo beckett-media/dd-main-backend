@@ -401,12 +401,12 @@ router.delete("/delete-user", async (req, res) => {
 router.get("/user-subscription", [appAuth, auth], async (req, res) => {
   const user = await User.findById(req.user._id);
   const { subscription = {} } = user;
-  const { cardsLeft = 0 } = subscription;
+  const { cardsLeft = 0, subId = '' } = subscription;
 
   return res.send(
     createResObject(
       true,
-      { cardsLeft },
+      { cardsLeft, subId },
       stringConstants.FETCH_SUCESSFUL
     )
   );
