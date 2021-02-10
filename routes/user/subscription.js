@@ -4,6 +4,7 @@ const auth = require("../../middlewares/authenticateUser");
 const appAuth = require("../../middlewares/authenticateApp");
 const SimpleLogger = require("../../utils/simpleLogger");
 const { Subscription } = require("../../models/subscription");
+const { User } = require("../../models/user");
 const { createResObject } = require("../../utils/utilFunctions");
 const { stringConstants } = require("../../utils/constants");
 const { errorObjects } = require("../../utils/errorObjects");
@@ -21,12 +22,10 @@ router.get("/details", [appAuth, auth], async (req, res) => {
         createResObject(
         true,
         {
-            subscription: {
-                ...subscriptionData,
+            subscription: subscriptionData,
                 activePlan: {
                     cardsLeft, subId
                 }
-            }
         },
         stringConstants.FETCH_SUCESSFUL
         )
