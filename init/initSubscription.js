@@ -6,9 +6,9 @@ const getDetail = (val) => `This plan gives you access to ${val} due dilly per m
 const initValue = {
     _id: "subscription",
     plans: [
-      { _id: "sub_low", price: "2.99", detail: getDetail('10'), cards: 10 },
-      { _id: "sub_med", price: "3.99", detail: getDetail('20'), cards: 20 },
-      { _id: "sub_high", price: "9.99", detail: getDetail('unlimited'), cards: 1000 }
+      { _id: "sub_low", price: "2.99", detail: getDetail('10'), duration: 'month', cards: 10, cardsInPlan: 10 },
+      { _id: "sub_med", price: "3.99", detail: getDetail('20'), duration: 'month', cards: 20, cardsInPlan: 20 },
+      { _id: "sub_high", price: "9.99", detail: getDetail('unlimited'), duration: 'month', cards: 1000, cardsInPlan: 'Unlimited' }
     ]
 };
 

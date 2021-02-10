@@ -13,7 +13,9 @@ const subscriptionSchema = new mongoose.Schema(
         _id: { type: String, required: true, trim: true },
         price: { type: String, required: true, trim: true },
         detail: { type: String, required: true, trim: true },
-        cards: { type: Number, required: true }
+        duration: { type: String, required: true, trim: true },
+        cards: { type: Number, required: true },
+        cardsInPlan: { type: String, required: true, trim: true }
       }
     ]
   },
