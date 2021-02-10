@@ -160,6 +160,15 @@ module.exports.errorObjects = {
     errorMessage: stringConstants.NO_PEDNING_CARDS_FOUND_FOR_USER,
   },
 
+  NO_CARD: {
+    errorCode: 222,
+    errorSubCode: getKey(
+      stringConstants,
+      stringConstants.NO_CARD
+    ),
+    errorMessage: stringConstants.NO_CARD,
+  },
+
   NO_CARDS_LEFT_IN_PLAN: {
     errorCode: 221,
     errorSubCode: getKey(

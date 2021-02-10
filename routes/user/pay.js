@@ -31,385 +31,69 @@ router.post(
   async (req, res) => {
     console.log('*******************cards payment has been called********************');
     const userId = req.user._id;
-    const amount = currency(req.body.amount).intValue;
-    const paymentMethod = req.body.paymentMethod;
+    const user = await User.findById(userId);
+    const { subscription = {} } = user;
+    const { cardsLeft = 0, subId = '' } = subscription;
 
-    let user = await User.findById(userId);
-
-    // Check if stripe ID, if not then create one
-    if (!user.stripeId) {
-      let customer;
-      try {
-        customer = await stripe.customers.create({
-          email: user.email,
-          description: stringConstants.STRIPE_CUSTOMER_CREATION_DESC,
-          metadata: {
-            userId: user._id.toString(),
-          },
-        });
-      } catch (err) {
-        SimpleLogger.error(err);
-        return res
-          .status(400)
-          .send(
-            createResObject(
-              false,
-              {},
-              stringConstants.UNSUSPECTED_ERROR,
-              errorObjects.UNSUSPECTED_ERROR(err.message)
-            )
-          );
-      }
-      // Everything went well add the ID to customer object
-      user = await User.findByIdAndUpdate(
-        userId,
-        {
-          $set: { stripeId: customer.id },
-        },
-        { new: true }
-      );
-    }
-
-    const stripeId = user.stripeId;
-    //   Get all pedning cards
-    const cards = await Card.find({
-      $and: [
-        { user: userId },
-        { isCompleted: true },
-        { status: stringConstants.cardState.PENDING },
-      ],
-    })
-      .lean()
-      .select("_id");
-
-    // If 0 cards return with error
-    if (cards.length <= 0)
-      return res
+    // if no card left in current plan
+    if (cardsLeft <= 0)
+    return res
         .status(404)
         .send(
           createResObject(
             false,
             {},
-            stringConstants.NO_PEDNING_CARDS_FOUND_FOR_USER,
-            errorObjects.NO_PEDNING_CARDS_FOUND_FOR_USER
+            stringConstants.NO_CARDS_LEFT_IN_PLAN,
+            errorObjects.NO_CARDS_LEFT_IN_PLAN
           )
         );
+    const cardId = req.body.cardId;
+    const card = await Card.findById(cardId);
 
-    // Calculate the amount to be paid and check with amoun from client side
-    /**
-     * Card pricing:
-     * $4.99 for <= 100
-     * $7.99 for > 100
-     */
-    let pendingAmount = 0,
-      price = 0;
-    const numCards = cards.length;
-    if (numCards <= 100) {
-      price = "4.99";
-      pendingAmount = currency(price).multiply(numCards);
-    } else if (numCards > 100) {
-      price = "7.99";
-      pendingAmount = currency(price).multiply(numCards);
-    }
-    pendingAmount = currency(pendingAmount).intValue;
-    // Return error if does not match
-    if (pendingAmount !== amount)
-      return res
-        .status(400)
+    // if no card found
+    if (!card)
+    return res
+        .status(404)
         .send(
           createResObject(
             false,
             {},
-            stringConstants.PENDING_AMOUNT_AND_AMOUNT_DO_NOT_MATCH,
-            errorObjects.PENDING_AMOUNT_AND_AMOUNT_DO_NOT_MATCH
+            stringConstants.NO_CARD,
+            errorObjects.NO_CARD
           )
         );
-    // Every check passes then create payment intent
-    let paymentIntent, transaction, transactionLog;
-    //   One database transaction
 
-    try {
-      paymentIntent = await stripe.paymentIntents.create({
-        amount: amount,
-        currency: stringConstants.currency.USD,
-        customer: stripeId,
-        // customer: "cus_HgxWVGiRx5yRFI",
-        payment_method: paymentMethod,
-        confirm: true,
-        description: "Payment for card grading @ DCGS.AI",
-        receipt_email: user.email,
-      });
-    } catch (error) {
-      SimpleLogger.info(error.code);
-      SimpleLogger.error(error);
-      const pm = error.raw.payment_intent;
-      if (pm) {
-        SimpleLogger.info(`Payment intent ID that errored out: ${pm.id}`);
-      }
-      return res
-        .status(400)
-        .send(
+        // grading of card
+        const { front: filePath = '' } = card;
+
+        // let cenGrading = await centerGrading(onlyCardId, filePath);
+        await Card.findByIdAndUpdate(
+          onlyCardId,
+          { $set: { status: stringConstants.cardState.GRADED, grading: { grade: '8' } } }
+        );
+
+        // reducing cards left in subscription by 1
+        await User.findByIdAndUpdate(
+          userId,
+          { $set: {
+            subscription: {
+              cardsLeft: cardsLeft - 1,
+              subId
+            }
+          } },
+          { new: true }
+        );
+
+        return res.send(
           createResObject(
-            false,
-            {},
-            stringConstants.PAYMENT_ERRORED,
-            errorObjects.PAYMENT_ERRORED(error.message)
+            true,
+            { clientSecret: null, cardsUpdated: cards.length },
+            'Card Graded Successfully'
           )
         );
-    }
 
-    // Everything else will be done use database transactions
-    // The try and catch block will acts as the main block
-    const session = await mongoose.startSession();
-    try {
-      session.startTransaction();
-      // Create a transaction and relating transaction log
-      transaction = new Transaction({
-        amount: amount,
-        currency: stringConstants.currency.USD,
-        status: stringConstants.transactionStatus.CREATED,
-        piId: paymentIntent.id,
-        desc: "Transaction created in the system",
-        user: userId,
-        cards: cards,
-      });
-      transaction = await transaction.save(session);
-
-      transactionLog = new TransactionLog({
-        transaction: transaction._id,
-        amount: transaction.amount,
-        currency: transaction.currency,
-        status: transaction.status,
-        piId: transaction.piId,
-        desc: transaction.desc,
-        user: transaction.user,
-        cards: transaction.cards,
-      });
-
-      transactionLog = await transactionLog.save(session);
-
-      switch (paymentIntent.status) {
-        case stringConstants.piStatus.SUCCEEDED:
-          // Update transaction
-          transaction.status = stringConstants.piStatus.SUCCEEDED;
-          transaction.desc = stringConstants.stripeMessages.SUCCEEDED;
-          transaction = await transaction.save(session);
-
-          transactionLog = new TransactionLog({
-            transaction: transaction._id,
-            amount: transaction.amount,
-            currency: transaction.currency,
-            status: transaction.status,
-            piId: transaction.piId,
-            desc: transaction.desc,
-            user: transaction.user,
-            cards: transaction.cards,
-          });
-
-          transactionLog = await transactionLog.save(session);
-
-          await session.commitTransaction();
-          session.endSession();
-
-          console.log('*******************payment success********************');
-
-          // grading of card
-          const [onlyCard = {}] = cards;
-          const { _id: onlyCardId = '' } = onlyCard; // for demo purpose we are expecting only 1 cardId
-          const onlyCardDetails = await Card.find({
-            _id: onlyCardId
-          })
-            .lean();
-
-          const [firstData = {}] = onlyCardDetails;
-          const { front: filePath = '' } = firstData;
-
-          // let cenGrading = await centerGrading(onlyCardId, filePath);
-          // let corGrading = await cornerGrading(onlyCardId, filePath);
-          // cenGrading = cenGrading > 0 ? cenGrading / 2 : 0;
-          // corGrading = corGrading > 0 ? corGrading / 2 : 0;
-
-          // let grading = cenGrading + corGrading;
-          // console.log('grading---------------', grading);
-          // grading = `${grading}`;
-          await Card.findByIdAndUpdate(
-            onlyCardId,
-            { $set: { status: stringConstants.cardState.GRADED, grading: { grade: '8' } } }
-          );
-
-          return res.send(
-            createResObject(
-              true,
-              { clientSecret: null, cardsUpdated: cards.length },
-              stringConstants.stripeMessages.SUCCEEDED
-            )
-          );
-
-        case stringConstants.piStatus.REQ_ACTION:
-          // 3D secure
-          transaction.status = stringConstants.piStatus.REQ_ACTION;
-          transaction.desc = stringConstants.stripeMessages.REQ_ACTION;
-          transaction = await transaction.save(session);
-
-          transactionLog = new TransactionLog({
-            transaction: transaction._id,
-            amount: transaction.amount,
-            currency: transaction.currency,
-            status: transaction.status,
-            piId: transaction.piId,
-            desc: transaction.desc,
-            user: transaction.user,
-            cards: transaction.cards,
-          });
-
-          transactionLog = await transactionLog.save(session);
-
-          await session.commitTransaction();
-          session.endSession();
-
-          return res.send(
-            createResObject(
-              true,
-              { clientSecret: paymentIntent.client_secret, cardsUpdated: null },
-              stringConstants.stripeMessages.REQ_ACTION
-            )
-          );
-
-        case stringConstants.piStatus.PROCESSING:
-          transaction.status = stringConstants.piStatus.PROCESSING;
-          transaction.desc = stringConstants.stripeMessages.PROCESSING;
-          transaction = await transaction.save(session);
-
-          transactionLog = new TransactionLog({
-            transaction: transaction._id,
-            amount: transaction.amount,
-            currency: transaction.currency,
-            status: transaction.status,
-            piId: transaction.piId,
-            desc: transaction.desc,
-            user: transaction.user,
-            cards: transaction.cards,
-          });
-
-          transactionLog = await transactionLog.save(session);
-
-          await session.commitTransaction();
-          session.endSession();
-
-          return res.send(
-            createResObject(
-              true,
-              { clientSecret: null, cardsUpdated: null },
-              stringConstants.stripeMessages.PROCESSING
-            )
-          );
-
-        case stringConstants.piStatus.REQ_PM_METHOD:
-          // Update transaction and create transaction log
-          // Update transaction
-          transaction.status = stringConstants.piStatus.REQ_PM_METHOD;
-          transaction.desc = "Transaction declined";
-          transaction = await transaction.save(session);
-
-          transactionLog = new TransactionLog({
-            transaction: transaction._id,
-            amount: transaction.amount,
-            currency: transaction.currency,
-            status: transaction.status,
-            piId: transaction.piId,
-            desc: transaction.desc,
-            user: transaction.user,
-            cards: transaction.cards,
-          });
-
-          transactionLog = await transactionLog.save(session);
-
-          await session.commitTransaction();
-          session.endSession();
-
-          return res.send(
-            createResObject(
-              false,
-              {},
-              stringConstants.stripeMessages.FAILED,
-              errorObjects.STRIPE_ERROR(stringConstants.stripeMessages.FAILED)
-            )
-          );
-
-        default:
-          transaction.status = paymentIntent.status;
-          transaction.desc = "Transaction declined";
-          transaction = await transaction.save(session);
-
-          transactionLog = new TransactionLog({
-            transaction: transaction._id,
-            amount: transaction.amount,
-            currency: transaction.currency,
-            status: transaction.status,
-            piId: transaction.piId,
-            desc: transaction.desc,
-            user: transaction.user,
-            cards: transaction.cards,
-          });
-
-          transactionLog = await transactionLog.save(session);
-
-          await session.commitTransaction();
-          session.endSession();
-
-          return res.send(
-            createResObject(
-              false,
-              {},
-              stringConstants.stripeMessages.FAILED,
-              errorObjects.STRIPE_ERROR(stringConstants.stripeMessages.FAILED)
-            )
-          );
-      }
-    } catch (error) {
-      SimpleLogger.error(error);
-      // Refund the payment
-      await session.abortTransaction();
-      session.endSession();
-
-      // Try catch block maybe
-      if (paymentIntent.status === stringConstants.piStatus.SUCCEEDED) {
-        const refund = await stripe.refunds.create({
-          payment_intent: paymentIntent.id,
-        });
-
-        if (transaction) {
-          transaction.status = stringConstants.transactionStatus.REFUNDED;
-          transaction.desc = `${transaction.piId} has been refunded ${refund.id}`;
-
-          transactionLog = new TransactionLog({
-            transaction: transaction._id,
-            amount: transaction.amount,
-            currency: transaction.currency,
-            status: transaction.status,
-            piId: transaction.piId,
-            desc: transaction.desc,
-            user: transaction.user,
-            cards: transaction.cards,
-          });
-
-          transactionLog = await transactionLog.save();
-        }
-
-        return res
-          .status(400)
-          .send(
-            createResObject(
-              false,
-              {},
-              stringConstants.stripeMessages.REFUND,
-              errorObjects.STRIPE_ERROR(stringConstants.stripeMessages.REFUND)
-            )
-          );
-      }
-    }
   }
-);
+)
 
 /**
  * Stripe webhook to listen for async payment processing
