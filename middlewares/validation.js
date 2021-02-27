@@ -366,6 +366,26 @@ module.exports = {
     }
     return next();
   },
+  valCard: (req, res, next) => {
+    const schema = Joi.object({
+      cardId: Joi.string().required()
+    });
+
+    const { error } = schema.validate(req.params);
+    if (error) {
+      return res
+        .status(400)
+        .send(
+          createResObject(
+            false,
+            { errorMessage: error.details[0].message },
+            stringConstants.REQUEST_VALIDATION_FAILED,
+            errorObjects.REQUEST_VALIDATION_ERROR(error.details[0].message)
+          )
+        );
+    }
+    return next();
+  },
   valCardGradeReq: async (req, res, next) => {
     const questions = await Question.find({})
       .lean()

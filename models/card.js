@@ -56,18 +56,8 @@ const cardSchema = new mongoose.Schema(
       default: false,
     },
     grading: {
-      signedCeleb: { type: Number },
-      cornerValue: { type: Number },
-      edgeValue: { type: Number },
-      surfaceValue: { type: Number },
-      eyeAppeal: { type: Number },
-      centerFront: { type: Number },
-      centerBack: { type: Number },
-      cardStains: { type: Number },
-      cardSleeving: { type: Number },
-      printingDefects: { type: Number },
-      grade: { type: String },
-      gradeDesc: { type: String },
+      centering: { type: String },
+      corners: { type: Object }
     },
   },
   { timestamps: true, toJSON: { getters: true } }
@@ -182,18 +172,8 @@ const Card = mongoose.model(
 
 function gradingEmpty(grading) {
   return (
-    !grading.gradeDesc &&
-    !grading.grade &&
-    !grading.signedCeleb &&
-    !grading.cornerValue &&
-    !grading.edgeValue &&
-    !grading.surfaceValue &&
-    !grading.eyeAppeal &&
-    !grading.centerFront &&
-    !grading.centerBack &&
-    !grading.cardStains &&
-    !grading.cardSleeving &&
-    !grading.printingDefects
+    !grading.centering &&
+    !grading.corners
   );
 }
 

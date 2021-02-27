@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const auth = require("../../middlewares/authenticateUser");
 const appAuth = require("../../middlewares/authenticateApp");
+const { valCard } = require("../../middlewares/validation");
 const SimpleLogger = require("../../utils/simpleLogger");
 const path = require("path");
 const fsPromises = require("fs").promises;
@@ -899,6 +900,37 @@ router.post("/add-grading", [appAuth, auth], async (req, res, next) => {
       createResObject(true, { ...card, grading }, stringConstants.GRADING_COMPLETED)
     );
   });
+});
+
+router.get('/card-details/:cardId', [appAuth, auth, valCard], async (req, res, next) => {
+  const { cardId = '' } = req.params;
+  try {
+    let card = await Card.findById(cardId);
+    if (!card)
+      return res.send(
+        createResObject(
+          false,
+          {},
+          stringConstants.CARD_ID_NOT_FOUND,
+          errorObjects.CARD_ID_NOT_FOUND
+        )
+      );
+
+    card = card.getCardDetailsWithGrading();
+
+    return res.send(
+        createResObject(true, { ...card }, stringConstants.CARD_DETAILS)
+    );
+  } catch(e) {
+    return res.send(
+      createResObject(
+        false,
+        {},
+        stringConstants.CARD_ID_NOT_FOUND,
+        errorObjects.CARD_ID_NOT_FOUND
+      )
+    );
+  }
 });
 
 

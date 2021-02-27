@@ -22,14 +22,13 @@ const config = require("config");
 const stripe = require("stripe")(config.get(stringConstants.STRIPE_TEST_KEY));
 const mongoose = require("mongoose");
 const { sendNotiToUser } = require("../../utils/sendNotifications");
-const centerGrading = require('../../grading/center');
-const cornerGrading = require('../../grading/corner');
+const combinedGrading = require('../../grading/combined');
 
 router.post(
   "/for-pending-cards",
-  [appAuth, auth, valPayPenReq],
+  [appAuth, auth],
   async (req, res) => {
-    console.log('*******************cards payment has been called********************');
+    console.log('*******************cards grading has been called********************');
     const userId = req.user._id;
     const user = await User.findById(userId);
     const { subscription = {} } = user;
@@ -66,10 +65,12 @@ router.post(
         // grading of card
         const { front: filePath = '' } = card;
 
-        // let cenGrading = await centerGrading(onlyCardId, filePath);
+        const grading = await combinedGrading(cardId, filePath);
+        console.log('grading--------', grading);
+        // check for value returned
         await Card.findByIdAndUpdate(
-          onlyCardId,
-          { $set: { status: stringConstants.cardState.GRADED, grading: { grade: '8' } } }
+          cardId,
+          { $set: { status: stringConstants.cardState.GRADED, grading } }
         );
 
         // reducing cards left in subscription by 1
@@ -87,11 +88,10 @@ router.post(
         return res.send(
           createResObject(
             true,
-            { clientSecret: null, cardsUpdated: cards.length },
+            { clientSecret: null, cardsUpdated: 1 },
             'Card Graded Successfully'
           )
         );
-
   }
 )
 

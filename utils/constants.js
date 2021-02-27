@@ -79,6 +79,8 @@ module.exports.stringConstants = {
 
   CARD_ID_NOT_FOUND: "Card with the given ID not found",
 
+  CARD_DETAILS: 'Card detials',
+
   PASSWORD_UPDATED_SUCCESSFULLY: "Password updated successfully",
 
   INVALID_APPLE_TOKEN_OR_TOKEN_EXPIRED: "Invalid Apple token or token expired",
