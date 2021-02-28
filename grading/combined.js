@@ -2,7 +2,6 @@ const request = require('request');
 const fs = require('fs');
 const path = require('path');
 const { combined: { url = '', point = '' } } = require('./apiconfig');
-const { roughScale } = require('./helper');
 
 const combinedGrading = (name, imagePath) => {
     const options = {
@@ -34,8 +33,14 @@ const combinedGrading = (name, imagePath) => {
                 const writeStream = fs.createWriteStream(`${fileDestination}/${name}`);
                 writeStream.write(body);
                 writeStream.end();
-                const grade = roughScale(body, 10);
-                resolve(grade);
+                try {
+                    const data = JSON.parse(body);
+                    resolve(data);
+                }catch (error) {
+                    resolve(0);
+                    console.log(error);
+                }
+                resolve(body);
             }
         });
     });

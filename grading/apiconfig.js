@@ -8,7 +8,7 @@ module.exports = {
         point: 'corners_score'
     },
     combined: {
-        url: 'http://13.127.43.216:5000',
+        url: 'http://52.66.245.12:5000',
         point: 'get_score'
     }
 };

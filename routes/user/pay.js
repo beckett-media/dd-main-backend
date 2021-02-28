@@ -66,7 +66,6 @@ router.post(
         const { front: filePath = '' } = card;
 
         const grading = await combinedGrading(cardId, filePath);
-        console.log('grading--------', grading);
         // check for value returned
         await Card.findByIdAndUpdate(
           cardId,
