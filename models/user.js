@@ -207,7 +207,7 @@ userSchema.methods.generateAuthToken = function () {
   const token = jwt.sign(
     { _id: this._id, role: this.role },
     config.get(stringConstants.JWT_PRIATE_KEY),
-    { expiresIn: "1m" }
+    { expiresIn: "30d" }
   );
   return {
     token,
@@ -222,7 +222,7 @@ userSchema.methods.generateRefreshToken = function () {
   const refreshToken = jwt.sign(
     { _id: this._id },
     config.get(stringConstants.JWT_REFRESH_KEY),
-    { expiresIn: "1m" }
+    { expiresIn: "30d" }
   );
   return {
     token: refreshToken,
