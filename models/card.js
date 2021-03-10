@@ -33,6 +33,15 @@ const cardSchema = new mongoose.Schema(
     brand: {
       type: String,
     },
+    model: {
+      type: String,
+    },
+    serialNo: {
+      type: String,
+    },
+    cardType: {
+      type: String,
+    },
     cardNumber: {
       type: Number,
     },
@@ -72,6 +81,7 @@ cardSchema.methods.checkIfCompleted = function () {
     !!this.year &&
     !!this.brand &&
     !!this.cardNumber &&
+    !!this.model &&
     !!this.playerNames.length > 0
   );
 };
@@ -87,6 +97,9 @@ cardSchema.methods.getCardDetails = function () {
   const gradedImage = this.gradedImage || null;
   const year = this.year || null;
   const brand = this.brand || null;
+  const model = this.model || null;
+  const serialNo = this.serialNo || null;
+  const cardType = this.cardType || null;
   const cardNumber = this.cardNumber || null;
   const playerNames = this.playerNames || null;
   const createdAt = this.createdAt || null;
@@ -105,6 +118,9 @@ cardSchema.methods.getCardDetails = function () {
     playerNames,
     createdAt,
     updatedAt,
+    model,
+    cardType,
+    serialNo
   };
 };
 /**
@@ -119,6 +135,9 @@ cardSchema.methods.getCardDetailsWithGrading = function () {
   const gradedImage = this.gradedImage || null;
   const year = this.year || null;
   const brand = this.brand || null;
+  const model = this.model || null;
+  const serialNo = this.serialNo || null;
+  const cardType = this.cardType || null;
   const cardNumber = this.cardNumber || null;
   const playerNames = this.playerNames || null;
   const status = this.status || null;
@@ -141,6 +160,9 @@ cardSchema.methods.getCardDetailsWithGrading = function () {
     status,
     createdAt,
     updatedAt,
+    model,
+    serialNo,
+    cardType
   };
 };
 /**
