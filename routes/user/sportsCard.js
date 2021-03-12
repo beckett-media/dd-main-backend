@@ -554,11 +554,17 @@ router.post(
     const brand = req.body.brand;
     const cardNumber = req.body.cardNumber;
     const playerNames = req.body.playerNames;
+    const serialNo = req.body.serialNo;
+    const modelNo = req.body.modelNo;
+    const cardType = req.body.cardType;
 
     card.year = year;
     card.brand = brand;
     card.cardNumber = cardNumber;
     card.playerNames = playerNames;
+    card.serialNo = serialNo;
+    card.modelNo = modelNo;
+    card.cardType = cardType;
 
     card.isCompleted = card.checkIfCompleted();
 

@@ -164,6 +164,9 @@ module.exports = {
       brand: Joi.string().required().min(1).max(255),
       cardNumber: Joi.number().required().min(0),
       playerNames: Joi.array().items(Joi.string().required()).required(),
+      modelNo: Joi.string().required().min(1).max(255),
+      cardType: Joi.string().required().min(1).max(255),
+      serialNo: Joi.string().required().min(1).max(255)
     });
 
     const { error } = schema.validate(req.body);
