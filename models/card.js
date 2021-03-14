@@ -43,7 +43,7 @@ const cardSchema = new mongoose.Schema(
       type: String,
     },
     cardNumber: {
-      type: Number,
+      type: String,
     },
     playerNames: [{ type: String }],
     user: {
