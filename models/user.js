@@ -211,7 +211,7 @@ userSchema.methods.generateAuthToken = function () {
   );
   return {
     token,
-    expiry: moment.utc(moment(Date.now()).add(15, "minutes")).format(),
+    expiry: moment.utc(moment(Date.now()).add(2, "minutes")).format(),
   };
 };
 
