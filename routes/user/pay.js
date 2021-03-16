@@ -110,6 +110,7 @@ router.post(
  * Stripe webhook to listen for async payment processing
  */
 router.post("/webhook", async (req, res, next) => {
+  console.log('####################### Webhooks Called ########################');
   // Webhook is specifically for async payment process
 
   let event, type, paymentIntent, transaction, transactionLog; // Stripe event
