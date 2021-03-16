@@ -115,6 +115,7 @@ module.exports.stringConstants = {
   NO_PEDNING_CARDS_FOUND_FOR_USER: "No pending cards found for the user",
   NO_CARDS_LEFT_IN_PLAN: "No cards left in plan. Please upgrade your subscription and try again.",
   NO_CARD: 'No Card Found for given Id',
+  API_ERROR: 'Not able to fetch grade at this moment. Please try again',
 
   NO_STRIPE_ID_FOUND_FOR_USER: "No stripe ID found for user: ",
 

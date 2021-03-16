@@ -37,7 +37,7 @@ router.post(
     // if no card left in current plan
     if (cardsLeft <= 0)
     return res
-        .status(404)
+        .status(400)
         .send(
           createResObject(
             false,
@@ -52,7 +52,7 @@ router.post(
     // if no card found
     if (!card)
     return res
-        .status(404)
+        .status(400)
         .send(
           createResObject(
             false,
@@ -66,6 +66,18 @@ router.post(
         const { front: filePath = '' } = card;
 
         const grading = await combinedGrading(cardId, filePath);
+        if (grading === 0) {
+          return res
+          .status(500)
+          .send(
+            createResObject(
+              false,
+              {},
+              stringConstants.API_ERROR,
+              errorObjects.API_ERROR
+            )
+          );
+        }
         // check for value returned
         await Card.findByIdAndUpdate(
           cardId,

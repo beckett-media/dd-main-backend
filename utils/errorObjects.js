@@ -169,6 +169,15 @@ module.exports.errorObjects = {
     errorMessage: stringConstants.NO_CARD,
   },
 
+  API_ERROR: {
+    errorCode: 322,
+    errorSubCode: getKey(
+      stringConstants,
+      stringConstants.API_ERROR
+    ),
+    errorMessage: stringConstants.API_ERROR,
+  },
+
   NO_CARDS_LEFT_IN_PLAN: {
     errorCode: 221,
     errorSubCode: getKey(
