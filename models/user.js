@@ -207,11 +207,11 @@ userSchema.methods.generateAuthToken = function () {
   const token = jwt.sign(
     { _id: this._id, role: this.role },
     config.get(stringConstants.JWT_PRIATE_KEY),
-    { expiresIn: "2m" }
+    { expiresIn: "30d" }
   );
   return {
     token,
-    expiry: moment.utc(moment(Date.now()).add(2, "minutes")).format(),
+    expiry: moment.utc(moment(Date.now()).add(30, "days")).format(),
   };
 };
 
