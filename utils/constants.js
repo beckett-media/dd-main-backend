@@ -67,6 +67,8 @@ module.exports.stringConstants = {
 
   FILE_CORRUPTED: "File corrupted or file size 0",
 
+  BAD_QUALITY: "Bad quality image. Please try uploading another image",
+
   USER_REGISTERATION_SUCCESSFUL: "User registered successfully",
 
   UNSUSPECTED_ERROR: "Unsuspected error occured",

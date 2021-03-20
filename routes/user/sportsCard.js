@@ -26,6 +26,7 @@ const {
   valUpdateCardData,
   valPageSizeNumber,
 } = require("../../middlewares/validation");
+const { ImageChecker } = require('image-checker');
 const centerGrading = require('../../grading/center');
 const cornerGrading = require('../../grading/corner');
 
@@ -112,6 +113,38 @@ router.post("/add-front", [appAuth, auth], async (req, res, next) => {
             {},
             stringConstants.FILE_CORRUPTED,
             errorObjects.FILE_CORRUPTED
+          )
+        );
+    }
+
+    // Check file quality is not good
+    const cardDestination = path.join(
+      __dirname,
+      "../../public/",
+      `${userId}/cards/${cardId}/`,
+      `${req.file.filename}`
+    );
+    const imageQuality = await ImageChecker.checkImageAtPath(cardDestination) || {};
+    const { isOk = false } = imageQuality;
+
+    if (!isOk) {
+      try {
+        await fsPromises.unlink(cardDestination);
+      } catch (err) {
+        SimpleLogger.error(err);
+        await new PendingDeletion({
+          deletionType: stringConstants.deletionType.FILE,
+          data: cardDestination,
+        }).save();
+      }
+      return res
+        .status(400)
+        .send(
+          createResObject(
+            true,
+            {},
+            stringConstants.BAD_QUALITY,
+            errorObjects.BAD_QUALITY
           )
         );
     }
@@ -224,6 +257,39 @@ router.post(
             )
           );
       }
+
+      // Check file quality is not good
+    const cardDestination = path.join(
+      __dirname,
+      "../../public/",
+      `${userId}/cards/${cardId}/`,
+      `${req.file.filename}`
+    );
+    const imageQuality = await ImageChecker.checkImageAtPath(cardDestination) || {};
+    const { isOk = false } = imageQuality;
+
+    if (!isOk) {
+      try {
+        await fsPromises.unlink(cardDestination);
+      } catch (err) {
+        SimpleLogger.error(err);
+        await new PendingDeletion({
+          deletionType: stringConstants.deletionType.FILE,
+          data: cardDestination,
+        }).save();
+      }
+      return res
+        .status(400)
+        .send(
+          createResObject(
+            true,
+            {},
+            stringConstants.BAD_QUALITY,
+            errorObjects.BAD_QUALITY
+          )
+        );
+    }
+
       // All the check completed delete the old card and update the new
       /*
       if (card.front) {
@@ -354,6 +420,39 @@ router.post(
             )
           );
       }
+
+      // Check file quality is not good
+    const cardDestination = path.join(
+      __dirname,
+      "../../public/",
+      `${userId}/cards/${cardId}/`,
+      `${req.file.filename}`
+    );
+    const imageQuality = await ImageChecker.checkImageAtPath(cardDestination) || {};
+    const { isOk = false } = imageQuality;
+
+    if (!isOk) {
+      try {
+        await fsPromises.unlink(cardDestination);
+      } catch (err) {
+        SimpleLogger.error(err);
+        await new PendingDeletion({
+          deletionType: stringConstants.deletionType.FILE,
+          data: cardDestination,
+        }).save();
+      }
+      return res
+        .status(400)
+        .send(
+          createResObject(
+            true,
+            {},
+            stringConstants.BAD_QUALITY,
+            errorObjects.BAD_QUALITY
+          )
+        );
+    }
+
       // Delete previous picture if any
       /*
       if (card.back) {

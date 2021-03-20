@@ -60,6 +60,11 @@ module.exports.errorObjects = {
     errorSubCode: getKey(stringConstants, stringConstants.FILE_CORRUPTED),
     errorMessage: stringConstants.FILE_CORRUPTED,
   },
+  BAD_QUALITY: {
+    errorCode: 208,
+    errorSubCode: getKey(stringConstants, stringConstants.BAD_QUALITY),
+    errorMessage: stringConstants.BAD_QUALITY,
+  },
   NO_FILE_FOUND: {
     errorCode: 109,
     errorSubCode: getKey(stringConstants, stringConstants.NO_FILE_FOUND),
