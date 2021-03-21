@@ -26,7 +26,7 @@ const {
   valUpdateCardData,
   valPageSizeNumber,
 } = require("../../middlewares/validation");
-const { ImageChecker } = require('image-checker');
+const sightengine = require('sightengine')('1635467598', 'i3u4TqqhAnoxcSgAxgv5');
 const centerGrading = require('../../grading/center');
 const cornerGrading = require('../../grading/corner');
 
@@ -124,10 +124,10 @@ router.post("/add-front", [appAuth, auth], async (req, res, next) => {
       `${userId}/cards/${cardId}/`,
       `${req.file.filename}`
     );
-    const imageQuality = await ImageChecker.checkImageAtPath(cardDestination) || {};
-    const { isOk = false } = imageQuality;
+    const { brightness = 0, contrast = 0, sharpness = 0 } = await sightengine.check(['properties']).set_file(cardDestination) || {};
+    const badCondition = brightness <= 0.5 || sharpness <= 0.6 || contrast <=0.3;
 
-    if (!isOk) {
+    if (badCondition) {
       try {
         await fsPromises.unlink(cardDestination);
       } catch (err) {
@@ -265,10 +265,10 @@ router.post(
       `${userId}/cards/${cardId}/`,
       `${req.file.filename}`
     );
-    const imageQuality = await ImageChecker.checkImageAtPath(cardDestination) || {};
-    const { isOk = false } = imageQuality;
+    const { brightness = 0, contrast = 0, sharpness = 0 } = await sightengine.check(['properties']).set_file(cardDestination) || {};
+    const badCondition = brightness <= 0.5 || sharpness <= 0.6 || contrast <=0.3;
 
-    if (!isOk) {
+    if (badCondition) {
       try {
         await fsPromises.unlink(cardDestination);
       } catch (err) {
@@ -428,10 +428,10 @@ router.post(
       `${userId}/cards/${cardId}/`,
       `${req.file.filename}`
     );
-    const imageQuality = await ImageChecker.checkImageAtPath(cardDestination) || {};
-    const { isOk = false } = imageQuality;
+    const { brightness = 0, contrast = 0, sharpness = 0 } = await sightengine.check(['properties']).set_file(cardDestination) || {};
+    const badCondition = brightness <= 0.5 || sharpness <= 0.6 || contrast <=0.3;
 
-    if (!isOk) {
+    if (badCondition) {
       try {
         await fsPromises.unlink(cardDestination);
       } catch (err) {
