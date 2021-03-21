@@ -443,4 +443,15 @@ router.get("/cancel-subscription", [appAuth, auth], async (req, res) => {
   return res.send(createResObject(false, {}, 'No Subscription taken'));
 });
 
+router.get("/authorize", [appAuth, auth], async (req, res) => {
+  // const user = await User.findById(req.user._id);
+  return res.send(
+    createResObject(
+      true,
+      {},
+      'Authorized User'
+    )
+  );
+});
+
 module.exports = router;
