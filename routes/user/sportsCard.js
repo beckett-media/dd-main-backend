@@ -125,7 +125,7 @@ router.post("/add-front", [appAuth, auth], async (req, res, next) => {
       `${req.file.filename}`
     );
     const { brightness = 0, contrast = 0, sharpness = 0 } = await sightengine.check(['properties']).set_file(cardDestination) || {};
-    const badCondition = brightness <= 0.5 || sharpness <= 0.6 || contrast <=0.3;
+    const badCondition = brightness <= 0.3 || sharpness <= 0.6 || contrast <=0.3;
 
     if (badCondition) {
       try {
@@ -266,7 +266,7 @@ router.post(
       `${req.file.filename}`
     );
     const { brightness = 0, contrast = 0, sharpness = 0 } = await sightengine.check(['properties']).set_file(cardDestination) || {};
-    const badCondition = brightness <= 0.5 || sharpness <= 0.6 || contrast <=0.3;
+    const badCondition = brightness <= 0.3 || sharpness <= 0.6 || contrast <=0.3;
 
     if (badCondition) {
       try {
@@ -429,7 +429,7 @@ router.post(
       `${req.file.filename}`
     );
     const { brightness = 0, contrast = 0, sharpness = 0 } = await sightengine.check(['properties']).set_file(cardDestination) || {};
-    const badCondition = brightness <= 0.5 || sharpness <= 0.6 || contrast <=0.3;
+    const badCondition = brightness <= 0.3 || sharpness <= 0.6 || contrast <=0.3;
 
     if (badCondition) {
       try {
