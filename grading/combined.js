@@ -4,6 +4,7 @@ const path = require('path');
 const { combined: { url = '', point = '' } } = require('./apiconfig');
 
 const combinedGrading = (name, imagePath) => {
+    console.log('imagePath--------', imagePath);
     const options = {
         method: 'POST',
         url: `${url}/${point}`,
