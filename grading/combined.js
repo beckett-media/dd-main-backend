@@ -34,7 +34,7 @@ const combinedGrading = (name, imagePath) => {
                 writeStream.write(body);
                 writeStream.end();
                 try {
-                    const data = JSON.parse(body);
+                    const data = typeof body === 'string' ? JSON.parse(body) : body;
                     resolve(data);
                 }catch (error) {
                     resolve(0);
