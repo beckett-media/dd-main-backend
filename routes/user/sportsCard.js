@@ -109,7 +109,7 @@ router.post("/add-front", [appAuth, auth], async (req, res, next) => {
         .status(400)
         .send(
           createResObject(
-            true,
+            false,
             {},
             stringConstants.FILE_CORRUPTED,
             errorObjects.FILE_CORRUPTED
@@ -141,7 +141,7 @@ router.post("/add-front", [appAuth, auth], async (req, res, next) => {
         .status(400)
         .send(
           createResObject(
-            true,
+            false,
             {},
             stringConstants.BAD_QUALITY,
             errorObjects.BAD_QUALITY
@@ -250,7 +250,7 @@ router.post(
           .status(400)
           .send(
             createResObject(
-              true,
+              false,
               {},
               stringConstants.FILE_CORRUPTED,
               errorObjects.FILE_CORRUPTED
@@ -282,7 +282,7 @@ router.post(
         .status(400)
         .send(
           createResObject(
-            true,
+            false,
             {},
             stringConstants.BAD_QUALITY,
             errorObjects.BAD_QUALITY
@@ -413,7 +413,7 @@ router.post(
           .status(400)
           .send(
             createResObject(
-              true,
+              false,
               {},
               stringConstants.FILE_CORRUPTED,
               errorObjects.FILE_CORRUPTED
@@ -445,7 +445,7 @@ router.post(
         .status(400)
         .send(
           createResObject(
-            true,
+            false,
             {},
             stringConstants.BAD_QUALITY,
             errorObjects.BAD_QUALITY
