@@ -48,7 +48,6 @@ router.post(
         );
     const cardId = req.body.cardId;
     const card = await Card.findById(cardId);
-    console.log('card---------', card);
 
     // if no card found
     if (!card)

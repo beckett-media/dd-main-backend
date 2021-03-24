@@ -4,7 +4,6 @@ const path = require('path');
 const { combined: { url = '', point = '' } } = require('./apiconfig');
 
 const combinedGrading = (name, imagePath) => {
-    console.log('imagePath--------', imagePath);
     const options = {
         method: 'POST',
         url: `${url}/${point}`,
@@ -35,7 +34,6 @@ const combinedGrading = (name, imagePath) => {
                 writeStream.write(body);
                 writeStream.end();
                 try {
-                    console.log('#########', body, typeof body);
                     const data = typeof body === 'string' ? JSON.parse(body) : body;
                     resolve(data);
                 }catch (error) {
