@@ -118,36 +118,36 @@ router.post("/add-front", [appAuth, auth], async (req, res, next) => {
     }
 
     // Check file quality is not good
-    const cardDestination = path.join(
-      __dirname,
-      "../../public/",
-      `${userId}/cards/${cardId}/`,
-      `${req.file.filename}`
-    );
-    const { brightness = 0, contrast = 0, sharpness = 0 } = await sightengine.check(['properties']).set_file(cardDestination) || {};
-    const badCondition = brightness <= 0.3 || sharpness <= 0.6 || contrast <=0.3;
+    // const cardDestination = path.join(
+    //   __dirname,
+    //   "../../public/",
+    //   `${userId}/cards/${cardId}/`,
+    //   `${req.file.filename}`
+    // );
+    // const { brightness = 0, contrast = 0, sharpness = 0 } = await sightengine.check(['properties']).set_file(cardDestination) || {};
+    // const badCondition = brightness <= 0.3 || sharpness <= 0.6 || contrast <=0.3;
 
-    if (badCondition) {
-      try {
-        await fsPromises.unlink(cardDestination);
-      } catch (err) {
-        SimpleLogger.error(err);
-        await new PendingDeletion({
-          deletionType: stringConstants.deletionType.FILE,
-          data: cardDestination,
-        }).save();
-      }
-      return res
-        .status(400)
-        .send(
-          createResObject(
-            false,
-            {},
-            stringConstants.BAD_QUALITY,
-            errorObjects.BAD_QUALITY
-          )
-        );
-    }
+    // if (badCondition) {
+    //   try {
+    //     await fsPromises.unlink(cardDestination);
+    //   } catch (err) {
+    //     SimpleLogger.error(err);
+    //     await new PendingDeletion({
+    //       deletionType: stringConstants.deletionType.FILE,
+    //       data: cardDestination,
+    //     }).save();
+    //   }
+    //   return res
+    //     .status(400)
+    //     .send(
+    //       createResObject(
+    //         false,
+    //         {},
+    //         stringConstants.BAD_QUALITY,
+    //         errorObjects.BAD_QUALITY
+    //       )
+    //     );
+    // }
 
     card.front = path.join(`${userId}/cards/${cardId}/`, req.file.filename);
     card = await card.save();
@@ -259,36 +259,36 @@ router.post(
       }
 
       // Check file quality is not good
-    const cardDestination = path.join(
-      __dirname,
-      "../../public/",
-      `${userId}/cards/${cardId}/`,
-      `${req.file.filename}`
-    );
-    const { brightness = 0, contrast = 0, sharpness = 0 } = await sightengine.check(['properties']).set_file(cardDestination) || {};
-    const badCondition = brightness <= 0.3 || sharpness <= 0.6 || contrast <=0.3;
+    // const cardDestination = path.join(
+    //   __dirname,
+    //   "../../public/",
+    //   `${userId}/cards/${cardId}/`,
+    //   `${req.file.filename}`
+    // );
+    // const { brightness = 0, contrast = 0, sharpness = 0 } = await sightengine.check(['properties']).set_file(cardDestination) || {};
+    // const badCondition = brightness <= 0.3 || sharpness <= 0.6 || contrast <=0.3;
 
-    if (badCondition) {
-      try {
-        await fsPromises.unlink(cardDestination);
-      } catch (err) {
-        SimpleLogger.error(err);
-        await new PendingDeletion({
-          deletionType: stringConstants.deletionType.FILE,
-          data: cardDestination,
-        }).save();
-      }
-      return res
-        .status(400)
-        .send(
-          createResObject(
-            false,
-            {},
-            stringConstants.BAD_QUALITY,
-            errorObjects.BAD_QUALITY
-          )
-        );
-    }
+    // if (badCondition) {
+    //   try {
+    //     await fsPromises.unlink(cardDestination);
+    //   } catch (err) {
+    //     SimpleLogger.error(err);
+    //     await new PendingDeletion({
+    //       deletionType: stringConstants.deletionType.FILE,
+    //       data: cardDestination,
+    //     }).save();
+    //   }
+    //   return res
+    //     .status(400)
+    //     .send(
+    //       createResObject(
+    //         false,
+    //         {},
+    //         stringConstants.BAD_QUALITY,
+    //         errorObjects.BAD_QUALITY
+    //       )
+    //     );
+    // }
 
       // All the check completed delete the old card and update the new
       /*
@@ -422,36 +422,36 @@ router.post(
       }
 
       // Check file quality is not good
-    const cardDestination = path.join(
-      __dirname,
-      "../../public/",
-      `${userId}/cards/${cardId}/`,
-      `${req.file.filename}`
-    );
-    const { brightness = 0, contrast = 0, sharpness = 0 } = await sightengine.check(['properties']).set_file(cardDestination) || {};
-    const badCondition = brightness <= 0.3 || sharpness <= 0.6 || contrast <=0.3;
+    // const cardDestination = path.join(
+    //   __dirname,
+    //   "../../public/",
+    //   `${userId}/cards/${cardId}/`,
+    //   `${req.file.filename}`
+    // );
+    // const { brightness = 0, contrast = 0, sharpness = 0 } = await sightengine.check(['properties']).set_file(cardDestination) || {};
+    // const badCondition = brightness <= 0.3 || sharpness <= 0.6 || contrast <=0.3;
 
-    if (badCondition) {
-      try {
-        await fsPromises.unlink(cardDestination);
-      } catch (err) {
-        SimpleLogger.error(err);
-        await new PendingDeletion({
-          deletionType: stringConstants.deletionType.FILE,
-          data: cardDestination,
-        }).save();
-      }
-      return res
-        .status(400)
-        .send(
-          createResObject(
-            false,
-            {},
-            stringConstants.BAD_QUALITY,
-            errorObjects.BAD_QUALITY
-          )
-        );
-    }
+    // if (badCondition) {
+    //   try {
+    //     await fsPromises.unlink(cardDestination);
+    //   } catch (err) {
+    //     SimpleLogger.error(err);
+    //     await new PendingDeletion({
+    //       deletionType: stringConstants.deletionType.FILE,
+    //       data: cardDestination,
+    //     }).save();
+    //   }
+    //   return res
+    //     .status(400)
+    //     .send(
+    //       createResObject(
+    //         false,
+    //         {},
+    //         stringConstants.BAD_QUALITY,
+    //         errorObjects.BAD_QUALITY
+    //       )
+    //     );
+    // }
 
       // Delete previous picture if any
       /*

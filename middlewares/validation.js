@@ -163,8 +163,8 @@ module.exports = {
       year: Joi.number().required().min(1000).max(currentYear),
       brand: Joi.string().required().min(1).max(255),
       playerNames: Joi.array().items(Joi.string().required()).required(),
-      modelNo: Joi.string().required().min(1).max(255),
-      cardType: Joi.string().required().min(1).max(255),
+      modelNo: Joi.string().min(1).max(255),
+      cardType: Joi.string().min(1).max(255),
       cardNumber: Joi.string().min(1).max(255),
       serialNo: Joi.string().min(1).max(255)
     });

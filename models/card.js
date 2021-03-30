@@ -80,7 +80,6 @@ cardSchema.methods.checkIfCompleted = function () {
     !!this.back &&
     !!this.year &&
     !!this.brand &&
-    !!this.modelNo &&
     !!this.playerNames.length > 0
   );
 };
