@@ -32,10 +32,10 @@ router.post(
     const userId = req.user._id;
     const user = await User.findById(userId);
     const { subscription = {} } = user;
-    const { cardsLeft = 0, subId = '' } = subscription;
+    let { cardsLeft = 0, subId = '' } = subscription;
 
     // if no card left in current plan
-    if (cardsLeft !== 'Unlimited' && cardsLeft <= 0)
+    if (cardsLeft !== 'Unlimited' && cardsLeft == 0)
     return res
         .status(400)
         .send(
@@ -89,7 +89,7 @@ router.post(
           userId,
           { $set: {
             subscription: {
-              cardsLeft: cardsLeft === 'Unlimited' ? 'Unlimited' : cardsLeft - 1,
+              cardsLeft: cardsLeft === 'Unlimited' ? 'Unlimited' : typeof cardsLeft === 'string' ? (parseInt(cardsLeft, 10) - 1).toString() : (cardsLeft - 1).toString(),
               subId
             }
           } },
@@ -363,7 +363,7 @@ router.post(
                   $set: {
                       subscription: {
                           subId: subscriptionId,
-                          cardsLeft: cardsLeft === 9999999 ? 'Unlimited' : cardsLeft
+                          cardsLeft: cardsLeft === 9999999 ? 'Unlimited' : typeof cardsLeft === 'string' ? cardsLeft :  cardsLeft.toString()
                       }
                   }
               }

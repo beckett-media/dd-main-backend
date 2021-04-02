@@ -77,7 +77,7 @@ const userSchema = new mongoose.Schema(
         default: ''
       },
       cardsLeft: {
-        type: mongoose.Schema.Types.Mixed,
+        type: String,
         default: 0
       }
     },

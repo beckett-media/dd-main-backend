@@ -427,7 +427,7 @@ router.get("/cancel-subscription", [appAuth, auth], async (req, res) => {
         $set: {
           subscription: {
             subId: '',
-            cardsLeft: 0
+            cardsLeft: '0'
           }
         }
       }
