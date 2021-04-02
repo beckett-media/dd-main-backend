@@ -35,7 +35,7 @@ router.post(
     const { cardsLeft = 0, subId = '' } = subscription;
 
     // if no card left in current plan
-    if (cardsLeft <= 0)
+    if (cardsLeft !== 'Unlimited' && cardsLeft <= 0)
     return res
         .status(400)
         .send(
@@ -89,7 +89,7 @@ router.post(
           userId,
           { $set: {
             subscription: {
-              cardsLeft: cardsLeft - 1,
+              cardsLeft: cardsLeft === 'Unlimited' ? 'Unlimited' : cardsLeft - 1,
               subId
             }
           } },
@@ -363,7 +363,7 @@ router.post(
                   $set: {
                       subscription: {
                           subId: subscriptionId,
-                          cardsLeft
+                          cardsLeft: cardsLeft === 9999999 ? 'Unlimited' : cardsLeft
                       }
                   }
               }
