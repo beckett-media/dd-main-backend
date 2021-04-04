@@ -139,7 +139,7 @@ cardSchema.methods.getCardDetailsWithGrading = function () {
   const cardNumber = this.cardNumber || null;
   const playerNames = this.playerNames || null;
   const status = this.status || null;
-  const grading = gradingEmpty(this.grading) ? null : this.grading;
+  const grading = this.grading || null;
   const createdAt = this.createdAt || null;
   const updatedAt = this.updatedAt || null;
 
