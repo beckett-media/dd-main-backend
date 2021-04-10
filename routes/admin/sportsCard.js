@@ -197,6 +197,7 @@ router.post(
 async function createGradedImage(card) {
   try {
     const cardId = card._id;
+    const userId = card.user;
     // Create the overlay image
     const cardImagePath = path.join(__dirname, "../../public", card.front);
     let cardImage = await Jimp.read(cardImagePath);
@@ -252,7 +253,7 @@ async function createGradedImage(card) {
       `../../assets/card_overlay/${cardId}_qr_code.png`
     );
     const qrBaseUrl = config.get(stringConstants.URLS.qrBaseUrl);
-    await QRCode.toFile(qrCodeImagePath, `${qrBaseUrl}${cardId}/graded_card.png`, {
+    await QRCode.toFile(qrCodeImagePath, `${qrBaseUrl}${userId}/cards/${cardId}/graded_card.png`, {
       color: {
         dark: '#fff',
         light: '#0000' // Transparent background
