@@ -252,7 +252,7 @@ async function createGradedImage(card) {
       `../../assets/card_overlay/${cardId}_qr_code.png`
     );
     const qrBaseUrl = config.get(stringConstants.URLS.qrBaseUrl);
-    await QRCode.toFile(qrCodeImagePath, `${qrBaseUrl}${cardId}`, {
+    await QRCode.toFile(qrCodeImagePath, `${qrBaseUrl}${cardId}/graded_card.png`, {
       color: {
         dark: '#fff',
         light: '#0000' // Transparent background
