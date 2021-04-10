@@ -23,6 +23,7 @@ const stripe = require("stripe")(config.get(stringConstants.STRIPE_TEST_KEY));
 const mongoose = require("mongoose");
 const { sendNotiToUser } = require("../../utils/sendNotifications");
 const combinedGrading = require('../../grading/combined');
+const createGradedImage = require('../../utils/digitalOverlay');
 
 router.post(
   "/for-pending-cards",
@@ -78,6 +79,27 @@ router.post(
             )
           );
         }
+
+        if (!grading.success) {
+          return res
+          .status(500)
+          .send(
+            createResObject(
+              false,
+              {},
+              grading.error,
+              {
+                errorCode: 444,
+                errorSubCode: 'API_ERROR',
+                errorMessage: grading.error
+              }
+            )
+          );
+        }
+
+        // create card grading image
+        await createGradedImage(card);
+
         // check for value returned
         await Card.findByIdAndUpdate(
           cardId,

@@ -4,207 +4,197 @@ const fs = require("fs");
 const QRCode = require("qrcode");
 const config = require("config");
 
-async function createGradedImage(card, grade, gradDesc) {
+async function createGradedImage(card) {
+    if (!card || !Object.keys(card).length) return;
     try {
-        const cardId = card._id;
-        // Create the overlay image
-        const cardImagePath = path.join(__dirname, "../../public", card.front);
-        let cardImage = await Jimp.read(cardImagePath);
-
-        cardImage.scaleToFit(500, 700);
-
-        const innerImageMaskPath = path.join(
-            __dirname,
-            "../../assets/card_overlay",
-            stringConstants.imageAssetNames.INNER_IMAGE_MASK
-        );
-        const innerImageMask = await Jimp.read(innerImageMaskPath);
-        innerImageMask.resize(cardImage.getWidth(), cardImage.getHeight());
-
-        cardImage.mask(innerImageMask, 0, 0);
-
-        let cardWidth = cardImage.getWidth();
-        let cardHeight = cardImage.getHeight();
-
-        const blackBgPath = path.join(
-            __dirname,
-            "../../assets/card_overlay",
-            stringConstants.imageAssetNames.OUTER_IMAGE_MASK
-        );
-        const blackBg = await Jimp.read(blackBgPath);
-
-        const overlayPadVert = 300;
-        const overlayPadHorz = 100;
-
-        blackBg.resize(cardWidth + overlayPadHorz, cardHeight + overlayPadVert);
-
-        let bgWidth = blackBg.getWidth();
-        let bgHeight = blackBg.getHeight();
-
-        blackBg.composite(cardImage, overlayPadHorz / 2, overlayPadVert / 2);
-
-        const logoImagePath = path.join(
-            __dirname,
-            "../../assets/card_overlay",
-            stringConstants.imageAssetNames.DCGS_LOGO
-        );
-        const logoImage = await Jimp.read(logoImagePath);
-
-        const logoQrWidth = 125;
-        const logoQrHeight = 125;
-
-        logoImage.resize(logoQrWidth, logoQrHeight);
-
-        blackBg.composite(logoImage, 0, 0);
-
-        // QR Code
-        const qrCodeImagePath = path.join(
-            __dirname,
-            `../../assets/card_overlay/${cardId}_qr_code.png`
-        );
-        const qrBaseUrl = config.get(stringConstants.URLS.qrBaseUrl);
-        await QRCode.toFile(qrCodeImagePath, `${qrBaseUrl}${cardId}`);
-
-        const qrCodeImage = await Jimp.read(qrCodeImagePath);
-        qrCodeImage.resize(logoQrWidth, logoQrHeight);
-
-        const qrCodeMaskPath = path.join(
-            __dirname,
-            "../../assets/card_overlay",
-            stringConstants.imageAssetNames.QR_CODE_MASK
-        );
-        const qrCodeMask = await Jimp.read(qrCodeMaskPath);
-        qrCodeMask.resize(logoQrWidth, logoQrHeight);
-        qrCodeImage.mask(qrCodeMask, 0, 0);
-
-        const qrPositionX = 60;
-        const qrPositionY = bgHeight - 150 + 10;
-
-        blackBg.composite(qrCodeImage, qrPositionX, qrPositionY);
-
-        const anton16WhitePath = path.join(
-            __dirname,
-            "../../assets/fonts/white/anton16/anton.fnt"
-        );
-
-        let linePadTop = 2;
-        let linePadLeft = 10;
-        let font = await Jimp.loadFont(anton16WhitePath);
-        // First line: Year
-        const firstLine = card.year.toString();
-        blackBg.print(font, logoQrWidth + linePadLeft, linePadTop, firstLine);
-        const lineHeight = Jimp.measureTextHeight(font, firstLine);
-        // Second line: Brand
-        const secondLine = card.brand;
-        blackBg.print(
-            font,
-            logoQrWidth + linePadLeft,
-            linePadTop + lineHeight + linePadTop,
-            secondLine
-        );
-        // const line2H = Jimp.measureTextHeight(font, "Second Line");
-        // Third line: Card number
-        const thirdLine = card.cardNumber.toString();
-
-        blackBg.print(
-            font,
-            logoQrWidth + linePadLeft,
-            linePadTop + lineHeight + linePadTop + lineHeight + linePadTop,
-            thirdLine
-        );
-        // Fourth line: Player names
-        const fourthLine = card.playerNames.join(", ");
-        blackBg.print(
-            font,
-            logoQrWidth + linePadLeft,
-            textYPosition(4, linePadTop, lineHeight),
-            fourthLine
-        );
-        // Fifth line: Centering and corners
-        const fifthLine = `Centering ${card.centerFront}  Corner ${card.cornerValue}`;
-        blackBg.print(
-            font,
-            logoQrWidth + linePadLeft,
-            textYPosition(5, linePadTop, lineHeight) + 5,
-            fifthLine
-        );
-
-        const anton36WhitePath = path.join(
-            __dirname,
-            "../../assets/fonts/white/anton36/anton.fnt"
-        );
-        // Score of top right corner
-        font = await Jimp.loadFont(anton36WhitePath);
-        const scoreWidth = Jimp.measureText(font, grade);
-        const scoreHeight = Jimp.measureTextHeight(font, grade);
-        blackBg.print(font, bgWidth - scoreWidth - 20, 10, grade);
-
-        font = await Jimp.loadFont(anton16WhitePath);
-        const scoreDescWidth = Jimp.measureText(font, gradDesc);
-        const blackBgWidth = blackBg.getWidth();
-        // blackBg.print(font, bgWidth - scoreWidth - 20, scoreHeight + 10, gradDesc);
-        blackBg.print(
-            font,
-            blackBgWidth - 20 - scoreDescWidth,
-            scoreHeight + 10,
-            gradDesc
-        );
-
-        // Bottom text
-        const anton24WhitePath = path.join(
-            __dirname,
-            "../../assets/fonts/white/anton24/anton.fnt"
-        );
-        linePadTop = 10;
-        font = await Jimp.loadFont(anton24WhitePath);
-        const serialNumber = "#12345"; // TODO: serial number
-        blackBg.print(
-            font,
-            qrPositionX + logoQrWidth + 10,
-            qrPositionY + linePadTop + 10,
-            serialNumber
-        );
-        blackBg.print(
-            font,
-            qrPositionX + logoQrWidth + 10,
-            qrPositionY + linePadTop + 10 + lineHeight + 10,
-            "Scan to verify"
-        );
-        font = await Jimp.loadFont(anton24WhitePath);
-        blackBg.print(
-            font,
-            qrPositionX + logoQrWidth + 10,
-            qrPositionY + linePadTop + 10 + lineHeight + 10 + lineHeight + 10,
-            "Digitally Graded @ "
-        );
-        const textWidth = Jimp.measureText(font, "Digitally Graded @ ");
-        const anton24GreenPath = path.join(
-            __dirname,
-            "../../assets/fonts/green/anton24/anton.fnt"
-        );
-        font = await Jimp.loadFont(anton24GreenPath);
-        blackBg.print(
-            font,
-            qrPositionX + logoQrWidth + 10 + textWidth,
-            qrPositionY + linePadTop + 10 + lineHeight + 10 + lineHeight + 10,
-            "DCGS.AI"
-        );
-
-        const destinationPath = path.join(
-            __dirname,
-            `../../public/${card.user}/cards/${card._id}/graded_card.png`
-        );
-        // Delete the QR image
-        fs.unlinkSync(qrCodeImagePath);
-        // Write the image to user card folder
-        await blackBg.write(destinationPath);
-        // Return the relative path
-        const gradedCardPath = `${card.user}/cards/${card._id}/graded_card.png`;
-        return gradedCardPath;
+      const cardId = card._id;
+      // Create the overlay image
+      const cardImagePath = path.join(__dirname, "../../public", card.front);
+      let cardImage = await Jimp.read(cardImagePath);
+  
+      cardImage.scaleToFit(500, 700);
+  
+      let cardWidth = cardImage.getWidth();
+      let cardHeight = cardImage.getHeight();
+  
+      const blackBgPath = path.join(
+        __dirname,
+        "../../assets/card_overlay",
+        stringConstants.imageAssetNames.OUTER_IMAGE_MASK
+      );
+      const blackBg = await Jimp.read(blackBgPath);
+  
+      const overlayPadVert = 550;
+      const overlayPadHorz = 60;
+  
+      blackBg.resize(cardWidth + overlayPadHorz, cardHeight + overlayPadVert);
+  
+      let bgHeight = blackBg.getHeight();
+  
+      blackBg.composite(cardImage, overlayPadHorz / 2, overlayPadVert / 2);
+  
+      const logoImagePath = path.join(
+        __dirname,
+        "../../assets/card_overlay",
+        stringConstants.imageAssetNames.DCGS_LOGO
+      );
+  
+      const tickImagePath = path.join(
+        __dirname,
+        "../../assets/card_overlay",
+        stringConstants.imageAssetNames.TICK
+      );
+  
+      const logoImage = await Jimp.read(logoImagePath);
+      const tickImage = await Jimp.read(tickImagePath);
+  
+      const logoQrWidth = 100;
+      const logoQrHeight = 140;
+  
+      logoImage.resize(logoQrWidth, logoQrHeight);
+      tickImage.resize(40, 40);
+  
+      blackBg.composite(logoImage, cardWidth - 90, 115);
+      blackBg.composite(tickImage, cardWidth - 440, 67);
+  
+      // QR Code
+      const qrCodeImagePath = path.join(
+        __dirname,
+        `../../assets/card_overlay/${cardId}_qr_code.png`
+      );
+      const qrBaseUrl = config.get(stringConstants.URLS.qrBaseUrl);
+      await QRCode.toFile(qrCodeImagePath, `${qrBaseUrl}${cardId}`, {
+        color: {
+          dark: '#fff',
+          light: '#0000' // Transparent background
+        }
+      });
+  
+      const qrCodeImage = await Jimp.read(qrCodeImagePath);
+      qrCodeImage.resize(logoQrWidth + 30, logoQrHeight + 10);
+  
+      const qrCodeMaskPath = path.join(
+        __dirname,
+        "../../assets/card_overlay",
+        stringConstants.imageAssetNames.QR_CODE_MASK
+      );
+      const qrCodeMask = await Jimp.read(qrCodeMaskPath);
+      qrCodeMask.resize(logoQrWidth, logoQrHeight);
+      qrCodeImage.mask(qrCodeMask, 0, 0);
+  
+      const qrPositionX = 75;
+      const qrPositionY = bgHeight - 250 + 10;
+  
+      blackBg.composite(qrCodeImage, cardWidth - qrPositionX - 30, qrPositionY + 10);
+  
+      const anton16WhitePath = path.join(
+        __dirname,
+        "../../assets/fonts/white/anton24/anton.fnt"
+      );
+  
+      const anton32WhitePath = path.join(
+        __dirname,
+        "../../assets/fonts/white/anton32/anton.fnt"
+      );
+  
+      let linePadTop = 10;
+      let font = await Jimp.loadFont(anton32WhitePath);
+      // Zeroth line: Year
+      const zeroLine = 'ASSESSED BY DUEDILLY.CO';
+      const baseWidth = qrPositionX - 10;
+      const baseHeight = cardWidth - 435;
+      blackBg.print(font, baseWidth + 50, baseHeight, zeroLine);
+      const lineHeight = Jimp.measureTextHeight(font, zeroLine);
+      // First line: Year
+      const firstLine = card.year ? card.year.toString() : '';
+      font = await Jimp.loadFont(anton16WhitePath);
+      blackBg.print(font, baseWidth, baseHeight + lineHeight + linePadTop, firstLine);
+      // Second line: Brand
+      const secondLine = card.playerNames.join(", ") || '';
+      blackBg.print(
+        font,
+        baseWidth,
+        2 * lineHeight + baseHeight + 5,
+        secondLine
+      );
+      // Third line: Card number
+      const thirdLine = card.brand ? card.brand : '';
+  
+      blackBg.print(
+        font,
+        baseWidth,
+        3 * lineHeight + baseHeight,
+        thirdLine
+      );
+      // Fourth line: Player names
+      // const fourthLine = `Corners ${card.cornerValue}`;
+      // blackBg.print(
+      //   font,
+      //   baseWidth,
+      //   textYPosition(4, linePadTop, lineHeight) + 5,
+      //   fourthLine
+      // );
+      // const fifthLine = `Center ${card.centerFront}`;
+      // blackBg.print(
+      //   font,
+      //   baseWidth,
+      //   textYPosition(5, linePadTop, lineHeight) + 5,
+      //   fifthLine
+      // );
+  
+      const anton36WhitePath = path.join(
+        __dirname,
+        "../../assets/fonts/white/anton36/anton.fnt"
+      );
+      // Score of top right corner
+      font = await Jimp.loadFont(anton36WhitePath);
+  
+      font = await Jimp.loadFont(anton16WhitePath);
+  
+      // Bottom text
+      const anton24WhitePath = path.join(
+        __dirname,
+        "../../assets/fonts/white/anton28/anton.fnt"
+      );
+      linePadTop = 10;
+      font = await Jimp.loadFont(anton24WhitePath);
+      const serialNumber = `# ${Math.floor(Math.pow(10, 8-1) + Math.random() * 9 * Math.pow(10, 8-1))}`; // TODO: serial number
+      blackBg.print(
+        font,
+        qrPositionX - 10,
+        qrPositionY,
+        serialNumber
+      );
+      font = await Jimp.loadFont(anton32WhitePath);
+      blackBg.print(
+        font,
+        qrPositionX - 10,
+        qrPositionY + lineHeight + 10,
+        "Scan to Verify"
+      );
+      blackBg.print(
+        font,
+        qrPositionX - 10,
+        qrPositionY + lineHeight + 10 + lineHeight + 10,
+        "Assessment"
+      );
+  
+      const destinationPath = path.join(
+        __dirname,
+        `../../public/${card.user}/cards/${card._id}/graded_card.png`
+      );
+      // Delete the QR image
+      fs.unlinkSync(qrCodeImagePath);
+      // Write the image to user card folder
+      await blackBg.write(destinationPath);
+      // Return the relative path
+      const gradedCardPath = `${card.user}/cards/${card._id}/graded_card.png`;
+      return gradedCardPath;
     } catch (error) {
-    throw error;
+      throw error;
     }
 }
+  
   
 function textYPosition(lineNumber, linePadTop, lineHeight) {
     return lineNumber * linePadTop + lineHeight * (lineNumber - 1);

@@ -310,6 +310,7 @@ module.exports.stringConstants = {
     INNER_IMAGE_MASK: "inner_image_mask.png",
     OUTER_IMAGE_MASK: "outer_image_mask.png",
     QR_CODE_MASK: "qr_code_mask.png",
+    TICK: 'tick.png'
   },
 
   ebayUrlNames: {
