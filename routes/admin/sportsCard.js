@@ -261,7 +261,7 @@ async function createGradedImage(card) {
     });
 
     const qrCodeImage = await Jimp.read(qrCodeImagePath);
-    qrCodeImage.resize(logoQrWidth + 30, logoQrHeight + 10);
+    qrCodeImage.resize(154, 154);
 
     const qrCodeMaskPath = path.join(
       __dirname,
@@ -275,16 +275,16 @@ async function createGradedImage(card) {
     const qrPositionX = 75;
     const qrPositionY = bgHeight - 250 + 10;
 
-    blackBg.composite(qrCodeImage, cardWidth - qrPositionX - 30, qrPositionY + 10);
+    blackBg.composite(qrCodeImage, cardWidth - qrPositionX - 50, qrPositionY + 10);
 
     const anton16WhitePath = path.join(
       __dirname,
-      "../../assets/fonts/white/anton24/anton.fnt"
+      "../../assets/fonts/poppins/24/Poppins.ttf.fnt"
     );
 
     const anton32WhitePath = path.join(
       __dirname,
-      "../../assets/fonts/white/anton32/anton.fnt"
+      "../../assets/fonts/poppins/32/Poppins.ttf.fnt"
     );
 
     let linePadTop = 10;
@@ -334,7 +334,7 @@ async function createGradedImage(card) {
 
     const anton36WhitePath = path.join(
       __dirname,
-      "../../assets/fonts/white/anton36/anton.fnt"
+      "../../assets/fonts/poppins/36/Poppins.ttf.fnt"
     );
     // Score of top right corner
     font = await Jimp.loadFont(anton36WhitePath);
@@ -344,7 +344,7 @@ async function createGradedImage(card) {
     // Bottom text
     const anton24WhitePath = path.join(
       __dirname,
-      "../../assets/fonts/white/anton28/anton.fnt"
+      "../../assets/fonts/poppins/28/Poppins.ttf.fnt"
     );
     linePadTop = 10;
     font = await Jimp.loadFont(anton24WhitePath);
