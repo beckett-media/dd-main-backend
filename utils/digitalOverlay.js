@@ -3,13 +3,14 @@ const path = require("path");
 const fs = require("fs");
 const QRCode = require("qrcode");
 const config = require("config");
+const { stringConstants } = require("../utils/constants");
 
 async function createGradedImage(card) {
   try {
     const cardId = card._id;
     const userId = card.user;
     // Create the overlay image
-    const cardImagePath = path.join(__dirname, "../../public", card.front);
+    const cardImagePath = path.join(__dirname, "../public", card.front);
     let cardImage = await Jimp.read(cardImagePath);
 
     cardImage.scaleToFit(500, 700);
@@ -19,7 +20,7 @@ async function createGradedImage(card) {
 
     const blackBgPath = path.join(
       __dirname,
-      "../../assets/card_overlay",
+      "../assets/card_overlay",
       stringConstants.imageAssetNames.OUTER_IMAGE_MASK
     );
     const blackBg = await Jimp.read(blackBgPath);
@@ -35,13 +36,13 @@ async function createGradedImage(card) {
 
     const logoImagePath = path.join(
       __dirname,
-      "../../assets/card_overlay",
+      "../assets/card_overlay",
       stringConstants.imageAssetNames.DCGS_LOGO
     );
 
     const tickImagePath = path.join(
       __dirname,
-      "../../assets/card_overlay",
+      "../assets/card_overlay",
       stringConstants.imageAssetNames.TICK
     );
 
@@ -60,7 +61,7 @@ async function createGradedImage(card) {
     // QR Code
     const qrCodeImagePath = path.join(
       __dirname,
-      `../../assets/card_overlay/${cardId}_qr_code.png`
+      `../assets/card_overlay/${cardId}_qr_code.png`
     );
     const qrBaseUrl = config.get(stringConstants.URLS.qrBaseUrl);
     await QRCode.toFile(qrCodeImagePath, `${qrBaseUrl}${userId}/cards/${cardId}/graded_card.png`, {
@@ -75,7 +76,7 @@ async function createGradedImage(card) {
 
     const qrCodeMaskPath = path.join(
       __dirname,
-      "../../assets/card_overlay",
+      "../assets/card_overlay",
       stringConstants.imageAssetNames.QR_CODE_MASK
     );
     const qrCodeMask = await Jimp.read(qrCodeMaskPath);
@@ -89,12 +90,12 @@ async function createGradedImage(card) {
 
     const anton16WhitePath = path.join(
       __dirname,
-      "../../assets/fonts/poppins/24/Poppins.ttf.fnt"
+      "../assets/fonts/poppins/24/Poppins.ttf.fnt"
     );
 
     const anton32WhitePath = path.join(
       __dirname,
-      "../../assets/fonts/poppins/32/Poppins.ttf.fnt"
+      "../assets/fonts/poppins/32/Poppins.ttf.fnt"
     );
 
     let linePadTop = 10;
@@ -144,7 +145,7 @@ async function createGradedImage(card) {
 
     const anton36WhitePath = path.join(
       __dirname,
-      "../../assets/fonts/poppins/36/Poppins.ttf.fnt"
+      "../assets/fonts/poppins/36/Poppins.ttf.fnt"
     );
     // Score of top right corner
     font = await Jimp.loadFont(anton36WhitePath);
@@ -154,7 +155,7 @@ async function createGradedImage(card) {
     // Bottom text
     const anton24WhitePath = path.join(
       __dirname,
-      "../../assets/fonts/poppins/28/Poppins.ttf.fnt"
+      "../assets/fonts/poppins/28/Poppins.ttf.fnt"
     );
     linePadTop = 10;
     font = await Jimp.loadFont(anton24WhitePath);
@@ -181,7 +182,7 @@ async function createGradedImage(card) {
 
     const destinationPath = path.join(
       __dirname,
-      `../../public/${card.user}/cards/${card._id}/graded_card.png`
+      `../public/${card.user}/cards/${card._id}/graded_card.png`
     );
     // Delete the QR image
     fs.unlinkSync(qrCodeImagePath);
