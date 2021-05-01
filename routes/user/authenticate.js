@@ -29,7 +29,9 @@ router.post(
     const deviceToken = req.body.deviceToken;
     const osType = req.body.osType;
     let firstSignin = false;
+    console.log('email----------', email);
     let user = await User.findOne({ email });
+    console.log('user---------', user);
     if (!user)
       return res
         .status(404)
