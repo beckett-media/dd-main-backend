@@ -616,7 +616,7 @@ router.post(
 
     user = await User.findOneAndUpdate(
       { email },
-      { $set: { password: encrypterNewPass } }
+      { $set: { password: encrypterNewPass, isOTPVerified: false } }
     );
 
     return res.send(
