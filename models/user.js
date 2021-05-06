@@ -102,6 +102,13 @@ const userSchema = new mongoose.Schema(
         ],
       },
     },
+    otp: {
+      type: Number
+    },
+    isOTPVerified: {
+      type: Boolean,
+      default: false
+    }
   },
   { timestamps: true }
 );

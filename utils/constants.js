@@ -43,8 +43,11 @@ module.exports.stringConstants = {
   USER_EMAIL_ALREADY_EXISTS: "User with the given email already exists",
 
   USER_EMAIL_NOT_FOUND: "User with the given email not found",
+  OTP_NOT_VERIFIED: "Please verify the OTP first and try again",
 
   USER_ID_DOEST_NOT_EXISTS: "User with the given ID does not exists",
+  NO_OTP: "No OTP found in the system. Please re-generate the OTP",
+  INVALID_OTP: "Invalid OTP",
 
   NO_AUTH_TOKEN_FOUND: "No auth token found",
 
@@ -84,6 +87,9 @@ module.exports.stringConstants = {
   CARD_DETAILS: 'Card detials',
 
   PASSWORD_UPDATED_SUCCESSFULLY: "Password updated successfully",
+  VERIFY_OTP: 'OTP Verified',
+  OTP_GENERATED: "OTP Sent to your Email",
+  OTP_GENERATE_ISSUE: "Issue while generating OTP, Try Again",
 
   INVALID_APPLE_TOKEN_OR_TOKEN_EXPIRED: "Invalid Apple token or token expired",
 
