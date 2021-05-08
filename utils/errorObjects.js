@@ -91,6 +91,26 @@ module.exports.errorObjects = {
     errorSubCode: getKey(stringConstants, stringConstants.USER_EMAIL_NOT_FOUND),
     errorMessage: stringConstants.USER_EMAIL_NOT_FOUND,
   },
+  OTP_GENERATE_ISSUE: {
+    errorCode: 400,
+    errorSubCode: getKey(stringConstants, stringConstants.OTP_GENERATE_ISSUE),
+    errorMessage: stringConstants.OTP_GENERATE_ISSUE,
+  },
+  INVALID_OTP: {
+    errorCode: 401,
+    errorSubCode: getKey(stringConstants, stringConstants.INVALID_OTP),
+    errorMessage: stringConstants.INVALID_OTP,
+  },
+  NO_OTP: {
+    errorCode: 402,
+    errorSubCode: getKey(stringConstants, stringConstants.NO_OTP),
+    errorMessage: stringConstants.NO_OTP,
+  },
+  OTP_NOT_VERIFIED: {
+    errorCode: 403,
+    errorSubCode: getKey(stringConstants, stringConstants.OTP_NOT_VERIFIED),
+    errorMessage: stringConstants.OTP_NOT_VERIFIED,
+  },
   INCORRECT_PASSWORD: {
     errorCode: 113,
     errorSubCode: getKey(stringConstants, stringConstants.INCORRECT_PASSWORD),

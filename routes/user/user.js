@@ -504,7 +504,8 @@ router.post(
     return res.send(
       createResObject(
         true,
-        stringConstants.OTP_GENERATE_ISSUE
+        stringConstants.OTP_GENERATE_ISSUE,
+        errorObjects.OTP_GENERATE_ISSUE
       )
     );
   }
