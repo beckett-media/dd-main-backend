@@ -6,7 +6,8 @@
   "scripts": {
     "test": "NODE_ENV=test mocha --timeout 3000 --recursive --sort --exit",
     "test-coverage": "NODE_ENV=test nyc mocha --timeout 3000 --recursive --sort --exit",
-    "dev": "NODE_ENV=development nodemon index.js"
+    "dev": "NODE_ENV=development nodemon index.js",
+    "prod": "NODE_ENV=production nodemon index.js"
   },
   "author": "Love Bhardwaj (SimpleDev.Solutions)",
   "license": "ISC",
