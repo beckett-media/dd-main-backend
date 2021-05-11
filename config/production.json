@@ -1,6 +1,6 @@
 {
-  "ebayoAuthUrl": "https://api.sandbox.ebay.com/identity/v1/oauth2/token",
-  "ebayGetUserUrl": "https://apiz.sandbox.ebay.com/commerce/identity/v1/user/",
+  "ebayoAuthUrl": "https://api.ebay.com/identity/v1/oauth2/token",
+  "ebayGetUserUrl": "https://apiz.ebay.com/commerce/identity/v1/user/",
   "ebayGetRefreshToken": "https://api.ebay.com/identity/v1/oauth2/token",
   "qrBaseUrl": "http://3.139.34.166/",
   "dbConnectionString": "mongodb://localhost:27017/snap_grade_test",
