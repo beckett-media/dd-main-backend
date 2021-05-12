@@ -67,12 +67,12 @@ router.get("/ebay-get-oauth", appAuth, async (req, res) => {
         form: {
           grant_type: "authorization_code",
           code: code,
-          redirect_uri: config.get('eBayClientId')
+          redirect_uri: config.get('eBayRuname')
         },
         responseType: "json",
       }
     );
-    console.log('clinet------------------', config.get('eBayClientId'));
+    console.log('clinet--------eBayRuname----------', config.get('eBayRuname'));
     console.log('body---------------', body);
     let returnObject = {};
     res.header(stringConstants.EBAY_ACCESS_TOKEN, body.access_token);
