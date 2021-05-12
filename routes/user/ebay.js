@@ -65,7 +65,7 @@ router.get("/ebay-get-oauth", appAuth, async (req, res) => {
         form: {
           grant_type: "authorization_code",
           code: code,
-          redirect_uri: "Anurag_Singla-AnuragSi-DCGS-S-sqsppiy",
+          redirect_uri: config.get('eBayClientId')
         },
         responseType: "json",
       }
