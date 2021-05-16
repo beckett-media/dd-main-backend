@@ -8,7 +8,7 @@ const getMessage = ({
 }) => {
       return {
         to: email,
-        from: 'bahl.chahatbahl@gmail.com',
+        from: 'support@duedilly.co',
         subject,
         text
       };
