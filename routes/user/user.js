@@ -503,7 +503,7 @@ router.post(
 
     return res.send(
       createResObject(
-        true,
+        false,
         stringConstants.OTP_GENERATE_ISSUE,
         errorObjects.OTP_GENERATE_ISSUE
       )
