@@ -53,10 +53,8 @@ router.get("/ebay-get-oauth", appAuth, async (req, res) => {
   const authorizationString = `${clientId}:${clientSecret}`;
   const authorization = Buffer.from(authorizationString).toString("base64");
   const token = `Basic ${authorization}`;
-  console.log('token------------', token);
 
   try {
-    console.log('URL-------------', config.get(stringConstants.ebayUrlNames.EBAY_O_AUTH));
     const { body } = await got.post(
       config.get(stringConstants.ebayUrlNames.EBAY_O_AUTH),
       {
@@ -72,8 +70,6 @@ router.get("/ebay-get-oauth", appAuth, async (req, res) => {
         responseType: "json",
       }
     );
-    console.log('clinet--------eBayRuname----------', config.get('eBayRuname'));
-    console.log('body---------------', body);
     let returnObject = {};
     res.header(stringConstants.EBAY_ACCESS_TOKEN, body.access_token);
     res.header(stringConstants.EBAY_REFRESH_TOKEN, body.refresh_token);
@@ -86,6 +82,7 @@ router.get("/ebay-get-oauth", appAuth, async (req, res) => {
     );
   } catch (error) {
     SimpleLogger.error(error);
+    
     return res
       .status(400)
       .send(

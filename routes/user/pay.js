@@ -98,12 +98,12 @@ router.post(
         }
 
         // create card grading image
-        await createGradedImage(card);
+        const gradedImage = await createGradedImage(card);
 
         // check for value returned
         await Card.findByIdAndUpdate(
           cardId,
-          { $set: { status: stringConstants.cardState.GRADED, grading } }
+          { $set: { status: stringConstants.cardState.GRADED, grading, gradedImage } }
         );
 
         // reducing cards left in subscription by 1
