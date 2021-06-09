@@ -121,6 +121,11 @@ module.exports.errorObjects = {
     errorSubCode: getKey(stringConstants, stringConstants.CARD_ID_NOT_FOUND),
     errorMessage: stringConstants.CARD_ID_NOT_FOUND,
   },
+  CARD_ALREADY_EXIST: {
+    errorCode: 214,
+    errorSubCode: getKey(stringConstants, stringConstants.CARD_ALREADY_EXIST),
+    errorMessage: stringConstants.CARD_ALREADY_EXIST,
+  },
 
   APP_TOKEN_INVALID_OR_EXPIRED: {
     errorCode: 115,
