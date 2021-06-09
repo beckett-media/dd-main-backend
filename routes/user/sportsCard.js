@@ -906,7 +906,7 @@ router.get(
       { $sort : { createdAt : 1 } },
       { $limit: pageSize }
     ]);
-    const [onlyCollection] = collectionCards;
+    const [onlyCollection = {}] = collectionCards || [];
     const { card: innerCards = [] } = onlyCollection;
     const stringCards = innerCards.map(card => card.toString());
     
