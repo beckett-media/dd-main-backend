@@ -908,13 +908,13 @@ router.get(
     ]);
     const [onlyCollection = {}] = collectionCards || [];
     const { card: innerCards = [] } = onlyCollection;
-    const stringCards = innerCards.map(card => card.toString());
+    const stringCards = innerCards.length > 0 ? JSON.stringify(innerCards.map(card => card.toString())) : [];
     
     cards = cards.map(card => {
-      const { _id = '' } = card;
+      const { id = '' } = card;
       return {
         ...card,
-        inCollection: stringCards.includes(_id.toString())
+        inCollection: stringCards.includes(id.toString())
       }
     })
 
