@@ -1,4 +1,5 @@
 const express = require("express");
+const mongoose = require("mongoose");
 const router = express.Router();
 const auth = require("../../middlewares/authenticateUser");
 const appAuth = require("../../middlewares/authenticateApp");
@@ -11,6 +12,7 @@ const currency = require("../../utils/currency");
 const Jimp = require("jimp");
 const { User } = require("../../models/user");
 const { Card } = require("../../models/card");
+const { Collection } = require("../../models/collection");
 const { PendingDeletion } = require("../../models/pendingDeletion");
 const { stringConstants } = require("../../utils/constants");
 const { errorObjects } = require("../../utils/errorObjects");
@@ -891,6 +893,30 @@ router.get(
     cards = cards.map((card) => {
       return card.getCardDetailsWithGrading();
     });
+
+    const collectionCards = await Collection.aggregate([
+      { $match: { user: mongoose.Types.ObjectId(userId) } },
+      { $group: {
+              _id: { user: "$user" },
+              user:  { $first: "$user" },
+              card: { $addToSet: "$card" }
+          }
+      },
+      { $skip: (pageNumber - 1) * pageSize },
+      { $sort : { createdAt : 1 } },
+      { $limit: pageSize }
+    ]);
+    const [onlyCollection] = collectionCards;
+    const { card: innerCards = [] } = onlyCollection;
+    const stringCards = innerCards.map(card => card.toString());
+    
+    cards = cards.map(card => {
+      const { _id = '' } = card;
+      return {
+        ...card,
+        inCollection: stringCards.includes(_id.toString())
+      }
+    })
 
     return res.send(
       createResObject(
