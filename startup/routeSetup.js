@@ -1,5 +1,6 @@
 const user = require("../routes/user/user");
 const subscription = require("../routes/user/subscription");
+const collection = require('../routes/myCollection/collection');
 const authenticate = require("../routes/user/authenticate");
 const payment = require("../routes/user/payment");
 const authToken = require("../routes/common/authToken");
@@ -18,6 +19,7 @@ module.exports = (app) => {
   // Import route and use app.use();
   app.use("/user", user);
   app.use("/subscription", subscription);
+  app.use("/collection", collection);
   app.use("/authenticate", authenticate);
   app.use("/payment", payment);
   app.use("/auth-token", authToken);

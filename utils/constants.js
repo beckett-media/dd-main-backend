@@ -46,6 +46,7 @@ module.exports.stringConstants = {
   OTP_NOT_VERIFIED: "Please verify the OTP first and try again",
 
   USER_ID_DOEST_NOT_EXISTS: "User with the given ID does not exists",
+  CARD_ALREADY_EXIST: "Card already exist in collection",
   NO_OTP: "No OTP found in the system. Please re-generate the OTP",
   INVALID_OTP: "Invalid OTP",
 
@@ -166,7 +167,8 @@ module.exports.stringConstants = {
     GLOBAL_REQ_RATE_RECORDS: "global_req_rate_records",
     WRONG_SIGNIN_REQ_RECORDS: "wrong_signin_req_records",
     QUESTIONS_COLLECTION: "Question",
-    SUBSCRIPTION_COLLECTION: "Subscription"
+    SUBSCRIPTION_COLLECTION: "Subscription",
+    MY_COLLECTION: "Collection"
   },
 
   deletionType: {
