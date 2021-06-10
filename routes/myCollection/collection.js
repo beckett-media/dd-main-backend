@@ -81,15 +81,15 @@ router.get(
 
         const collection = await Collection.aggregate([
             { $match: { user: mongoose.Types.ObjectId(userId) } },
+            { $skip: (pageNumber - 1) * pageSize },
+            { $sort : { createdAt : 1 } },
+            { $limit: pageSize },
             { $group: {
                     _id: { user: "$user" },
                     user:  { $first: "$user" },
                     card: { $addToSet: "$card" }
                 }
-            },
-            { $skip: (pageNumber - 1) * pageSize },
-            { $sort : { createdAt : 1 } },
-            { $limit: pageSize }
+            }
         ]);
 
         if (collection && collection.length) {
