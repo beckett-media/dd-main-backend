@@ -1,10 +1,14 @@
 module.exports = {
-    center: {
-        url: 'http://52.175.212.243:5000',
-        point: 'centering_score'
-    },
-    corner: {
-        url: 'http://52.175.212.243:5000',
-        point: 'corners_score'
-    }
+	center: {
+		url: "http://localhost:3000",
+		point: "centering_score",
+	},
+	corner: {
+		url: "http://localhost:3000",
+		point: "corners_score",
+	},
+	combined: {
+		url: "http://localhost:3000",
+		point: "get_score",
+	},
 };
