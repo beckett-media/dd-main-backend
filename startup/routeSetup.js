@@ -1,6 +1,6 @@
 const user = require("../routes/user/user");
 const subscription = require("../routes/user/subscription");
-const collection = require("../routes/myCollection/collection");
+const collection = require('../routes/myCollection/collection');
 const authenticate = require("../routes/user/authenticate");
 const payment = require("../routes/user/payment");
 const authToken = require("../routes/common/authToken");

@@ -48,6 +48,7 @@ module.exports = async (req, res, next) => {
             errorObjects.USER_ID_DOEST_NOT_EXISTS
           )
         );
+        return next();
 
     if (role !== stringConstants.role.ADMIN || role !== user.role) {
       //   Forbidden resource

@@ -65,7 +65,7 @@ router.get("/ebay-get-oauth", appAuth, async (req, res) => {
         form: {
           grant_type: "authorization_code",
           code: code,
-          redirect_uri: "Anurag_Singla-AnuragSi-DCGS-S-sqsppiy",
+          redirect_uri: config.get('eBayRuname')
         },
         responseType: "json",
       }
@@ -82,6 +82,7 @@ router.get("/ebay-get-oauth", appAuth, async (req, res) => {
     );
   } catch (error) {
     SimpleLogger.error(error);
+    
     return res
       .status(400)
       .send(
@@ -166,4 +167,5 @@ router.get("/ebay-refresh-token", appAuth, async (req, res) => {
       );
   }
 });
+
 module.exports = router;

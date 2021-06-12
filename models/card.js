@@ -33,8 +33,17 @@ const cardSchema = new mongoose.Schema(
     brand: {
       type: String,
     },
+    modelNo: {
+      type: String,
+    },
+    serialNo: {
+      type: String,
+    },
+    cardType: {
+      type: String,
+    },
     cardNumber: {
-      type: Number,
+      type: String,
     },
     playerNames: [{ type: String }],
     user: {
@@ -56,18 +65,8 @@ const cardSchema = new mongoose.Schema(
       default: false,
     },
     grading: {
-      signedCeleb: { type: Number },
-      cornerValue: { type: Number },
-      edgeValue: { type: Number },
-      surfaceValue: { type: Number },
-      eyeAppeal: { type: Number },
-      centerFront: { type: Number },
-      centerBack: { type: Number },
-      cardStains: { type: Number },
-      cardSleeving: { type: Number },
-      printingDefects: { type: Number },
-      grade: { type: String },
-      gradeDesc: { type: String },
+      centering: { type: String },
+      corners: { type: Object }
     },
   },
   { timestamps: true, toJSON: { getters: true } }
@@ -79,10 +78,8 @@ cardSchema.methods.checkIfCompleted = function () {
   return (
     !!this.front &&
     !!this.back &&
-    !!this.video &&
     !!this.year &&
     !!this.brand &&
-    !!this.cardNumber &&
     !!this.playerNames.length > 0
   );
 };
@@ -98,6 +95,9 @@ cardSchema.methods.getCardDetails = function () {
   const gradedImage = this.gradedImage || null;
   const year = this.year || null;
   const brand = this.brand || null;
+  const modelNo = this.modelNo || null;
+  const serialNo = this.serialNo || null;
+  const cardType = this.cardType || null;
   const cardNumber = this.cardNumber || null;
   const playerNames = this.playerNames || null;
   const createdAt = this.createdAt || null;
@@ -116,6 +116,9 @@ cardSchema.methods.getCardDetails = function () {
     playerNames,
     createdAt,
     updatedAt,
+    modelNo,
+    cardType,
+    serialNo
   };
 };
 /**
@@ -130,10 +133,13 @@ cardSchema.methods.getCardDetailsWithGrading = function () {
   const gradedImage = this.gradedImage || null;
   const year = this.year || null;
   const brand = this.brand || null;
+  const modelNo = this.modelNo || null;
+  const serialNo = this.serialNo || null;
+  const cardType = this.cardType || null;
   const cardNumber = this.cardNumber || null;
   const playerNames = this.playerNames || null;
   const status = this.status || null;
-  const grading = gradingEmpty(this.grading) ? null : this.grading;
+  const grading = this.grading || null;
   const createdAt = this.createdAt || null;
   const updatedAt = this.updatedAt || null;
 
@@ -152,6 +158,9 @@ cardSchema.methods.getCardDetailsWithGrading = function () {
     status,
     createdAt,
     updatedAt,
+    modelNo,
+    serialNo,
+    cardType
   };
 };
 /**
@@ -183,18 +192,8 @@ const Card = mongoose.model(
 
 function gradingEmpty(grading) {
   return (
-    !grading.gradeDesc &&
-    !grading.grade &&
-    !grading.signedCeleb &&
-    !grading.cornerValue &&
-    !grading.edgeValue &&
-    !grading.surfaceValue &&
-    !grading.eyeAppeal &&
-    !grading.centerFront &&
-    !grading.centerBack &&
-    !grading.cardStains &&
-    !grading.cardSleeving &&
-    !grading.printingDefects
+    !grading.centering &&
+    !grading.corners
   );
 }
 

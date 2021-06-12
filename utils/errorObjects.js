@@ -60,6 +60,11 @@ module.exports.errorObjects = {
     errorSubCode: getKey(stringConstants, stringConstants.FILE_CORRUPTED),
     errorMessage: stringConstants.FILE_CORRUPTED,
   },
+  BAD_QUALITY: {
+    errorCode: 208,
+    errorSubCode: getKey(stringConstants, stringConstants.BAD_QUALITY),
+    errorMessage: stringConstants.BAD_QUALITY,
+  },
   NO_FILE_FOUND: {
     errorCode: 109,
     errorSubCode: getKey(stringConstants, stringConstants.NO_FILE_FOUND),
@@ -86,6 +91,26 @@ module.exports.errorObjects = {
     errorSubCode: getKey(stringConstants, stringConstants.USER_EMAIL_NOT_FOUND),
     errorMessage: stringConstants.USER_EMAIL_NOT_FOUND,
   },
+  OTP_GENERATE_ISSUE: {
+    errorCode: 400,
+    errorSubCode: getKey(stringConstants, stringConstants.OTP_GENERATE_ISSUE),
+    errorMessage: stringConstants.OTP_GENERATE_ISSUE,
+  },
+  INVALID_OTP: {
+    errorCode: 401,
+    errorSubCode: getKey(stringConstants, stringConstants.INVALID_OTP),
+    errorMessage: stringConstants.INVALID_OTP,
+  },
+  NO_OTP: {
+    errorCode: 402,
+    errorSubCode: getKey(stringConstants, stringConstants.NO_OTP),
+    errorMessage: stringConstants.NO_OTP,
+  },
+  OTP_NOT_VERIFIED: {
+    errorCode: 403,
+    errorSubCode: getKey(stringConstants, stringConstants.OTP_NOT_VERIFIED),
+    errorMessage: stringConstants.OTP_NOT_VERIFIED,
+  },
   INCORRECT_PASSWORD: {
     errorCode: 113,
     errorSubCode: getKey(stringConstants, stringConstants.INCORRECT_PASSWORD),
@@ -95,6 +120,11 @@ module.exports.errorObjects = {
     errorCode: 114,
     errorSubCode: getKey(stringConstants, stringConstants.CARD_ID_NOT_FOUND),
     errorMessage: stringConstants.CARD_ID_NOT_FOUND,
+  },
+  CARD_ALREADY_EXIST: {
+    errorCode: 214,
+    errorSubCode: getKey(stringConstants, stringConstants.CARD_ALREADY_EXIST),
+    errorMessage: stringConstants.CARD_ALREADY_EXIST,
   },
 
   APP_TOKEN_INVALID_OR_EXPIRED: {
@@ -158,6 +188,42 @@ module.exports.errorObjects = {
       stringConstants.NO_PEDNING_CARDS_FOUND_FOR_USER
     ),
     errorMessage: stringConstants.NO_PEDNING_CARDS_FOUND_FOR_USER,
+  },
+
+  NO_CARD: {
+    errorCode: 222,
+    errorSubCode: getKey(
+      stringConstants,
+      stringConstants.NO_CARD
+    ),
+    errorMessage: stringConstants.NO_CARD,
+  },
+
+  API_ERROR: {
+    errorCode: 322,
+    errorSubCode: getKey(
+      stringConstants,
+      stringConstants.API_ERROR
+    ),
+    errorMessage: stringConstants.API_ERROR,
+  },
+
+  NO_CARDS_LEFT_IN_PLAN: {
+    errorCode: 221,
+    errorSubCode: getKey(
+      stringConstants,
+      stringConstants.NO_CARDS_LEFT_IN_PLAN
+    ),
+    errorMessage: stringConstants.NO_CARDS_LEFT_IN_PLAN,
+  },
+
+  AMOUNT_MISMATCH: {
+    errorCode: 134,
+    errorSubCode: getKey(
+      stringConstants,
+      stringConstants.AMOUNT_MISMATCH
+    ),
+    errorMessage: stringConstants.AMOUNT_MISMATCH,
   },
 
   PENDING_AMOUNT_AND_AMOUNT_DO_NOT_MATCH: {

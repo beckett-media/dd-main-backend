@@ -1,9 +1,9 @@
 const questionaireScript = require("../init/initQuestions");
-const productScript = require("../init/initProduct");
-const gradeScript = require("../init/initGrade");
+const subscriptionScript = require("../init/initSubscription");
 
 module.exports = async () => {
-	await questionaireScript();
-	await productScript();
+  await questionaireScript();
+  await subscriptionScript();
+  await productScript();
 	await gradeScript();
 };

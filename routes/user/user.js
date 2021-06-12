@@ -15,11 +15,14 @@ const {
   valRegisterRequest,
   valUsernameRequest,
   valChangePasswordRequest,
+  valNewPasswordRequest,
+  valVerifyOtp
 } = require("../../middlewares/validation");
-const { createResObject } = require("../../utils/utilFunctions");
+const { createResObject, generate } = require("../../utils/utilFunctions");
 const { stringConstants } = require("../../utils/constants");
 const { errorObjects } = require("../../utils/errorObjects");
 const sendNotifications = require("../../utils/sendNotifications");
+const sendMail = require('./../../handler/sendMail');
 
 // Dev remove in production
 const Joi = require("@hapi/joi");
@@ -377,5 +380,236 @@ router.delete("/delete-user", async (req, res) => {
     createResObject(true, {}, `${userArray.length} user deleted`)
   );
 });
+
+/**
+ * GET user subscription
+ */
+router.get("/user-subscription", [appAuth, auth], async (req, res) => {
+  const user = await User.findById(req.user._id);
+  const { subscription = {} } = user;
+  const { cardsLeft = 0, subId = '' } = subscription;
+
+  return res.send(
+    createResObject(
+      true,
+      { cardsLeft, subId },
+      stringConstants.FETCH_SUCESSFUL
+    )
+  );
+});
+
+/**
+ * GET cancel user subscription
+ */
+router.get("/cancel-subscription", [appAuth, auth], async (req, res) => {
+  const user = await User.findById(req.user._id);
+  const { subscription = {} } = user;
+  const { subId = '' } = subscription;
+  if (subId) {
+    const userId = req.user._id;
+    let user = await User.findByIdAndUpdate(
+      userId,
+      {
+        $set: {
+          subscription: {
+            subId: '',
+            cardsLeft: '0'
+          }
+        }
+      }
+    );
+    return res.send(
+      createResObject(
+        true,
+        { user },
+        'Subscription Cancelled'
+      )
+    );
+  }
+  return res.send(createResObject(false, {}, 'No Subscription taken'));
+});
+
+router.get("/authorize", [appAuth, auth], async (req, res) => {
+  // const user = await User.findById(req.user._id);
+  return res.send(
+    createResObject(
+      true,
+      {},
+      'Authorized User'
+    )
+  );
+});
+
+/**
+ * Generate OTP
+ */
+router.post(
+  "/generate-otp",
+  [appAuth],
+  async (req, res) => {
+    const email = req.body.email;
+
+    let user = await User.findOne({ email });
+    if (!user)
+      return res
+        .status(400)
+        .send(
+          createResObject(
+            false,
+            {},
+            stringConstants.USER_EMAIL_NOT_FOUND,
+            errorObjects.USER_EMAIL_NOT_FOUND
+          )
+        );
+
+    const otp = generate(6);
+
+    user = await User.findOneAndUpdate(
+      { email },
+      { $set: { otp, isOTPVerified: false } }
+    );
+
+    const mail = await sendMail({
+      email, subject: 'OTP for Forgot Password',
+      text: `Your forgot password OTP is ${otp}`
+    });
+
+    const { success = false } = mail;
+    if (success) {
+      return res.send(
+        createResObject(
+          true,
+          stringConstants.OTP_GENERATED
+        )
+      );
+    }
+
+    return res.send(
+      createResObject(
+        false,
+        stringConstants.OTP_GENERATE_ISSUE,
+        errorObjects.OTP_GENERATE_ISSUE
+      )
+    );
+  }
+);
+
+/**
+ * Verify OTP
+ */
+router.post(
+  "/verify-otp",
+  [appAuth, valVerifyOtp],
+  async (req, res) => {
+    const otp = req.body.otp;
+    const email = req.body.email;
+
+    let user = await User.findOne({ email });
+    if (!user)
+      return res
+        .status(400)
+        .send(
+          createResObject(
+            false,
+            {},
+            stringConstants.USER_EMAIL_NOT_FOUND,
+            errorObjects.USER_EMAIL_NOT_FOUND
+          )
+        );
+
+    const { otp: dbOtp = 0 } = user;
+    if (dbOtp) {
+      if (dbOtp === Number(otp)) {
+        user = await User.findOneAndUpdate(
+          { email },
+          { $set: { otp: 0, isOTPVerified: true } }
+        );
+      } else {
+        return res
+        .status(500)
+        .send(
+          createResObject(
+            false,
+            {},
+            stringConstants.INVALID_OTP,
+            errorObjects.INVALID_OTP
+          )
+        );
+      }
+    } else {
+      return res
+        .status(500)
+        .send(
+          createResObject(
+            false,
+            {},
+            stringConstants.NO_OTP,
+            errorObjects.NO_OTP
+          )
+        );
+    }
+
+    return res.send(
+      createResObject(
+        true,
+        stringConstants.VERIFY_OTP
+      )
+    );
+  }
+);
+
+/**
+ * Change user password
+ */
+router.post(
+  "/new-password",
+  [appAuth, valNewPasswordRequest],
+  async (req, res) => {
+    const newPassword = req.body.newPassword;
+    const email = req.body.email;
+
+    let user = await User.findOne({ email });
+    if (!user)
+      return res
+        .status(400)
+        .send(
+          createResObject(
+            false,
+            {},
+            stringConstants.USER_EMAIL_NOT_FOUND,
+            errorObjects.USER_EMAIL_NOT_FOUND
+          )
+        );
+
+    const { isOTPVerified = false } = user;
+    if (!isOTPVerified) {
+      return res
+        .status(400)
+        .send(
+          createResObject(
+            false,
+            {},
+            stringConstants.OTP_NOT_VERIFIED,
+            errorObjects.OTP_NOT_VERIFIED
+          )
+        );
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const encrypterNewPass = await bcrypt.hash(newPassword, salt);
+
+    user = await User.findOneAndUpdate(
+      { email },
+      { $set: { password: encrypterNewPass, isOTPVerified: false } }
+    );
+
+    return res.send(
+      createResObject(
+        true,
+        stringConstants.PASSWORD_UPDATED_SUCCESSFULLY
+      )
+    );
+  }
+);
 
 module.exports = router;

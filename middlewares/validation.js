@@ -157,13 +157,60 @@ module.exports = {
     return next();
   },
 
+  valNewPasswordRequest: (req, res, next) => {
+    const schema = Joi.object({
+      newPassword: Joi.string().required().min(6).max(255),
+      email: Joi.string().required()
+    });
+
+    const { error } = schema.validate(req.body);
+    if (error) {
+      return res
+        .status(400)
+        .send(
+          createResObject(
+            false,
+            { errorMessage: error.details[0].message },
+            stringConstants.REQUEST_VALIDATION_FAILED,
+            errorObjects.REQUEST_VALIDATION_ERROR(error.details[0].message)
+          )
+        );
+    }
+    return next();
+  },
+
+  valVerifyOtp: (req, res, next) => {
+    const schema = Joi.object({
+      email: Joi.string().required(),
+      otp: Joi.string().required().min(6)
+    });
+
+    const { error } = schema.validate(req.body);
+    if (error) {
+      return res
+        .status(400)
+        .send(
+          createResObject(
+            false,
+            { errorMessage: error.details[0].message },
+            stringConstants.REQUEST_VALIDATION_FAILED,
+            errorObjects.REQUEST_VALIDATION_ERROR(error.details[0].message)
+          )
+        );
+    }
+    return next();
+  },
+
   valUpdateCardData: (req, res, next) => {
     const currentYear = new Date().getFullYear();
     const schema = Joi.object({
       year: Joi.number().required().min(1000).max(currentYear),
       brand: Joi.string().required().min(1).max(255),
-      cardNumber: Joi.number().required().min(0),
       playerNames: Joi.array().items(Joi.string().required()).required(),
+      modelNo: Joi.string().min(1).max(255),
+      cardType: Joi.string().min(1).max(255),
+      cardNumber: Joi.string().min(1).max(255),
+      serialNo: Joi.string().min(1).max(255)
     });
 
     const { error } = schema.validate(req.body);
@@ -327,6 +374,68 @@ module.exports = {
     const schema = Joi.object({
       amount: Joi.number().required(),
       paymentMethod: Joi.string().required(),
+    });
+
+    const { error } = schema.validate(req.body);
+    if (error) {
+      return res
+        .status(400)
+        .send(
+          createResObject(
+            false,
+            { errorMessage: error.details[0].message },
+            stringConstants.REQUEST_VALIDATION_FAILED,
+            errorObjects.REQUEST_VALIDATION_ERROR(error.details[0].message)
+          )
+        );
+    }
+    return next();
+  },
+  valPaySubReq: (req, res, next) => {
+    const schema = Joi.object({
+      amount: Joi.number().required(),
+      subscriptionId: Joi.string().required(),
+      paymentMethod: Joi.string().required(),
+    });
+
+    const { error } = schema.validate(req.body);
+    if (error) {
+      return res
+        .status(400)
+        .send(
+          createResObject(
+            false,
+            { errorMessage: error.details[0].message },
+            stringConstants.REQUEST_VALIDATION_FAILED,
+            errorObjects.REQUEST_VALIDATION_ERROR(error.details[0].message)
+          )
+        );
+    }
+    return next();
+  },
+  valCard: (req, res, next) => {
+    const schema = Joi.object({
+      cardId: Joi.string().required()
+    });
+
+    const { error } = schema.validate(req.params);
+    if (error) {
+      return res
+        .status(400)
+        .send(
+          createResObject(
+            false,
+            { errorMessage: error.details[0].message },
+            stringConstants.REQUEST_VALIDATION_FAILED,
+            errorObjects.REQUEST_VALIDATION_ERROR(error.details[0].message)
+          )
+        );
+    }
+    return next();
+  },
+  valCardPost: (req, res, next) => {
+    const schema = Joi.object({
+      cardId: Joi.string().required()
     });
 
     const { error } = schema.validate(req.body);

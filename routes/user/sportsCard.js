@@ -1,7 +1,9 @@
 const express = require("express");
+const mongoose = require("mongoose");
 const router = express.Router();
 const auth = require("../../middlewares/authenticateUser");
 const appAuth = require("../../middlewares/authenticateApp");
+const { valCard } = require("../../middlewares/validation");
 const SimpleLogger = require("../../utils/simpleLogger");
 const path = require("path");
 const fsPromises = require("fs").promises;
@@ -10,6 +12,7 @@ const currency = require("../../utils/currency");
 const Jimp = require("jimp");
 const { User } = require("../../models/user");
 const { Card } = require("../../models/card");
+const { Collection } = require("../../models/collection");
 const { PendingDeletion } = require("../../models/pendingDeletion");
 const { stringConstants } = require("../../utils/constants");
 const { errorObjects } = require("../../utils/errorObjects");
@@ -25,6 +28,7 @@ const {
   valUpdateCardData,
   valPageSizeNumber,
 } = require("../../middlewares/validation");
+const sightengine = require('sightengine')('1635467598', 'i3u4TqqhAnoxcSgAxgv5');
 const centerGrading = require('../../grading/center');
 const cornerGrading = require('../../grading/corner');
 
@@ -107,13 +111,45 @@ router.post("/add-front", [appAuth, auth], async (req, res, next) => {
         .status(400)
         .send(
           createResObject(
-            true,
+            false,
             {},
             stringConstants.FILE_CORRUPTED,
             errorObjects.FILE_CORRUPTED
           )
         );
     }
+
+    // Check file quality is not good
+    // const cardDestination = path.join(
+    //   __dirname,
+    //   "../../public/",
+    //   `${userId}/cards/${cardId}/`,
+    //   `${req.file.filename}`
+    // );
+    // const { brightness = 0, contrast = 0, sharpness = 0 } = await sightengine.check(['properties']).set_file(cardDestination) || {};
+    // const badCondition = brightness <= 0.3 || sharpness <= 0.6 || contrast <=0.3;
+
+    // if (badCondition) {
+    //   try {
+    //     await fsPromises.unlink(cardDestination);
+    //   } catch (err) {
+    //     SimpleLogger.error(err);
+    //     await new PendingDeletion({
+    //       deletionType: stringConstants.deletionType.FILE,
+    //       data: cardDestination,
+    //     }).save();
+    //   }
+    //   return res
+    //     .status(400)
+    //     .send(
+    //       createResObject(
+    //         false,
+    //         {},
+    //         stringConstants.BAD_QUALITY,
+    //         errorObjects.BAD_QUALITY
+    //       )
+    //     );
+    // }
 
     card.front = path.join(`${userId}/cards/${cardId}/`, req.file.filename);
     card = await card.save();
@@ -216,17 +252,65 @@ router.post(
           .status(400)
           .send(
             createResObject(
-              true,
+              false,
               {},
               stringConstants.FILE_CORRUPTED,
               errorObjects.FILE_CORRUPTED
             )
           );
       }
-      /**
-       * Multer automatically replaces the existing 
-       * picture
-       */
+
+      // Check file quality is not good
+    // const cardDestination = path.join(
+    //   __dirname,
+    //   "../../public/",
+    //   `${userId}/cards/${cardId}/`,
+    //   `${req.file.filename}`
+    // );
+    // const { brightness = 0, contrast = 0, sharpness = 0 } = await sightengine.check(['properties']).set_file(cardDestination) || {};
+    // const badCondition = brightness <= 0.3 || sharpness <= 0.6 || contrast <=0.3;
+
+    // if (badCondition) {
+    //   try {
+    //     await fsPromises.unlink(cardDestination);
+    //   } catch (err) {
+    //     SimpleLogger.error(err);
+    //     await new PendingDeletion({
+    //       deletionType: stringConstants.deletionType.FILE,
+    //       data: cardDestination,
+    //     }).save();
+    //   }
+    //   return res
+    //     .status(400)
+    //     .send(
+    //       createResObject(
+    //         false,
+    //         {},
+    //         stringConstants.BAD_QUALITY,
+    //         errorObjects.BAD_QUALITY
+    //       )
+    //     );
+    // }
+
+      // All the check completed delete the old card and update the new
+      /*
+      if (card.front) {
+        const pathToCardFront = path.join(
+          __dirname,
+          "../../public/",
+          card.front
+        );
+        try {
+          await fsPromises.unlink(pathToCardFront);
+        } catch (error) {
+          SimpleLogger.error(error);
+          await new PendingDeletion({
+            deletionType: stringConstants.deletionType.FILE,
+            data: pathToCardFront,
+          }).save();
+        }
+      }
+      */
 
       card.front = path.join(`${userId}/cards/${cardId}/`, req.file.filename);
       card = await card.save();
@@ -331,17 +415,65 @@ router.post(
           .status(400)
           .send(
             createResObject(
-              true,
+              false,
               {},
               stringConstants.FILE_CORRUPTED,
               errorObjects.FILE_CORRUPTED
             )
           );
       }
-      /**
-       * Multer automatically replaces the existing 
-       * picture
-       */
+
+      // Check file quality is not good
+    // const cardDestination = path.join(
+    //   __dirname,
+    //   "../../public/",
+    //   `${userId}/cards/${cardId}/`,
+    //   `${req.file.filename}`
+    // );
+    // const { brightness = 0, contrast = 0, sharpness = 0 } = await sightengine.check(['properties']).set_file(cardDestination) || {};
+    // const badCondition = brightness <= 0.3 || sharpness <= 0.6 || contrast <=0.3;
+
+    // if (badCondition) {
+    //   try {
+    //     await fsPromises.unlink(cardDestination);
+    //   } catch (err) {
+    //     SimpleLogger.error(err);
+    //     await new PendingDeletion({
+    //       deletionType: stringConstants.deletionType.FILE,
+    //       data: cardDestination,
+    //     }).save();
+    //   }
+    //   return res
+    //     .status(400)
+    //     .send(
+    //       createResObject(
+    //         false,
+    //         {},
+    //         stringConstants.BAD_QUALITY,
+    //         errorObjects.BAD_QUALITY
+    //       )
+    //     );
+    // }
+
+      // Delete previous picture if any
+      /*
+      if (card.back) {
+        try {
+          const cardBackPath = path.join(__dirname, "../../public/", card.back);
+          await fsPromises.unlink(cardBackPath);
+        } catch (error) {
+          SimpleLogger.error(error);
+          await new PendingDeletion({
+            deletionType: stringConstants.deletionType.FILE,
+            data: path.join(
+              __dirname,
+              "../../public/card_backs/",
+              `${req.file.filename}`
+            ),
+          }).save();
+        }
+      }
+      */
       card.back = path.join(`${userId}/cards/${cardId}/`, req.file.filename);
       card = await card.save();
 
@@ -512,11 +644,17 @@ router.post(
     const brand = req.body.brand;
     const cardNumber = req.body.cardNumber;
     const playerNames = req.body.playerNames;
+    const serialNo = req.body.serialNo;
+    const modelNo = req.body.modelNo;
+    const cardType = req.body.cardType;
 
     card.year = year;
     card.brand = brand;
     card.cardNumber = cardNumber;
     card.playerNames = playerNames;
+    card.serialNo = serialNo;
+    card.modelNo = modelNo;
+    card.cardType = cardType;
 
     card.isCompleted = card.checkIfCompleted();
 
@@ -745,6 +883,30 @@ router.get(
       return card.getCardDetailsWithGrading();
     });
 
+    const collectionCards = await Collection.aggregate([
+      { $match: { user: mongoose.Types.ObjectId(userId) } },
+      { $group: {
+              _id: { user: "$user" },
+              user:  { $first: "$user" },
+              card: { $addToSet: "$card" }
+          }
+      },
+      { $skip: (pageNumber - 1) * pageSize },
+      { $sort : { createdAt : 1 } },
+      { $limit: pageSize }
+    ]);
+    const [onlyCollection = {}] = collectionCards || [];
+    const { card: innerCards = [] } = onlyCollection;
+    const stringCards = innerCards.length > 0 ? JSON.stringify(innerCards.map(card => card.toString())) : [];
+    
+    cards = cards.map(card => {
+      const { id = '' } = card;
+      return {
+        ...card,
+        inCollection: stringCards.includes(id.toString())
+      }
+    })
+
     return res.send(
       createResObject(
         true,
@@ -858,6 +1020,37 @@ router.post("/add-grading", [appAuth, auth], async (req, res, next) => {
       createResObject(true, { ...card, grading }, stringConstants.GRADING_COMPLETED)
     );
   });
+});
+
+router.get('/card-details/:cardId', [appAuth, auth, valCard], async (req, res, next) => {
+  const { cardId = '' } = req.params;
+  try {
+    let card = await Card.findById(cardId);
+    if (!card)
+      return res.send(
+        createResObject(
+          false,
+          {},
+          stringConstants.CARD_ID_NOT_FOUND,
+          errorObjects.CARD_ID_NOT_FOUND
+        )
+      );
+
+    card = card.getCardDetailsWithGrading();
+
+    return res.send(
+        createResObject(true, { ...card }, stringConstants.CARD_DETAILS)
+    );
+  } catch(e) {
+    return res.send(
+      createResObject(
+        false,
+        {},
+        stringConstants.CARD_ID_NOT_FOUND,
+        errorObjects.CARD_ID_NOT_FOUND
+      )
+    );
+  }
 });
 
 

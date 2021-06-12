@@ -71,6 +71,16 @@ const userSchema = new mongoose.Schema(
         default: true,
       },
     },
+    subscription: {
+      subId: {
+        type: String,
+        default: ''
+      },
+      cardsLeft: {
+        type: String,
+        default: 0
+      }
+    },
     metadata: {
       signupType: {
         type: String,
@@ -92,6 +102,13 @@ const userSchema = new mongoose.Schema(
         ],
       },
     },
+    otp: {
+      type: Number
+    },
+    isOTPVerified: {
+      type: Boolean,
+      default: false
+    }
   },
   { timestamps: true }
 );
@@ -201,7 +218,7 @@ userSchema.methods.generateAuthToken = function () {
   );
   return {
     token,
-    expiry: moment.utc(moment(Date.now()).add(15, "minutes")).format(),
+    expiry: moment.utc(moment(Date.now()).add(30, "days")).format(),
   };
 };
 
