@@ -309,6 +309,12 @@ module.exports.errorObjects = {
     errorMessage: stringConstants.NO_EBAY_REFRESH_TOKEN_FOUND,
   },
 
+  NO_CARD_FOR_USER: {
+    errorCode: 132,
+    errorSubCode: "NO_CARD_FOR_USER",
+    errorMessage: stringConstants.NO_CARD_FOR_USER,
+  },
+
   REQUEST_VALIDATION_ERROR: (errorMessage) => {
     return {
       errorCode: 301,
