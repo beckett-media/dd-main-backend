@@ -8,7 +8,7 @@ const sportsCard = require("../routes/user/sportsCard");
 const ebay = require("../routes/user/ebay");
 const pay = require("../routes/user/pay");
 const notificaiton = require("../routes/user/testNotifications");
-const marketplace = require("../routes/marketPlace/dashboard");
+const marketplace = require("../routes/marketPlace/home");
 const listing = require("../routes/marketPlace/listing");
 const product = require("../routes/open/product");
 const grade = require("../routes/open/grade");
@@ -30,7 +30,7 @@ module.exports = (app) => {
 	app.use("/sports-card", sportsCard);
 	app.use("/ebay", ebay);
 	app.use("/pay", pay);
-	// app.use("/marketplace", marketplace);
+	app.use("/marketplace", marketplace);
 	app.use("/listing", listing);
 	// Test notificaiton route
 	app.use("/notification", notificaiton);

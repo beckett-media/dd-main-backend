@@ -180,7 +180,6 @@ router.post(
 			playerNames: playerNames,
 		});
 		listing = await listing.save();
-		console.log("created listing", listing);
 		if (isPublic) {
 			let marketplace = await Marketplace.findOne({ listing: listing._id });
 			console.log("marketplace", marketplace);
@@ -189,12 +188,15 @@ router.post(
 					listing: listing._id,
 					user: userId,
 				});
-				console.log("addListingMarket", addListingMarket);
 			}
 		}
 
 		return res.send(
-			createResObject(true, {}, stringConstants.CARD_ADD_LISTING_SUCCESSFULLY)
+			createResObject(
+				true,
+				{ listing },
+				stringConstants.CARD_ADD_LISTING_SUCCESSFULLY
+			)
 		);
 	}
 );

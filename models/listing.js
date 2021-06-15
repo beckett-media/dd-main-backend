@@ -23,14 +23,14 @@ const listingSchema = new mongoose.Schema(
 			type: String,
 			required: true,
 		},
-		playerNames: { type: [String], required: true },
+		playerNames: { type: [String], default: [], required: false },
 
 		serialNumber: {
 			type: String,
 			required: false,
 		},
 		tags: [{ type: String }],
-		images: [{ type: String }],
+		images: { type: [String], default: [], required: false },
 		isPublic: {
 			type: Boolean,
 			default: false,
@@ -74,6 +74,15 @@ const listingSchema = new mongoose.Schema(
 				stringConstants.gradeState.GRADE_100,
 				stringConstants.gradeState.GRADE_RAW,
 			],
+			required: true,
+		},
+		status: {
+			type: String,
+			enum: [
+				stringConstants.listingState.LISTING_SALE,
+				stringConstants.listingState.LISTING_SOLD,
+			],
+			default: stringConstants.listingState.LISTING_SALE,
 			required: true,
 		},
 		user: {

@@ -183,7 +183,8 @@ module.exports.stringConstants = {
 		PRODUCTS_COLLECTION: "Product",
 		GRADES_COLLECTION: "Grade",
 		MARKETPLACE_COLLECTION: "Marketplace",
-		Listing_COLLECTION: "Lisitng",
+		Listing_COLLECTION: "Listing",
+		ORDER_COLLECTION: "Order",
 	},
 
 	deletionType: {
@@ -370,5 +371,9 @@ module.exports.stringConstants = {
 		GRADE_95: "Grade95",
 		GRADE_100: "Grade100",
 		GRADE_RAW: "GradeRaw",
+	},
+	listingState: {
+		LISTING_SALE: "sale",
+		LISTING_SOLD: "sold",
 	},
 };

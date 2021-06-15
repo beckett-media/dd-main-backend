@@ -620,7 +620,7 @@ module.exports = {
 			serialNumber: Joi.string().allow(""),
 			tags: Joi.allow(""),
 			isPublic: Joi.required(),
-			playerNames: Joi.array().items(Joi.string().required()).required(),
+			playerNames: Joi.allow(""),
 		});
 
 		const { error } = schema.validate(req.body);
