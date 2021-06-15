@@ -2,7 +2,7 @@ const { Grade } = require("../models/grade");
 const SimpleLogger = require("../utils/simpleLogger");
 
 const rawGrade = {
-	_id: "gradeRaw",
+	_id: "GradeRaw",
 	name: "Raw",
 };
 const Grade100 = {

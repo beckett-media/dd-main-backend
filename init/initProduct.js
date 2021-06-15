@@ -11,7 +11,15 @@ const boxCard = {
 	_id: "boxCard",
 	name: "Box",
 	desc: "Box Cards",
-	options: [],
+	options: [
+		{ _id: "retailBox", name: "Retail Box", desc: "Retail Box Cards" },
+		{ _id: "hobbyBox", name: "Hobby Box", desc: "Hobby Box Cards" },
+		{
+			_id: "jumboHobbyBox",
+			name: "Jumbo Hobby Box",
+			desc: "Jumbo Hobby Box Cards",
+		},
+	],
 };
 const packCard = {
 	_id: "packCard",
