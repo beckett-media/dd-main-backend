@@ -58,6 +58,62 @@ router.get(
 );
 
 /**
+ * Route to get list/card detail
+ */
+router.get("/:cardId", [appAuth, auth], async (req, res) => {
+	const cardId = req.params.cardId;
+	const userId = req.user._id;
+	const user = await User.findById(userId);
+	if (!user)
+		return res
+			.status(404)
+			.send(
+				createResObject(
+					false,
+					{},
+					stringConstants.USER_ID_DOEST_NOT_EXISTS,
+					errorObjects.USER_ID_DOEST_NOT_EXISTS
+				)
+			);
+	const cardDetail = await Listing.aggregate([
+		{ $match: { _id: mongoose.Types.ObjectId(cardId) } },
+		{
+			$lookup: {
+				from: "users",
+				localField: "user",
+				foreignField: "_id",
+				as: "seller",
+			},
+		},
+		{ $unwind: { path: "$seller" } },
+		{
+			$project: {
+				_id: "$_id",
+				tags: "$tags",
+				images: "$images",
+				product: "$product",
+				grade: "$grade",
+				title: "$title",
+				description: "$description",
+				price: "$price",
+				condition: "$condition",
+				isPublic: "$isPublic",
+				status: "$status",
+				playerNames: "$playerNames",
+				seller: {
+					_id: "$seller._id",
+					fullName: "$seller.fullName",
+					email: "$seller.email",
+				},
+			},
+		},
+	]);
+	return res.send(
+		createResObject(true, { cardDetail }, stringConstants.FETCH_SUCESSFUL)
+	);
+});
+
+/**
  * POST route to add card to listing
  */
 router.post(
