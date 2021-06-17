@@ -185,6 +185,7 @@ module.exports.stringConstants = {
 		MARKETPLACE_COLLECTION: "Marketplace",
 		Listing_COLLECTION: "Listing",
 		ORDER_COLLECTION: "Order",
+		CART_COLLECTION: "Cart",
 	},
 
 	deletionType: {
