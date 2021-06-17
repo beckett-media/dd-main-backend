@@ -169,6 +169,9 @@ module.exports.stringConstants = {
 	CART_ADD_SUCCESSFULLY: "card add successfully into cart",
 	CART_REMOVE_SUCCESSFULLY: "cart remove successfully by id",
 	CART_REMOVE_ALL_SUCCESSFULLY: "cart remove successfully",
+	ORDER_ID_NOT_FOUND: "Order with the given ID not found",
+	ORDER_STATUS_CHANGE: "Order status change successfully",
+	INVALID_ORDER_STATUS: "Invlaid order status",
 
 	collectionNames: {
 		USER_COLLECTION: "User",
@@ -379,5 +382,13 @@ module.exports.stringConstants = {
 	listingState: {
 		LISTING_SALE: "sale",
 		LISTING_SOLD: "sold",
+	},
+	orderState: {
+		SHIPPING: "shipping",
+		WAITING_TO_BE_SHIIPED: "waitingToBeShipped",
+		PENDING: "pending",
+		ACTIVE: "active",
+		CANCELED: "canceled",
+		COMPLETED: "completed",
 	},
 };
