@@ -1,11 +1,5 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
-const path = require("path");
-const fsPromises = require("fs").promises;
-const SimpleLogger = require("../utils/simpleLogger");
-const rimraf = require("rimraf");
-const _ = require("lodash");
-const { PendingDeletion } = require("./pendingDeletion");
 const { stringConstants } = require("../utils/constants");
 
 const cartSchema = new mongoose.Schema(
@@ -15,7 +9,7 @@ const cartSchema = new mongoose.Schema(
 			ref: stringConstants.collectionNames.USER_COLLECTION,
 			required: true,
 		},
-		user: {
+		listing: {
 			type: Schema.Types.ObjectId,
 			ref: stringConstants.collectionNames.Listing_COLLECTION,
 			required: true,

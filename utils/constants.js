@@ -166,6 +166,9 @@ module.exports.stringConstants = {
 	LISTING_ADD_MARKETPLACE_SUCCESSFULLY:
 		"Listing add successfully into marketplace",
 	LISTING_EXIST_MARKETPLACE: "Listing already exist in marketplace",
+	CART_ADD_SUCCESSFULLY: "card add successfully into cart",
+	CART_REMOVE_SUCCESSFULLY: "cart remove successfully by id",
+	CART_REMOVE_ALL_SUCCESSFULLY: "cart remove successfully",
 
 	collectionNames: {
 		USER_COLLECTION: "User",

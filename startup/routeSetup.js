@@ -12,6 +12,7 @@ const marketplace = require("../routes/marketPlace/home");
 const listing = require("../routes/marketPlace/listing");
 const product = require("../routes/open/product");
 const grade = require("../routes/open/grade");
+const cart = require("../routes/cart/cart");
 // Admin routes
 const adminAuth = require("../routes/admin/authenticate");
 const adminSportsCard = require("../routes/admin/sportsCard");
@@ -32,6 +33,7 @@ module.exports = (app) => {
 	app.use("/pay", pay);
 	app.use("/marketplace", marketplace);
 	app.use("/listing", listing);
+	app.use("/cart", cart);
 	// Test notificaiton route
 	app.use("/notification", notificaiton);
 	// Admin routes
