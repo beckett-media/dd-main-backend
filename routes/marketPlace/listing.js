@@ -25,6 +25,7 @@ const { createResObject } = require("../../utils/utilFunctions");
 const { stringConstants } = require("../../utils/constants");
 const { errorObjects } = require("../../utils/errorObjects");
 const { uploadMultiImage } = require("../../middlewares/multerSingle");
+const { Order } = require("../../models/order");
 
 /**
  * Route to get listing by user
@@ -447,6 +448,140 @@ router.post(
 				{ updateListing },
 				stringConstants.LISTING_ADD_MARKETPLACE_SUCCESSFULLY
 			)
+		);
+	}
+);
+
+/**
+ * Route to get buying listing by user
+ */
+router.get(
+	"/buying/:pageSize/:pageNumber",
+	[appAuth, auth, valPageSizeNumber],
+	async (req, res) => {
+		const pageSize = parseInt(req.params.pageSize);
+		const pageNumber = parseInt(req.params.pageNumber);
+		const userId = req.user._id;
+		const user = await User.findById(userId);
+		if (!user)
+			return res
+				.status(404)
+				.send(
+					createResObject(
+						false,
+						{},
+						stringConstants.USER_ID_DOEST_NOT_EXISTS,
+						errorObjects.USER_ID_DOEST_NOT_EXISTS
+					)
+				);
+
+		const buyingListing = await Order.aggregate([
+			{ $match: { buyer: mongoose.Types.ObjectId(userId) } },
+			{
+				$lookup: {
+					from: "users",
+					localField: "seller",
+					foreignField: "_id",
+					as: "seller",
+				},
+			},
+			{ $unwind: { path: "$seller" } },
+			{
+				$lookup: {
+					from: "listings",
+					localField: "listing",
+					foreignField: "_id",
+					as: "listing",
+				},
+			},
+			{ $unwind: { path: "$listing" } },
+			{
+				$project: {
+					_id: "$_id",
+					status: "$status",
+					buyer: "$buyer",
+					seller: {
+						_id: "$seller._id",
+						fullName: "$seller.fullName",
+						email: "$seller.email",
+					},
+					listing: "$listing",
+				},
+			},
+			{ $skip: (pageNumber - 1) * pageSize },
+			{ $sort: { createdAt: 1 } },
+			{ $limit: pageSize },
+		]);
+
+		return res.send(
+			createResObject(true, buyingListing, stringConstants.FETCH_SUCESSFUL)
+		);
+	}
+);
+
+/**
+ * Route to get selling listing by user
+ */
+router.get(
+	"/selling/:pageSize/:pageNumber",
+	[appAuth, auth, valPageSizeNumber],
+	async (req, res) => {
+		const pageSize = parseInt(req.params.pageSize);
+		const pageNumber = parseInt(req.params.pageNumber);
+		const userId = req.user._id;
+		const user = await User.findById(userId);
+		if (!user)
+			return res
+				.status(404)
+				.send(
+					createResObject(
+						false,
+						{},
+						stringConstants.USER_ID_DOEST_NOT_EXISTS,
+						errorObjects.USER_ID_DOEST_NOT_EXISTS
+					)
+				);
+
+		const buyingListing = await Order.aggregate([
+			{ $match: { seller: mongoose.Types.ObjectId(userId) } },
+			{
+				$lookup: {
+					from: "users",
+					localField: "buyer",
+					foreignField: "_id",
+					as: "buyer",
+				},
+			},
+			{ $unwind: { path: "$buyer" } },
+			{
+				$lookup: {
+					from: "listings",
+					localField: "listing",
+					foreignField: "_id",
+					as: "listing",
+				},
+			},
+			{ $unwind: { path: "$listing" } },
+			{
+				$project: {
+					_id: "$_id",
+					status: "$status",
+					seller: "$seller",
+					buyer: {
+						_id: "$buyer._id",
+						fullName: "$buyer.fullName",
+						email: "$buyer.email",
+					},
+					listing: "$listing",
+				},
+			},
+			{ $skip: (pageNumber - 1) * pageSize },
+			{ $sort: { createdAt: 1 } },
+			{ $limit: pageSize },
+		]);
+
+		return res.send(
+			createResObject(true, buyingListing, stringConstants.FETCH_SUCESSFUL)
 		);
 	}
 );
