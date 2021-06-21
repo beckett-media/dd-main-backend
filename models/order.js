@@ -17,6 +17,11 @@ const orderSchema = new mongoose.Schema(
 			default: stringConstants.orderState.PENDING,
 			required: true,
 		},
+		address: {
+			type: Schema.Types.ObjectId,
+			ref: stringConstants.collectionNames.ADDRESS_COLLECTION,
+			required: true,
+		},
 		buyer: {
 			type: Schema.Types.ObjectId,
 			ref: stringConstants.collectionNames.USER_COLLECTION,
