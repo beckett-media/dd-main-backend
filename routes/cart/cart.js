@@ -67,6 +67,17 @@ router.post("/add/:listingId", [appAuth, auth], async (req, res) => {
 					errorObjects.CARD_ID_NOT_FOUND
 				)
 			);
+	if (card.user.toString() === userId)
+		return res
+			.status(401)
+			.send(
+				createResObject(
+					false,
+					{},
+					stringConstants.CARD_OWN_ERROR,
+					errorObjects.CARD_OWN_ERROR
+				)
+			);
 	const cart = await Cart.create({
 		user: userId,
 		listing: listingId,
