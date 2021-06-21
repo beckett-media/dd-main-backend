@@ -78,7 +78,22 @@ router.post("/add/:listingId", [appAuth, auth], async (req, res) => {
 					errorObjects.CARD_OWN_ERROR
 				)
 			);
-	const cart = await Cart.create({
+	const checkListinExist = await Cart.findOne({
+		user: userId,
+		listing: listingId,
+	});
+	if (checkListinExist)
+		return res
+			.status(401)
+			.send(
+				createResObject(
+					false,
+					{},
+					stringConstants.CARD_ALREADY_CART,
+					errorObjects.CARD_ALREADY_CART
+				)
+			);
+	await Cart.create({
 		user: userId,
 		listing: listingId,
 	});

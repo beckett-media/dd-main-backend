@@ -179,6 +179,7 @@ module.exports.stringConstants = {
 	ADDRESS_TYPE_CONFLICT: "Please make another default address first",
 	REMVOE_DEFAULT_ADDRESS: "You cannot delete the default address.",
 	CARD_OWN_ERROR: "You are not able to purchase your own card.",
+	CARD_ALREADY_CART: "You have already into your cart.",
 
 	collectionNames: {
 		USER_COLLECTION: "User",
