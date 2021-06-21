@@ -172,6 +172,12 @@ module.exports.stringConstants = {
 	ORDER_ID_NOT_FOUND: "Order with the given ID not found",
 	ORDER_STATUS_CHANGE: "Order status change successfully",
 	INVALID_ORDER_STATUS: "Invlaid order status",
+	ADDRESS_ID_NOT_FOUND: "Address with the given ID not found",
+	ADDRESS_REMOVE_SUCCESSFULLY: "Address has been remove",
+	ADDRESS_ADD_SUCCESSFULLY: "Address add successfully",
+	ADDRESS_EDIT_SUCCESSFULLY: "Address edit successfully",
+	ADDRESS_TYPE_CONFLICT: "Please make another default address first",
+	REMVOE_DEFAULT_ADDRESS: "You cannot delete the default address.",
 
 	collectionNames: {
 		USER_COLLECTION: "User",
@@ -192,6 +198,7 @@ module.exports.stringConstants = {
 		Listing_COLLECTION: "Listing",
 		ORDER_COLLECTION: "Order",
 		CART_COLLECTION: "Cart",
+		ADDRESS_COLLECTION: "Address",
 	},
 
 	deletionType: {

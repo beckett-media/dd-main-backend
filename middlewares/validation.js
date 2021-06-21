@@ -638,4 +638,39 @@ module.exports = {
 		}
 		return next();
 	},
+	valAddress: (req, res, next) => {
+		const schema = Joi.object({
+			fullName: Joi.string().required().min(1).max(255),
+			countryCode: Joi.string()
+				.pattern(/^(\+?\d{1,3}|\d{1,4})$/)
+				.required(),
+			mobile: Joi.string()
+				.length(10)
+				.pattern(/^[0-9]+$/)
+				.required(),
+			streetAddress: Joi.string().required().min(1).max(250),
+			streetAddress2: Joi.string().allow("").min(1).max(250),
+			city: Joi.string().required().min(1).max(50),
+			state: Joi.string().required().min(1).max(50),
+			zipcode: Joi.string()
+				.pattern(/^([0-9]{5})(?:[-\s]*([0-9]{4}))?$/)
+				.required(),
+			isDefaultAddress: Joi.boolean(),
+		});
+
+		const { error } = schema.validate(req.body);
+		if (error) {
+			return res
+				.status(400)
+				.send(
+					createResObject(
+						false,
+						{ errorMessage: error.details[0].message },
+						stringConstants.REQUEST_VALIDATION_FAILED,
+						errorObjects.REQUEST_VALIDATION_ERROR(error.details[0].message)
+					)
+				);
+		}
+		return next();
+	},
 };
