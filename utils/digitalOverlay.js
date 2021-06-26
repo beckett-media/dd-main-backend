@@ -13,7 +13,7 @@ async function createGradedImage(card) {
     const cardImagePath = path.join(__dirname, "../public", card.front);
     let cardImage = await Jimp.read(cardImagePath);
 
-    cardImage.scaleToFit(500, 700);
+    cardImage.cover(500, 700);
 
     let cardWidth = cardImage.getWidth();
     let cardHeight = cardImage.getHeight();
