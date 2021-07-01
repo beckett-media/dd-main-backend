@@ -26,6 +26,7 @@ const { stringConstants } = require("../../utils/constants");
 const { errorObjects } = require("../../utils/errorObjects");
 const { uploadMultiImage } = require("../../middlewares/multerSingle");
 const { Order } = require("../../models/order");
+const { StripeConnect } = require("../../models/stripeConnect");
 
 /**
  * Route to get listing by user
@@ -137,6 +138,9 @@ router.post(
 		const isPublic = req.body.isPublic;
 		const playerNames = req.body.playerNames;
 		const user = await User.findById(userId);
+		const stripe = await StripeConnect.findOne({
+			user: mongoose.Types.ObjectId(userId),
+		});
 		if (!user)
 			return res
 				.status(400)
@@ -146,6 +150,17 @@ router.post(
 						{},
 						stringConstants.USER_ID_DOEST_NOT_EXISTS,
 						errorObjects.USER_ID_DOEST_NOT_EXISTS
+					)
+				);
+		if (!stripe)
+			return res
+				.status(400)
+				.send(
+					createResObject(
+						false,
+						{},
+						stringConstants.STRIPE_CONNECT_ERROR,
+						errorObjects.STRIPE_CONNECT_ERROR
 					)
 				);
 		if (cardId !== "") {

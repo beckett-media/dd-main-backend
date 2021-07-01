@@ -180,6 +180,10 @@ module.exports.stringConstants = {
 	REMVOE_DEFAULT_ADDRESS: "You cannot delete the default address.",
 	CARD_OWN_ERROR: "You are not able to purchase your own card.",
 	CARD_ALREADY_CART: "You have already into your cart.",
+	STRIPE_ACCOUNT_CONNECT_SUCCESSFULLY: "Stripe account connect successfully.",
+	ORDER_SUCCESSFULLY: "Your order has been successfully submitted.",
+	APPLICATION_FEE_PERCENTAGE: 5,
+	STRIPE_CONNECT_ERROR: "Please attach stripe id.",
 
 	collectionNames: {
 		USER_COLLECTION: "User",
@@ -201,6 +205,8 @@ module.exports.stringConstants = {
 		ORDER_COLLECTION: "Order",
 		CART_COLLECTION: "Cart",
 		ADDRESS_COLLECTION: "Address",
+		STRIPE_CONNECT_COLLECTION: "StripeConnect",
+		ORDER_LOG_COLLECTION: "OrderLog",
 	},
 
 	deletionType: {
