@@ -21,9 +21,9 @@ module.exports = (req, res, next) => {
 	}
 
 	try {
-		// jwt.verify(token, config.get(stringConstants.JWT_APP_KEY), {
-		//   ignoreExpiration: true,
-		// });
+		jwt.verify(token, config.get(stringConstants.JWT_APP_KEY), {
+			ignoreExpiration: true,
+		});
 		return next();
 	} catch (error) {
 		SimpleLogger.error(error);
