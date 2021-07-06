@@ -16,7 +16,7 @@ const { OrderLog } = require("../../models/orderLog");
 const stripe = require("stripe")(config.get(stringConstants.STRIPE_TEST_KEY));
 
 /**
- * Route to checkout the order
+ * Route to checkout the order and paid to seller
  */
 router.post("/checkout", [appAuth, auth], async (req, res) => {
 	const userId = req.user._id;
@@ -88,7 +88,7 @@ router.post("/checkout", [appAuth, auth], async (req, res) => {
 });
 
 /**
- * Route to get orders by filter(status) of a seller
+ * Route to filter(status) the orders for seller
  */
 router.get("/:filter", [appAuth, auth], async (req, res) => {
 	const userId = req.user._id;
@@ -116,7 +116,7 @@ router.get("/:filter", [appAuth, auth], async (req, res) => {
 });
 
 /**
- * Route to change order status
+ * Route to change order status for seller
  */
 router.post("/status-change/:orderId", [appAuth, auth], async (req, res) => {
 	const orderId = req.params.orderId;
