@@ -97,6 +97,19 @@ router.post(
           );
         }
 
+        const { surface = {} } = grading || {};
+        const { success: surfaceSuccess = false } = surface;
+
+        if (!surfaceSuccess) {
+          return res.send(
+            createResObject(
+              true,
+              { clientSecret: null, cardsUpdated: 0, grading },
+              'Surface Assessment Issue'
+            )
+          );
+        }
+
         // create card grading image
         const gradedImage = await createGradedImage(card);
 
