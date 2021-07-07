@@ -72,7 +72,7 @@ async function createGradedImage(card) {
     });
 
     const qrCodeImage = await Jimp.read(qrCodeImagePath);
-    qrCodeImage.resize(154, 154);
+    // qrCodeImage.resize(154, 154);
 
     const qrCodeMaskPath = path.join(
       __dirname,
@@ -86,7 +86,7 @@ async function createGradedImage(card) {
     const qrPositionX = 75;
     const qrPositionY = bgHeight - 250 + 10;
 
-    blackBg.composite(qrCodeImage, cardWidth - qrPositionX - 50, qrPositionY + 10);
+    blackBg.composite(qrCodeImage, cardWidth - qrPositionX - 80, qrPositionY - 20);
 
     const anton16WhitePath = path.join(
       __dirname,
