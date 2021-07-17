@@ -108,6 +108,7 @@ router.get("/renew-auth-token", appAuth, async (req, res) => {
     savedRefreshToken !== refreshToken ||
     user._id.toString() !== refreshDecoded._id
   ) {
+    // Remove in production
     SimpleLogger.debug("Saved Token", savedRefreshToken);
     SimpleLogger.debug("Refresh Token", refreshToken);
     SimpleLogger.debug("User ID", user._id.toString());

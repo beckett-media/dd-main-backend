@@ -598,21 +598,10 @@ router.post(
           );
       }
 
-      // Check if already has card video if yes the delete the old and replace with new
-      /*
-      if (card.video) {
-        try {
-          const videoPath = path.join(__dirname, "../../public/", card.video);
-          await fsPromises.unlink(videoPath);
-        } catch (error) {
-          SimpleLogger.error(error);
-          await new PendingDeletion({
-            deletionType: stringConstants.deletionType.FILE,
-            data: path.join(__dirname, "../../public/", card.video),
-          }).save();
-        }
-      }
-      */
+      /**
+       * Multer automatically replaces the existing 
+       * picture
+       */
       card.video = path.join(
         `${userId}/cards/${cardId}/`,
         `${req.file.filename}`
