@@ -66,7 +66,7 @@ router.post(
         // grading of card
         const { front: filePath = '' } = card;
 
-        const grading = await combinedGrading(cardId, filePath);
+        const grading = await combinedGrading(cardId, filePath, userId);
         if (grading === 0) {
           return res
           .status(500)
