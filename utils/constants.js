@@ -158,8 +158,13 @@ module.exports.stringConstants = {
 	NO_EBAY_REFRESH_TOKEN_FOUND: "No ebay refresh token found",
 	CARD_ADD_MARKETPLACE_SUCCESSFULLY: "Card add successfully into marketplace",
 	CARD_ADD_LISTING_SUCCESSFULLY: "Create listing successfully",
+	CARD_UPDATE_LISTING_SUCCESSFULLY: "listing update successfully",
+	LISTING_DELETE_SUCCESSFULLY: "listing delete successfully",
 	PRODUCT_NOT_FOUND: "Products not found",
 	PRODUCT_ID_NOT_FOUND: "Product with the given ID not found",
+	LISTING_ID_NOT_FOUND: "Listing with the given ID not found",
+	LISTING_ALREADY_SOLD:
+		"Listing is already sold. you can't update the listing.",
 	GRADE_ID_NOT_FOUND: "Grade with the given ID not found",
 	GRADE_NOT_FOUND: "Grades not found",
 	UNAUTHENTICATE_USER: "unauthenticate user",

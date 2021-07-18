@@ -13,9 +13,7 @@ const { User } = require("../../models/user");
 const config = require("config");
 const { StripeConnect } = require("../../models/stripeConnect");
 const { OrderLog } = require("../../models/orderLog");
-const stripe = require("stripe")(
-	"sk_test_51J69FVHLMVmaevrSP5xvGCw6tC3boF7LGhf0LENO6e6df5zeIhP5nujJteXbNfDU9Ue27zBAE9yJXYs9jV3ukIK600JE4XxP2x"
-);
+const stripe = require("stripe")(config.get(stringConstants.STRIPE_TEST_KEY));
 
 /**
  * Route to checkout the order and paid to seller
@@ -55,7 +53,8 @@ router.post("/checkout", [appAuth, auth], async (req, res) => {
 					customer: createCustomer.id,
 					card: cardId,
 					application_fee_amount:
-						(list.price * stringConstants.APPLICATION_FEE_PERCENTAGE) / 100,
+						((list.price * stringConstants.APPLICATION_FEE_PERCENTAGE) / 100) *
+						100,
 					transfer_data: {
 						destination: stripeObj.stripeUserId,
 					},

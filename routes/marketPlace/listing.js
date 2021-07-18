@@ -275,7 +275,191 @@ router.post(
 );
 
 /**
- * POST route to update listing by images
+ * Put route to edit the listing
+ */
+router.put(
+	"/:listingId",
+	[appAuth, auth, valObjectIdInUrl, valLisitngCardData],
+	async (req, res) => {
+		const listingId = req.params.listingId;
+
+		const userId = req.user._id;
+		const cardId = req.body.cardId;
+		const productId = req.body.productId;
+		const gradeId = req.body.gradeId;
+		const title = req.body.title;
+		const description = req.body.description;
+		const quantity = req.body.quantity;
+		const price = req.body.price;
+		const condition = req.body.condition;
+		const serialNumber = req.body.serialNumber;
+		const tags = req.body.tags;
+		const isPublic = req.body.isPublic;
+		const playerNames = req.body.playerNames;
+		const user = await User.findById(userId);
+
+		const listing = await Listing.findById(listingId);
+		if (!user)
+			return res
+				.status(400)
+				.send(
+					createResObject(
+						false,
+						{},
+						stringConstants.USER_ID_DOEST_NOT_EXISTS,
+						errorObjects.USER_ID_DOEST_NOT_EXISTS
+					)
+				);
+		if (!listing)
+			return res
+				.status(400)
+				.send(
+					createResObject(
+						false,
+						{},
+						stringConstants.LISTING_ID_NOT_FOUND,
+						errorObjects.LISTING_ID_NOT_FOUND
+					)
+				);
+
+		if (listing.user.toString() !== userId)
+			return res
+				.status(400)
+				.send(
+					createResObject(
+						false,
+						{},
+						stringConstants.UNAUTHENTICATE_USER,
+						errorObjects.UNAUTHENTICATE_USER
+					)
+				);
+		if (listing.status === "sold")
+			return res
+				.status(400)
+				.send(
+					createResObject(
+						false,
+						{},
+						stringConstants.LISTING_ALREADY_SOLD,
+						errorObjects.LISTING_ALREADY_SOLD
+					)
+				);
+		const product = await Product.findById(productId);
+		if (!product)
+			return res
+				.status(400)
+				.send(
+					createResObject(
+						false,
+						{},
+						stringConstants.PRODUCT_ID_NOT_FOUND,
+						errorObjects.PRODUCT_ID_NOT_FOUND
+					)
+				);
+
+		const grade = await Grade.findById(gradeId);
+		if (!grade)
+			return res
+				.status(400)
+				.send(
+					createResObject(
+						false,
+						{},
+						stringConstants.GRADE_ID_NOT_FOUND,
+						errorObjects.GRADE_ID_NOT_FOUND
+					)
+				);
+		let updateListing = await Listing.findByIdAndUpdate(
+			listingId,
+			{
+				$set: {
+					user: userId,
+					card: cardId,
+					product: productId,
+					grade: gradeId,
+					title: title,
+					description: description,
+					quantity: quantity,
+					price: price,
+					condition: condition,
+					serialNumber: serialNumber,
+					tags: tags,
+					isPublic: isPublic,
+					playerNames: playerNames,
+				},
+			},
+			{ new: true }
+		);
+
+		return res.send(
+			createResObject(
+				true,
+				{ updateListing },
+				stringConstants.CARD_UPDATE_LISTING_SUCCESSFULLY
+			)
+		);
+	}
+);
+
+/**
+ *  route to delete the listing by id
+ */
+router.delete(
+	"/:listingId",
+	[appAuth, auth, valObjectIdInUrl],
+	async (req, res) => {
+		const listingId = req.params.listingId;
+
+		const userId = req.user._id;
+		const user = await User.findById(userId);
+
+		const listing = await Listing.findById(listingId);
+		if (!user)
+			return res
+				.status(400)
+				.send(
+					createResObject(
+						false,
+						{},
+						stringConstants.USER_ID_DOEST_NOT_EXISTS,
+						errorObjects.USER_ID_DOEST_NOT_EXISTS
+					)
+				);
+		if (!listing)
+			return res
+				.status(400)
+				.send(
+					createResObject(
+						false,
+						{},
+						stringConstants.LISTING_ID_NOT_FOUND,
+						errorObjects.LISTING_ID_NOT_FOUND
+					)
+				);
+
+		if (listing.user.toString() !== userId)
+			return res
+				.status(400)
+				.send(
+					createResObject(
+						false,
+						{},
+						stringConstants.UNAUTHENTICATE_USER,
+						errorObjects.UNAUTHENTICATE_USER
+					)
+				);
+		await Listing.deleteOne({
+			_id: mongoose.Types.ObjectId(listingId),
+		});
+
+		return res.send(
+			createResObject(true, {}, stringConstants.LISTING_DELETE_SUCCESSFULLY)
+		);
+	}
+);
+
+/**
+ *  route to update listing by images
  */
 router.post(
 	"/update-lsiting-images/:listingId",
