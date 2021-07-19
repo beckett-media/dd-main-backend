@@ -186,9 +186,11 @@ module.exports.stringConstants = {
 	CARD_OWN_ERROR: "You are not able to purchase your own card.",
 	CARD_ALREADY_CART: "You have already into your cart.",
 	STRIPE_ACCOUNT_CONNECT_SUCCESSFULLY: "Stripe account connect successfully.",
+	SAVE_CARD_REMOVE: "Save card remove successfully.",
 	ORDER_SUCCESSFULLY: "Your order has been successfully submitted.",
 	APPLICATION_FEE_PERCENTAGE: 5,
 	STRIPE_CONNECT_ERROR: "Please attach stripe id.",
+	LISTING_NOT_FOUND: "Listing not found with given id's",
 
 	collectionNames: {
 		USER_COLLECTION: "User",

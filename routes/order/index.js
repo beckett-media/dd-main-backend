@@ -10,6 +10,7 @@ const { stringConstants } = require("../../utils/constants");
 const { errorObjects } = require("../../utils/errorObjects");
 const { Listing } = require("../../models/listing");
 const { User } = require("../../models/user");
+const { Cart } = require("../../models/cart");
 const config = require("config");
 const { StripeConnect } = require("../../models/stripeConnect");
 const { OrderLog } = require("../../models/orderLog");
@@ -21,9 +22,10 @@ const stripe = require("stripe")(config.get(stringConstants.STRIPE_TEST_KEY));
 router.post("/checkout", [appAuth, auth], async (req, res) => {
 	const userId = req.user._id;
 	const cardToken = req.body.cardToken;
-	const cardId = req.body.cardId;
+	const customerId = req.body.customerId;
 	const addressId = req.body.addressId;
-	const listingIds = req.body.listingIds;
+	const cartIds = req.body.cartIds;
+	const isCardSave = req.body.isCardSave;
 	const user = await User.findById(userId);
 	if (!user)
 		return res
@@ -37,27 +39,78 @@ router.post("/checkout", [appAuth, auth], async (req, res) => {
 				)
 			);
 	try {
-		const listings = await Listing.find({ _id: { $in: listingIds } });
-		if (listings.length > 0) {
+		const listingsIds = await Cart.find({ _id: { $in: cartIds } }).distinct(
+			"listing"
+		);
+		console.log(listingsIds);
+		const amount = await Listing.aggregate([
+			{ $match: { _id: { $in: listingsIds } } },
+			{
+				$group: {
+					_id: "sum amount",
+					totalAmount: { $sum: "$price" },
+					count: { $sum: 1 },
+				},
+			},
+		]);
+		let cusId = "";
+		if (customerId === "") {
 			const createCustomer = await stripe.customers.create({
+				email: user.email,
 				source: cardToken,
-				description: "For purchasing sports card",
+				description: "Purchasing sports card",
+				metadata: {
+					userId: user._id.toString(),
+				},
+			});
+			cusId = createCustomer.id;
+			if (isCardSave) {
+				await User.findByIdAndUpdate(userId, {
+					$set: {
+						stripeId: cusId,
+					},
+				});
+			}
+		} else {
+			cusId = customerId;
+		}
+		// const totalAmount = await Listing.aggregate([{ _id: { $in: listingsIds } }]);
+		// let totalAmount = amount[0].totalAmount;
+
+		// const paymentIntent = await stripe.paymentIntents.create({
+		// 	amount: 10000,
+		// 	currency: "usd",
+		// 	payment_method_types: ["card"],
+		// 	transfer_group: "{ORDER10}",
+		// });
+
+		// const transfer = await stripe.transfers.create({
+		// 	amount: 7000,
+		// 	currency: "usd",
+		// 	destination: "{{CONNECTED_STRIPE_ACCOUNT_ID}}",
+		// 	transfer_group: "{ORDER10}",
+		// });
+		const listings = await Listing.find({ _id: { $in: listingsIds } });
+		if (listings.length > 0) {
+			const charge = await stripe.charges.create({
+				amount: amount[0].totalAmount,
+				currency: "usd",
+				customer: cusId,
+				// card: cardId,
 			});
 			for (const list of listings) {
+				const cart = await Cart.findOne({
+					listing: mongoose.Types.ObjectId(list.id),
+				});
 				const stripeObj = await StripeConnect.findOne({
 					user: list.user.toString(),
 				});
-				const charge = await stripe.charges.create({
-					amount: list.price,
+				const transfer = await stripe.transfers.create({
+					amount:
+						(list.price * stringConstants.APPLICATION_FEE_PERCENTAGE) / 100,
 					currency: "usd",
-					customer: createCustomer.id,
-					card: cardId,
-					application_fee_amount:
-						((list.price * stringConstants.APPLICATION_FEE_PERCENTAGE) / 100) *
-						100,
-					transfer_data: {
-						destination: stripeObj.stripeUserId,
-					},
+					source_transaction: charge.id,
+					destination: stripeObj.stripeUserId,
 				});
 				const updateListing = await Listing.findByIdAndUpdate(
 					list.id,
@@ -78,9 +131,14 @@ router.post("/checkout", [appAuth, auth], async (req, res) => {
 					buyer: userId,
 					listing: list.id,
 				});
+				await Cart.remove({ _id: cart._id });
 			}
 			return res.send(
 				createResObject(true, {}, stringConstants.ORDER_SUCCESSFULLY)
+			);
+		} else {
+			return res.send(
+				createResObject(true, {}, stringConstants.LISTING_NOT_FOUND)
 			);
 		}
 	} catch (e) {
