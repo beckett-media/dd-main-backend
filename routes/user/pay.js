@@ -134,7 +134,7 @@ router.post(
         return res.send(
           createResObject(
             true,
-            { clientSecret: null, cardsUpdated: 1 },
+            { clientSecret: null, cardsUpdated: 1, grading },
             'Card Graded Successfully'
           )
         );
