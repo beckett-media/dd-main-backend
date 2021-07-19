@@ -14,12 +14,13 @@ const { Cart } = require("../../models/cart");
 const config = require("config");
 const { StripeConnect } = require("../../models/stripeConnect");
 const { OrderLog } = require("../../models/orderLog");
+const { valPageSizeNumber } = require("../../middlewares/validation");
 const stripe = require("stripe")(config.get(stringConstants.STRIPE_TEST_KEY));
 
 /**
  * Route to checkout the order and paid to seller
  */
-router.post("/checkout", [auth], async (req, res) => {
+router.post("/checkout", [appAuth, auth], async (req, res) => {
 	const userId = req.user._id;
 	const cardToken = req.body.cardToken;
 	const customerId = req.body.customerId;

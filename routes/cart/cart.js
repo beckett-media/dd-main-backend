@@ -93,12 +93,12 @@ router.post("/add/:listingId", [appAuth, auth], async (req, res) => {
 					errorObjects.CARD_ALREADY_CART
 				)
 			);
-	await Cart.create({
+	const saveCart = await Cart.create({
 		user: userId,
 		listing: listingId,
 	});
 	return res.send(
-		createResObject(true, {}, stringConstants.CART_ADD_SUCCESSFULLY)
+		createResObject(true, saveCart, stringConstants.CART_ADD_SUCCESSFULLY)
 	);
 });
 
