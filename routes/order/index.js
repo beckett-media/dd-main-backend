@@ -19,7 +19,7 @@ const stripe = require("stripe")(config.get(stringConstants.STRIPE_TEST_KEY));
 /**
  * Route to checkout the order and paid to seller
  */
-router.post("/checkout", [appAuth, auth], async (req, res) => {
+router.post("/checkout", [auth], async (req, res) => {
 	const userId = req.user._id;
 	const cardToken = req.body.cardToken;
 	const customerId = req.body.customerId;
@@ -74,31 +74,17 @@ router.post("/checkout", [appAuth, auth], async (req, res) => {
 		} else {
 			cusId = customerId;
 		}
-		// const totalAmount = await Listing.aggregate([{ _id: { $in: listingsIds } }]);
-		// let totalAmount = amount[0].totalAmount;
-
-		// const paymentIntent = await stripe.paymentIntents.create({
-		// 	amount: 10000,
-		// 	currency: "usd",
-		// 	payment_method_types: ["card"],
-		// 	transfer_group: "{ORDER10}",
-		// });
-
-		// const transfer = await stripe.transfers.create({
-		// 	amount: 7000,
-		// 	currency: "usd",
-		// 	destination: "{{CONNECTED_STRIPE_ACCOUNT_ID}}",
-		// 	transfer_group: "{ORDER10}",
-		// });
 		const listings = await Listing.find({ _id: { $in: listingsIds } });
 		if (listings.length > 0) {
 			const charge = await stripe.charges.create({
-				amount: amount[0].totalAmount,
+				amount: amount[0].totalAmount * 100,
 				currency: "usd",
 				customer: cusId,
 				// card: cardId,
 			});
 			for (const list of listings) {
+				let fee =
+					(list.price * stringConstants.APPLICATION_FEE_PERCENTAGE) / 100;
 				const cart = await Cart.findOne({
 					listing: mongoose.Types.ObjectId(list.id),
 				});
@@ -106,8 +92,7 @@ router.post("/checkout", [appAuth, auth], async (req, res) => {
 					user: list.user.toString(),
 				});
 				const transfer = await stripe.transfers.create({
-					amount:
-						(list.price * stringConstants.APPLICATION_FEE_PERCENTAGE) / 100,
+					amount: (list.price - fee) * 100,
 					currency: "usd",
 					source_transaction: charge.id,
 					destination: stripeObj.stripeUserId,
