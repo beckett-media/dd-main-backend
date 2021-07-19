@@ -24,7 +24,6 @@ router.post("/checkout", [auth], async (req, res) => {
 	const cardToken = req.body.cardToken;
 	const customerId = req.body.customerId;
 	const addressId = req.body.addressId;
-	const cartIds = req.body.cartIds;
 	const isCardSave = req.body.isCardSave;
 	const user = await User.findById(userId);
 	if (!user)
@@ -39,9 +38,7 @@ router.post("/checkout", [auth], async (req, res) => {
 				)
 			);
 	try {
-		const listingsIds = await Cart.find({ _id: { $in: cartIds } }).distinct(
-			"listing"
-		);
+		const listingsIds = await Cart.find({ user: userId }).distinct("listing");
 		console.log(listingsIds);
 		const amount = await Listing.aggregate([
 			{ $match: { _id: { $in: listingsIds } } },
