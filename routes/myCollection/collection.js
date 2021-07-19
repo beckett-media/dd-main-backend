@@ -1,5 +1,6 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const SimpleLogger = require('./../../utils/simpleLogger');
 const router = express.Router();
 const auth = require("../../middlewares/authenticateUser");
 const appAuth = require("../../middlewares/authenticateApp");
@@ -119,5 +120,60 @@ router.get(
         }
     }
 );
+
+/**
+ * POST route to delete card from collection
+ */
+router.delete("/delete", [appAuth, auth], async (req, res) => {
+    const cardId = req.query.cardId;
+    if (!cardId)
+    return res
+        .status(400)
+        .send(
+            createResObject(
+                false,
+                {},
+                stringConstants.REQUEST_VALIDATION_FAILED,
+                errorObjects.REQUEST_VALIDATION_ERROR(
+                    "No card found in query parameters"
+                )
+            )
+        );
+    try {
+        const userId = req.user._id;
+        const user = mongoose.Types.ObjectId(userId);
+        const card = mongoose.Types.ObjectId(cardId);
+        let collection = await Collection.find({ user, card });
+        if (collection && collection.length) {
+            collection = await Collection.remove({ user, card });
+            return res.send(
+                createResObject(true, { deletedCount: collection.deletedCount }, stringConstants.DELETED_SUCCESSFULLY)
+            );
+        } else {
+            return res
+            .status(400)
+            .send(
+                createResObject(
+                    false,
+                    {},
+                    stringConstants.NO_CARD_FOR_USER,
+                    errorObjects.NO_CARD_FOR_USER
+                )
+            );
+        }
+    } catch (error) {
+        SimpleLogger.error(error);
+        return res
+            .status(400)
+            .send(
+                createResObject(
+                    false,
+                    {},
+                    stringConstants.UNSUSPECTED_ERROR,
+                    errorObjects.UNSUSPECTED_ERROR(error.message)
+                )
+            );
+    }
+});
 
 module.exports = router;
