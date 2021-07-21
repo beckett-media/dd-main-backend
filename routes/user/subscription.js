@@ -2,12 +2,11 @@ const express = require("express");
 const router = express.Router();
 const auth = require("../../middlewares/authenticateUser");
 const appAuth = require("../../middlewares/authenticateApp");
-const SimpleLogger = require("../../utils/simpleLogger");
 const { Subscription } = require("../../models/subscription");
 const { User } = require("../../models/user");
 const { createResObject } = require("../../utils/utilFunctions");
 const { stringConstants } = require("../../utils/constants");
-const { errorObjects } = require("../../utils/errorObjects");
+const config = require('config');
 
 /**
  * GET route to fetch user details including settins
@@ -17,6 +16,7 @@ router.get("/details", [appAuth, auth], async (req, res) => {
     const { subscription = {} } = user;
     const { cardsLeft = 0, subId = '' } = subscription;
     const subscriptionData = await Subscription.findOne({});
+    const skipPayment = config.get('skipPayment');
 
     return res.send(
         createResObject(
@@ -24,7 +24,7 @@ router.get("/details", [appAuth, auth], async (req, res) => {
         {
             subscription: subscriptionData,
                 activePlan: {
-                    cardsLeft, subId
+                    cardsLeft: skipPayment ? 9999999 : cardsLeft, subId: skipPayment ? 'sub_high' : subId
                 }
         },
         stringConstants.FETCH_SUCESSFUL
