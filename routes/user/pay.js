@@ -32,11 +32,12 @@ router.post(
     console.log('*******************cards grading has been called********************');
     const userId = req.user._id;
     const user = await User.findById(userId);
+    const skipPayment = config.get('skipPayment');
     const { subscription = {} } = user;
     let { cardsLeft = 0, subId = '' } = subscription;
 
     // if no card left in current plan
-    if (cardsLeft !== 'Unlimited' && cardsLeft == 0)
+    if (!skipPayment && cardsLeft !== 'Unlimited' && cardsLeft == 0)
     return res
         .status(400)
         .send(
@@ -124,7 +125,7 @@ router.post(
           userId,
           { $set: {
             subscription: {
-              cardsLeft: cardsLeft === 'Unlimited' ? 'Unlimited' : typeof cardsLeft === 'string' ? (parseInt(cardsLeft, 10) - 1).toString() : (cardsLeft - 1).toString(),
+              cardsLeft: cardsLeft === 'Unlimited' || skipPayment ? 'Unlimited' : typeof cardsLeft === 'string' ? (parseInt(cardsLeft, 10) - 1).toString() : (cardsLeft - 1).toString(),
               subId
             }
           } },

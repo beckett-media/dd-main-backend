@@ -23,6 +23,7 @@ const { stringConstants } = require("../../utils/constants");
 const { errorObjects } = require("../../utils/errorObjects");
 const sendNotifications = require("../../utils/sendNotifications");
 const sendMail = require('./../../handler/sendMail');
+const config = require('config');
 
 // Dev remove in production
 const Joi = require("@hapi/joi");
@@ -405,11 +406,12 @@ router.get("/user-subscription", [appAuth, auth], async (req, res) => {
   const user = await User.findById(req.user._id);
   const { subscription = {} } = user;
   const { cardsLeft = 0, subId = '' } = subscription;
+  const skipPayment = config.get('skipPayment');
 
   return res.send(
     createResObject(
       true,
-      { cardsLeft, subId },
+      { cardsLeft: skipPayment ? '9999999' : cardsLeft, subId: skipPayment ? 'sub_high' :  subId},
       stringConstants.FETCH_SUCESSFUL
     )
   );
