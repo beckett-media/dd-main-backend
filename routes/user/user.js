@@ -397,7 +397,7 @@ router.get("/user-subscription", [appAuth, auth], async (req, res) => {
   return res.send(
     createResObject(
       true,
-      { cardsLeft: skipPayment ? '9999999' : cardsLeft, subId: skipPayment ? 'sub_high' :  subId},
+      { cardsLeft: skipPayment ? 'Unlimited' : cardsLeft, subId: skipPayment ? 'sub_high' :  subId},
       stringConstants.FETCH_SUCESSFUL
     )
   );
