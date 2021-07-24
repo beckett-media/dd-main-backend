@@ -24,7 +24,7 @@ router.get("/details", [appAuth, auth], async (req, res) => {
         {
             subscription: subscriptionData,
                 activePlan: {
-                    cardsLeft: skipPayment ? 9999999 : cardsLeft, subId: skipPayment ? 'sub_high' : subId
+                    cardsLeft: skipPayment ? 'Unlimited' : cardsLeft, subId: skipPayment ? 'sub_high' : subId
                 }
         },
         stringConstants.FETCH_SUCESSFUL
