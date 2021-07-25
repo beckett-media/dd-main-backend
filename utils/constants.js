@@ -87,6 +87,8 @@ module.exports.stringConstants = {
 
   CARD_DETAILS: 'Card detials',
 
+  CARD_FAC: 'Card Fac',
+
   PASSWORD_UPDATED_SUCCESSFULLY: "Password updated successfully",
   VERIFY_OTP: 'OTP Verified',
   OTP_GENERATED: "OTP Sent to your Email",
