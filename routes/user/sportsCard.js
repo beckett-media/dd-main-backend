@@ -1053,5 +1053,52 @@ router.get('/card-details/:cardId', [appAuth, auth, valCard], async (req, res, n
   }
 });
 
+router.get('/card-fac/:cardId', [appAuth, auth, valCard], async (req, res, next) => {
+  const { cardId = '' } = req.params;
+  try {
+    // user details fetching
+    const userId = req.user._id;
+    const user = await User.findById(userId);
+    if (!user)
+      return res
+        .status(404)
+        .send(
+          createResObject(
+            false,
+            {},
+            stringConstants.USER_ID_DOEST_NOT_EXISTS,
+            errorObjects.USER_ID_DOEST_NOT_EXISTS
+          )
+        );
+
+    // card details fetching
+    let card = await Card.findById(cardId);
+    if (!card)
+      return res.send(
+        createResObject(
+          false,
+          {},
+          stringConstants.CARD_ID_NOT_FOUND,
+          errorObjects.CARD_ID_NOT_FOUND
+        )
+      );
+
+    card = card.getCardDetailsWithGrading();
+
+    return res.send(
+        createResObject(true, { card, user: user.getUserDetails() }, stringConstants.CARD_FAC)
+    );
+  } catch(e) {
+    return res.send(
+      createResObject(
+        false,
+        {},
+        stringConstants.CARD_ID_NOT_FOUND,
+        errorObjects.CARD_ID_NOT_FOUND
+      )
+    );
+  }
+});
+
 
 module.exports = router;

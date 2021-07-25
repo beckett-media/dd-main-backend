@@ -86,6 +86,7 @@ module.exports.stringConstants = {
 	CARD_ID_NOT_FOUND: "Card with the given ID not found",
 
 	CARD_DETAILS: "Card detials",
+	CARD_FAC: 'Card Fac',
 
 	PASSWORD_UPDATED_SUCCESSFULLY: "Password updated successfully",
 	VERIFY_OTP: "OTP Verified",
