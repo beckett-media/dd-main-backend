@@ -23,7 +23,7 @@ const stripe = require("stripe")(config.get(stringConstants.STRIPE_TEST_KEY));
 router.post("/checkout", [appAuth, auth], async (req, res) => {
 	const userId = req.user._id;
 	const cardToken = req.body.cardToken;
-	const customerId = req.body.customerId;
+	// const customerId = req.body.customerId;
 	const addressId = req.body.addressId;
 	const isCardSave = req.body.isCardSave;
 	const user = await User.findById(userId);
@@ -40,7 +40,6 @@ router.post("/checkout", [appAuth, auth], async (req, res) => {
 			);
 	try {
 		const listingsIds = await Cart.find({ user: userId }).distinct("listing");
-		console.log(listingsIds);
 		const amount = await Listing.aggregate([
 			{ $match: { _id: { $in: listingsIds } } },
 			{
@@ -52,7 +51,7 @@ router.post("/checkout", [appAuth, auth], async (req, res) => {
 			},
 		]);
 		let cusId = "";
-		if (customerId === "") {
+		if (cardToken !== "") {
 			const createCustomer = await stripe.customers.create({
 				email: user.email,
 				source: cardToken,
@@ -70,7 +69,19 @@ router.post("/checkout", [appAuth, auth], async (req, res) => {
 				});
 			}
 		} else {
-			cusId = customerId;
+			cusId = user.stripeId;
+			if (cusId === "") {
+				return res
+					.status(404)
+					.send(
+						createResObject(
+							false,
+							{},
+							stringConstants.STRIPE_CLIENTID_NOT_FOUND,
+							errorObjects.STRIPE_CLIENTID_NOT_FOUND
+						)
+					);
+			}
 		}
 		const listings = await Listing.find({ _id: { $in: listingsIds } });
 		if (listings.length > 0) {
@@ -95,11 +106,23 @@ router.post("/checkout", [appAuth, auth], async (req, res) => {
 					source_transaction: charge.id,
 					destination: stripeObj.stripeUserId,
 				});
-				const updateListing = await Listing.findByIdAndUpdate(
-					list.id,
-					{ $set: { status: "sold" } },
-					{ new: true }
-				);
+
+				const item = await Listing.findById(list.id);
+				if (item.quantity === cart.quantity) {
+					const updateListing = await Listing.findByIdAndUpdate(
+						list.id,
+						{ $set: { status: "sold", availableQuantity: 0 } },
+						{ new: true }
+					);
+				}
+				if (item.quantity > cart.quantity) {
+					let q = item.quantity - cart.quantity;
+					const updateListing = await Listing.findByIdAndUpdate(
+						list.id,
+						{ $set: { availableQuantity: q } },
+						{ new: true }
+					);
+				}
 
 				const createOrder = await Order.create({
 					buyer: userId,
@@ -107,6 +130,7 @@ router.post("/checkout", [appAuth, auth], async (req, res) => {
 					listing: list.id,
 					address: addressId,
 					status: "pending",
+					quantity: cart.quantity,
 				});
 				const orderLog = await OrderLog.create({
 					response: charge,

@@ -4,6 +4,10 @@ const { stringConstants } = require("../utils/constants");
 
 const cartSchema = new mongoose.Schema(
 	{
+		quantity: {
+			type: Number,
+			required: true,
+		},
 		user: {
 			type: Schema.Types.ObjectId,
 			ref: stringConstants.collectionNames.USER_COLLECTION,

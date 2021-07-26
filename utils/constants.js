@@ -192,6 +192,10 @@ module.exports.stringConstants = {
 	APPLICATION_FEE_PERCENTAGE: 5,
 	STRIPE_CONNECT_ERROR: "Please attach stripe id.",
 	LISTING_NOT_FOUND: "Listing not found with given id's",
+	LISTING_QUANTITY_LOW: "Sorry , we don't have enough stock.",
+	UNRECOGNISE_QUANTITY: "Please add some quantity.",
+	STRIPE_CLIENTID_NOT_FOUND: "Client Id not found, please send a card token.",
+	IMAGE_REMOVE_SUCCESSFULLY: "Image remove successfully.",
 
 	collectionNames: {
 		USER_COLLECTION: "User",

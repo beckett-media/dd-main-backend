@@ -1,9 +1,14 @@
 const mongoose = require("mongoose");
+const shortid = require("shortid");
 const Schema = mongoose.Schema;
 const { stringConstants } = require("../utils/constants");
 
 const orderSchema = new mongoose.Schema(
 	{
+		quantity: {
+			type: Number,
+			required: true,
+		},
 		status: {
 			type: String,
 			enum: [
@@ -36,6 +41,10 @@ const orderSchema = new mongoose.Schema(
 			type: Schema.Types.ObjectId,
 			ref: stringConstants.collectionNames.Listing_COLLECTION,
 			required: true,
+		},
+		orderId: {
+			type: String,
+			default: shortid.generate,
 		},
 	},
 	{ timestamps: true, toJSON: { getters: true } }

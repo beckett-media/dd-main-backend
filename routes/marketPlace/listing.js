@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const router = express.Router();
 const auth = require("../../middlewares/authenticateUser");
 const appAuth = require("../../middlewares/authenticateApp");
+const fs = require("fs");
 const {
 	valCardPost,
 	valLisitngCardData,
@@ -90,6 +91,15 @@ router.get("/:cardId", [appAuth, auth], async (req, res) => {
 		},
 		{ $unwind: { path: "$seller" } },
 		{
+			$lookup: {
+				from: "cards",
+				localField: "card",
+				foreignField: "_id",
+				as: "card",
+			},
+		},
+		{ $unwind: { path: "$card" } },
+		{
 			$project: {
 				_id: "$_id",
 				tags: "$tags",
@@ -97,12 +107,16 @@ router.get("/:cardId", [appAuth, auth], async (req, res) => {
 				product: "$product",
 				grade: "$grade",
 				title: "$title",
+				card: "$card",
 				description: "$description",
 				price: "$price",
+				quantity: "$quantity",
+				availableQuantity: "$availableQuantity",
 				condition: "$condition",
 				isPublic: "$isPublic",
 				status: "$status",
 				playerNames: "$playerNames",
+				serialNumber: "$serialNumber",
 				seller: {
 					_id: "$seller._id",
 					fullName: "$seller.fullName",
@@ -131,6 +145,7 @@ router.post(
 		const title = req.body.title;
 		const description = req.body.description;
 		const quantity = req.body.quantity;
+		const availableQuantity = quantity;
 		const price = req.body.price;
 		const condition = req.body.condition;
 		const serialNumber = req.body.serialNumber;
@@ -238,13 +253,14 @@ router.post(
 		// Create a new card in listing
 		let listing = new Listing({
 			user: userId,
-			card: cardId,
+			card: cardId === "" ? null : cardId,
 			product: productId,
 			// productOption: productOptionId,
 			grade: gradeId,
 			title: title,
 			description: description,
 			quantity: quantity,
+			availableQuantity: availableQuantity,
 			price: price,
 			condition: condition,
 			serialNumber: serialNumber,
@@ -290,6 +306,7 @@ router.put(
 		const title = req.body.title;
 		const description = req.body.description;
 		const quantity = req.body.quantity;
+		const availableQuantity = quantity;
 		const price = req.body.price;
 		const condition = req.body.condition;
 		const serialNumber = req.body.serialNumber;
@@ -380,6 +397,7 @@ router.put(
 					title: title,
 					description: description,
 					quantity: quantity,
+					availableQuantity: availableQuantity,
 					price: price,
 					condition: condition,
 					serialNumber: serialNumber,
@@ -573,6 +591,59 @@ router.post(
 );
 
 /**
+ *  route to remove the image of a listing
+ */
+router.delete(
+	"/image/:listingId",
+	[appAuth, auth, valObjectIdInUrl],
+	async (req, res) => {
+		const cardId = req.params.listingId;
+		const userId = req.user._id;
+		const fileName = req.body.fileName;
+		let listing = await Listing.findById(cardId);
+		if (!listing) {
+			return res
+				.status(404)
+				.send(
+					createResObject(
+						false,
+						{},
+						stringConstants.CARD_ID_NOT_FOUND,
+						errorObjects.CARD_ID_NOT_FOUND
+					)
+				);
+		}
+
+		const user = await User.findById(userId);
+		if (!user)
+			return res
+				.status(404)
+				.send(
+					createResObject(
+						false,
+						{},
+						stringConstants.USER_ID_DOEST_NOT_EXISTS,
+						errorObjects.USER_ID_DOEST_NOT_EXISTS
+					)
+				);
+		try {
+			const filePath = path.join(__dirname, "../../public/", fileName);
+			console.log("filePath", filePath);
+			await fs.unlinkSync(filePath);
+			await Listing.updateOne(
+				{ _id: listing._id },
+				{ $pull: { images: fileName } }
+			);
+			return res.send(
+				createResObject(true, {}, stringConstants.IMAGE_REMOVE_SUCCESSFULLY)
+			);
+		} catch (err) {
+			return res.send(createResObject(false, {}, err.message));
+		}
+	}
+);
+
+/**
  * POST route to add a listing into marketplace
  */
 
@@ -652,10 +723,10 @@ router.post(
 );
 
 /**
- * Route to get buying listing by user
+ * Route to get buyer order list
  */
 router.get(
-	"/buying/:pageSize/:pageNumber",
+	"/invoices/:pageSize/:pageNumber",
 	[appAuth, auth, valPageSizeNumber],
 	async (req, res) => {
 		const pageSize = parseInt(req.params.pageSize);
@@ -699,6 +770,8 @@ router.get(
 					_id: "$_id",
 					status: "$status",
 					buyer: "$buyer",
+					invoiceId: "$orderId",
+					date: "$createdAt",
 					seller: {
 						_id: "$seller._id",
 						fullName: "$seller.fullName",
@@ -719,10 +792,10 @@ router.get(
 );
 
 /**
- * Route to get selling listing by user
+ * Route to get seller order list
  */
 router.get(
-	"/selling/:pageSize/:pageNumber",
+	"/seller/:pageSize/:pageNumber",
 	[appAuth, auth, valPageSizeNumber],
 	async (req, res) => {
 		const pageSize = parseInt(req.params.pageSize);
@@ -766,6 +839,8 @@ router.get(
 					_id: "$_id",
 					status: "$status",
 					seller: "$seller",
+					date: "$createdAt",
+					orderId: "$orderId",
 					buyer: {
 						_id: "$buyer._id",
 						fullName: "$buyer.fullName",

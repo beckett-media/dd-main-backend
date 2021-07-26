@@ -43,6 +43,7 @@ router.get("/", [appAuth, auth], async (req, res) => {
 router.post("/add/:listingId", [appAuth, auth], async (req, res) => {
 	const listingId = req.params.listingId;
 	const userId = req.user._id;
+	const quantity = req.body.quantity;
 	const user = await User.findById(userId);
 	if (!user)
 		return res
@@ -78,6 +79,33 @@ router.post("/add/:listingId", [appAuth, auth], async (req, res) => {
 					errorObjects.CARD_OWN_ERROR
 				)
 			);
+	if (
+		quantity < 1 ||
+		quantity === "" ||
+		quantity === undefined ||
+		quantity === null
+	)
+		return res
+			.status(401)
+			.send(
+				createResObject(
+					false,
+					{},
+					stringConstants.UNRECOGNISE_QUANTITY,
+					errorObjects.UNRECOGNISE_QUANTITY
+				)
+			);
+	if (card.quantity < quantity)
+		return res
+			.status(401)
+			.send(
+				createResObject(
+					false,
+					{},
+					stringConstants.LISTING_QUANTITY_LOW,
+					errorObjects.LISTING_QUANTITY_LOW
+				)
+			);
 	const checkListinExist = await Cart.findOne({
 		user: userId,
 		listing: listingId,
@@ -96,6 +124,7 @@ router.post("/add/:listingId", [appAuth, auth], async (req, res) => {
 	const saveCart = await Cart.create({
 		user: userId,
 		listing: listingId,
+		quantity: quantity,
 	});
 	return res.send(
 		createResObject(true, saveCart, stringConstants.CART_ADD_SUCCESSFULLY)
