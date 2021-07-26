@@ -64,7 +64,7 @@ router.get(
  * Route to get list/card detail
  */
 
-router.get("/:cardId", [appAuth, auth], async (req, res) => {
+router.get("/:cardId", [appAuth], async (req, res) => {
 	const cardId = req.params.cardId;
 	const userId = req.user._id;
 	const user = await User.findById(userId);

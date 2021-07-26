@@ -2,6 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const router = express.Router();
 const auth = require("../../middlewares/authenticateUser");
+const publicRouteAuth = require("../../middlewares/publicRouteAuth");
 const appAuth = require("../../middlewares/authenticateApp");
 const {
 	valCardPost,
@@ -30,22 +31,10 @@ const { Order } = require("../../models/order");
 /**
  * Route to get all marketplace data
  */
-router.get("/", [appAuth, auth], async (req, res) => {
+router.get("/", [appAuth, publicRouteAuth], async (req, res) => {
 	const pageSize = 10;
 	const pageNumber = 1;
-	const userId = req.user._id;
-	const user = await User.findById(userId);
-	if (!user)
-		return res
-			.status(404)
-			.send(
-				createResObject(
-					false,
-					{},
-					stringConstants.USER_ID_DOEST_NOT_EXISTS,
-					errorObjects.USER_ID_DOEST_NOT_EXISTS
-				)
-			);
+	const userId = req.user ? req.user._id : "";
 	const arivalCondition = {
 		$match: {
 			$and: [
@@ -98,39 +87,77 @@ router.get("/", [appAuth, auth], async (req, res) => {
 	let trendingLisitnProductId = trendingLisitnProduct.map((element, idx) => {
 		return element._id;
 	});
-	const cardCondition = {
-		$match: {
-			$and: [
-				{ product: { $in: trendingLisitnProductId } },
-				{ user: { $ne: userId } },
+	let cardCondition = "";
+	if (userId === "") {
+		cardCondition = {
+			$match: {
+				$and: [
+					{ product: { $in: trendingLisitnProductId } },
+					// { user: { $ne: userId } },
 
-				{ isPublic: true },
-				{ status: stringConstants.listingState.LISTING_SALE },
-			],
-		},
-	};
+					{ isPublic: true },
+					{ status: stringConstants.listingState.LISTING_SALE },
+				],
+			},
+		};
+	} else {
+		cardCondition = {
+			$match: {
+				$and: [
+					{ product: { $in: trendingLisitnProductId } },
+					{ user: { $ne: userId } },
+
+					{ isPublic: true },
+					{ status: stringConstants.listingState.LISTING_SALE },
+				],
+			},
+		};
+	}
+
 	const trendingCards = await filterData(cardCondition, pageSize, pageNumber);
 	// trading list for current user
-	const playerCondition = {
-		$match: {
-			$and: [
-				{ product: { $in: trendingLisitnProductId } },
-				{ user: { $ne: userId } },
-				{ isPublic: true },
-				{ status: stringConstants.listingState.LISTING_SALE },
-				{ $expr: { $gte: [{ $size: "$playerNames" }, 1] } },
-			],
-		},
-	};
+	let playerCondition = "";
+	if (userId === "") {
+		playerCondition = {
+			$match: {
+				$and: [
+					{ product: { $in: trendingLisitnProductId } },
+					// { user: { $ne: userId } },
+					{ isPublic: true },
+					{ status: stringConstants.listingState.LISTING_SALE },
+					{ $expr: { $gte: [{ $size: "$playerNames" }, 1] } },
+				],
+			},
+		};
+	} else {
+		playerCondition = {
+			$match: {
+				$and: [
+					{ product: { $in: trendingLisitnProductId } },
+					{ user: { $ne: userId } },
+					{ isPublic: true },
+					{ status: stringConstants.listingState.LISTING_SALE },
+					{ $expr: { $gte: [{ $size: "$playerNames" }, 1] } },
+				],
+			},
+		};
+	}
+
 	const trendingPlayers = await filterData(
 		playerCondition,
 		pageSize,
 		pageNumber
 	);
 	// check order for current user recommendation list
-	const checkCurrentUserOrder = await Order.find({ buyer: userId }).distinct(
-		"listing"
-	);
+	let checkCurrentUserOrder = "";
+	if (userId === "") {
+		checkCurrentUserOrder = await Order.find().distinct("listing");
+	} else {
+		checkCurrentUserOrder = await Order.find({ buyer: userId }).distinct(
+			"listing"
+		);
+	}
+
 	const recommendationListByPrice = await Listing.aggregate([
 		{
 			$match: {
@@ -139,28 +166,55 @@ router.get("/", [appAuth, auth], async (req, res) => {
 		},
 		{ $project: { max: { $max: "$price" }, min: { $min: "$price" } } },
 	]);
-	const recomendCondition = {
-		$match: {
-			$and: [
-				{ user: { $ne: mongoose.Types.ObjectId(userId) } },
-				{
-					price: {
-						$gte:
-							recommendationListByPrice.length > 0
-								? recommendationListByPrice[0].min
-								: 1,
-						$lte:
-							recommendationListByPrice.length > 0
-								? recommendationListByPrice[0].max
-								: 10000,
+	let recomendCondition = "";
+	if (userId === "") {
+		recomendCondition = {
+			$match: {
+				$and: [
+					// { user: { $ne: mongoose.Types.ObjectId(userId) } },
+					{
+						price: {
+							$gte:
+								recommendationListByPrice.length > 0
+									? recommendationListByPrice[0].min
+									: 1,
+							$lte:
+								recommendationListByPrice.length > 0
+									? recommendationListByPrice[0].max
+									: 10000,
+						},
 					},
-				},
 
-				{ isPublic: true },
-				{ status: stringConstants.listingState.LISTING_SALE },
-			],
-		},
-	};
+					{ isPublic: true },
+					{ status: stringConstants.listingState.LISTING_SALE },
+				],
+			},
+		};
+	} else {
+		recomendCondition = {
+			$match: {
+				$and: [
+					{ user: { $ne: mongoose.Types.ObjectId(userId) } },
+					{
+						price: {
+							$gte:
+								recommendationListByPrice.length > 0
+									? recommendationListByPrice[0].min
+									: 1,
+							$lte:
+								recommendationListByPrice.length > 0
+									? recommendationListByPrice[0].max
+									: 10000,
+						},
+					},
+
+					{ isPublic: true },
+					{ status: stringConstants.listingState.LISTING_SALE },
+				],
+			},
+		};
+	}
+
 	const recommendation = await filterData(
 		recomendCondition,
 		pageSize,
@@ -188,24 +242,12 @@ router.get("/", [appAuth, auth], async (req, res) => {
 
 router.get(
 	"/:filter/:pageSize/:pageNumber",
-	[appAuth, auth, valPageSizeNumber],
+	[appAuth, publicRouteAuth, valPageSizeNumber],
 	async (req, res) => {
 		const pageSize = parseInt(req.params.pageSize);
 		const pageNumber = parseInt(req.params.pageNumber);
 		const filter = req.params.filter;
-		const userId = req.user._id;
-		const user = await User.findById(userId);
-		if (!user)
-			return res
-				.status(404)
-				.send(
-					createResObject(
-						false,
-						{},
-						stringConstants.USER_ID_DOEST_NOT_EXISTS,
-						errorObjects.USER_ID_DOEST_NOT_EXISTS
-					)
-				);
+		const userId = req.user ? req.user._id : "";
 		if (filter === "newArrival") {
 			const condition = {
 				$match: {
@@ -262,17 +304,33 @@ router.get(
 				}
 			);
 
-			const condition = {
-				$match: {
-					$and: [
-						{ product: { $in: trendingLisitnProductId } },
-						{ user: { $ne: userId } },
+			let condition = "";
+			if (userId === "") {
+				condition = {
+					$match: {
+						$and: [
+							{ product: { $in: trendingLisitnProductId } },
+							// { user: { $ne: userId } },
 
-						{ isPublic: true },
-						{ status: stringConstants.listingState.LISTING_SALE },
-					],
-				},
-			};
+							{ isPublic: true },
+							{ status: stringConstants.listingState.LISTING_SALE },
+						],
+					},
+				};
+			} else {
+				condition = {
+					$match: {
+						$and: [
+							{ product: { $in: trendingLisitnProductId } },
+							{ user: { $ne: userId } },
+
+							{ isPublic: true },
+							{ status: stringConstants.listingState.LISTING_SALE },
+						],
+					},
+				};
+			}
+
 			const cards = await filterData(condition, pageSize, pageNumber);
 			return res.send(
 				createResObject(true, cards, stringConstants.FETCH_SUCESSFUL)
@@ -322,17 +380,33 @@ router.get(
 				}
 			);
 
-			const condition = {
-				$match: {
-					$and: [
-						{ product: { $in: trendingLisitnProductId } },
-						{ user: { $ne: userId } },
-						{ isPublic: true },
-						{ status: stringConstants.listingState.LISTING_SALE },
-						{ $expr: { $gte: [{ $size: "$playerNames" }, 1] } },
-					],
-				},
-			};
+			let condition = "";
+			if (userId === "") {
+				condition = {
+					$match: {
+						$and: [
+							{ product: { $in: trendingLisitnProductId } },
+							// { user: { $ne: userId } },
+							{ isPublic: true },
+							{ status: stringConstants.listingState.LISTING_SALE },
+							{ $expr: { $gte: [{ $size: "$playerNames" }, 1] } },
+						],
+					},
+				};
+			} else {
+				condition = {
+					$match: {
+						$and: [
+							{ product: { $in: trendingLisitnProductId } },
+							{ user: { $ne: userId } },
+							{ isPublic: true },
+							{ status: stringConstants.listingState.LISTING_SALE },
+							{ $expr: { $gte: [{ $size: "$playerNames" }, 1] } },
+						],
+					},
+				};
+			}
+
 			const cards = await filterData(condition, pageSize, pageNumber);
 			return res.send(
 				createResObject(true, cards, stringConstants.FETCH_SUCESSFUL)
@@ -341,9 +415,15 @@ router.get(
 
 		// check order for current user recommendation list
 		else if (filter === "recommended") {
-			const checkCurrentUserOrder = await Order.find({
-				buyer: userId,
-			}).distinct("listing");
+			let checkCurrentUserOrder = "";
+			if (userId === "") {
+				checkCurrentUserOrder = await Order.find().distinct("listing");
+			} else {
+				checkCurrentUserOrder = await Order.find({
+					buyer: userId,
+				}).distinct("listing");
+			}
+
 			const recommendationListByPrice = await Listing.aggregate([
 				{
 					$match: {
@@ -352,28 +432,63 @@ router.get(
 				},
 				{ $project: { max: { $max: "$price" }, min: { $min: "$price" } } },
 			]);
-			const condition = {
-				$match: {
-					$and: [
-						{ user: { $ne: mongoose.Types.ObjectId(userId) } },
-						{
-							price: {
-								$gte:
-									recommendationListByPrice.length > 0
-										? recommendationListByPrice[0].min
-										: 1,
-								$lte:
-									recommendationListByPrice.length > 0
-										? recommendationListByPrice[0].max
-										: 10000,
+			let condition = "";
+			if (userId === "") {
+				condition = {
+					$match: {
+						$and: [
+							// { user: { $ne: mongoose.Types.ObjectId(userId) } },
+							{
+								price: {
+									$gte:
+										recommendationListByPrice.length > 0
+											? Math.min(
+													...recommendationListByPrice.map((elt) => elt.min)
+											  )
+											: 1,
+									$lte:
+										recommendationListByPrice.length > 0
+											? Math.min(
+													...recommendationListByPrice.map((elt) => elt.max)
+											  )
+											: 10000,
+								},
 							},
-						},
 
-						{ isPublic: true },
-						{ status: stringConstants.listingState.LISTING_SALE },
-					],
-				},
-			};
+							{ isPublic: true },
+							{ status: stringConstants.listingState.LISTING_SALE },
+						],
+					},
+				};
+			} else {
+				condition = {
+					$match: {
+						$and: [
+							{ user: { $ne: mongoose.Types.ObjectId(userId) } },
+							{
+								price: {
+									$gte:
+										recommendationListByPrice.length > 0
+											? Math.min(
+													...recommendationListByPrice.map((elt) => elt.min)
+											  )
+											: 1,
+									$lte:
+										recommendationListByPrice.length > 0
+											? Math.min(
+													...recommendationListByPrice.map((elt) => elt.max)
+											  )
+											: 10000,
+								},
+							},
+
+							{ isPublic: true },
+							{ status: stringConstants.listingState.LISTING_SALE },
+						],
+					},
+				};
+			}
+
 			const recommanded = await filterData(condition, pageSize, pageNumber);
 			return res.send(
 				createResObject(true, recommanded, stringConstants.FETCH_SUCESSFUL)
@@ -392,24 +507,24 @@ router.get(
 
 router.get(
 	"/product/:productType/:pageSize/:pageNumber",
-	[appAuth, auth, valPageSizeNumber],
+	[appAuth, valPageSizeNumber],
 	async (req, res) => {
 		const pageSize = parseInt(req.params.pageSize);
 		const pageNumber = parseInt(req.params.pageNumber);
 		const filter = req.params.productType;
-		const userId = req.user._id;
-		const user = await User.findById(userId);
-		if (!user)
-			return res
-				.status(404)
-				.send(
-					createResObject(
-						false,
-						{},
-						stringConstants.USER_ID_DOEST_NOT_EXISTS,
-						errorObjects.USER_ID_DOEST_NOT_EXISTS
-					)
-				);
+		// const userId = req.user._id;
+		// const user = await User.findById(userId);
+		// if (!user)
+		// 	return res
+		// 		.status(404)
+		// 		.send(
+		// 			createResObject(
+		// 				false,
+		// 				{},
+		// 				stringConstants.USER_ID_DOEST_NOT_EXISTS,
+		// 				errorObjects.USER_ID_DOEST_NOT_EXISTS
+		// 			)
+		// 		);
 
 		const condition = {
 			$match: {
@@ -433,24 +548,24 @@ router.get(
 
 router.get(
 	"/grade/:gradeType/:pageSize/:pageNumber",
-	[appAuth, auth, valPageSizeNumber],
+	[appAuth, valPageSizeNumber],
 	async (req, res) => {
 		const pageSize = parseInt(req.params.pageSize);
 		const pageNumber = parseInt(req.params.pageNumber);
 		const filter = req.params.gradeType;
-		const userId = req.user._id;
-		const user = await User.findById(userId);
-		if (!user)
-			return res
-				.status(404)
-				.send(
-					createResObject(
-						false,
-						{},
-						stringConstants.USER_ID_DOEST_NOT_EXISTS,
-						errorObjects.USER_ID_DOEST_NOT_EXISTS
-					)
-				);
+		// const userId = req.user._id;
+		// const user = await User.findById(userId);
+		// if (!user)
+		// 	return res
+		// 		.status(404)
+		// 		.send(
+		// 			createResObject(
+		// 				false,
+		// 				{},
+		// 				stringConstants.USER_ID_DOEST_NOT_EXISTS,
+		// 				errorObjects.USER_ID_DOEST_NOT_EXISTS
+		// 			)
+		// 		);
 
 		const condition = {
 			$match: {
