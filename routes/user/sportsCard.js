@@ -1086,7 +1086,7 @@ router.get('/card-fac/:cardId', [valCard], async (req, res, next) => {
     card = card.getCardDetailsWithGrading();
 
     return res.send(
-        createResObject(true, { card, user: user ? user.getUserDetails() : {} }, stringConstants.CARD_FAC)
+        createResObject(true, { card, user: user ? user.getUserBasicInfo() : {} }, stringConstants.CARD_FAC)
     );
   } catch(e) {
     return res.send(
