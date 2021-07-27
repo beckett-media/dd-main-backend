@@ -28,6 +28,7 @@ const { errorObjects } = require("../../utils/errorObjects");
 const { uploadMultiImage } = require("../../middlewares/multerSingle");
 const { Order } = require("../../models/order");
 const { StripeConnect } = require("../../models/stripeConnect");
+const { OrderItem } = require("../../models/orderItem");
 
 /**
  * Route to get listing by user
@@ -727,7 +728,7 @@ router.post(
  */
 router.get(
 	"/invoices/:pageSize/:pageNumber",
-	[appAuth, auth, valPageSizeNumber],
+	[auth, valPageSizeNumber],
 	async (req, res) => {
 		const pageSize = parseInt(req.params.pageSize);
 		const pageNumber = parseInt(req.params.pageNumber);
@@ -746,38 +747,48 @@ router.get(
 				);
 
 		const buyingListing = await Order.aggregate([
-			{ $match: { buyer: mongoose.Types.ObjectId(userId) } },
+			{
+				$match: { buyer: mongoose.Types.ObjectId(userId), status: "completed" },
+			},
+			{
+				$lookup: {
+					from: "orderitems",
+					localField: "_id",
+					foreignField: "parent",
+					as: "items",
+				},
+			},
+			{ $unwind: { path: "$items", preserveNullAndEmptyArrays: true } },
 			{
 				$lookup: {
 					from: "users",
-					localField: "seller",
-					foreignField: "_id",
-					as: "seller",
+					let: { sellerId: "$items.seller" },
+					pipeline: [
+						{ $match: { $expr: { $eq: ["$_id", "$$sellerId"] } } },
+						{
+							$project: {
+								_id: 1,
+								fullName: 1,
+								email: 1,
+							},
+						},
+					],
+					as: "items.seller",
 				},
 			},
-			{ $unwind: { path: "$seller" } },
+			{ $unwind: { path: "$items.seller", preserveNullAndEmptyArrays: true } },
+
 			{
-				$lookup: {
-					from: "listings",
-					localField: "listing",
-					foreignField: "_id",
-					as: "listing",
-				},
-			},
-			{ $unwind: { path: "$listing" } },
-			{
-				$project: {
+				$group: {
 					_id: "$_id",
-					status: "$status",
-					buyer: "$buyer",
-					invoiceId: "$orderId",
-					date: "$createdAt",
-					seller: {
-						_id: "$seller._id",
-						fullName: "$seller.fullName",
-						email: "$seller.email",
-					},
-					listing: "$listing",
+					status: { $first: "$status" },
+					address: { $first: "$address" },
+					price: { $first: "$price" },
+					orderId: { $first: "$orderId" },
+					createdAt: { $first: "$createdAt" },
+					updatedAt: { $first: "$updatedAt" },
+					buyer: { $first: "$buyer" },
+					items: { $push: "$items" },
 				},
 			},
 			{ $skip: (pageNumber - 1) * pageSize },
@@ -801,6 +812,7 @@ router.get(
 		const pageSize = parseInt(req.params.pageSize);
 		const pageNumber = parseInt(req.params.pageNumber);
 		const userId = req.user._id;
+		// const userId = "60c1e943ac722e253061a51f";
 		const user = await User.findById(userId);
 		if (!user)
 			return res
@@ -813,40 +825,85 @@ router.get(
 						errorObjects.USER_ID_DOEST_NOT_EXISTS
 					)
 				);
-
-		const buyingListing = await Order.aggregate([
-			{ $match: { seller: mongoose.Types.ObjectId(userId) } },
+		const orderIds = await OrderItem.find({ seller: userId }).distinct(
+			"parent"
+		);
+		let ids = [];
+		if (orderIds.length > 0) {
+			ids = orderIds.map((id, i) => {
+				return mongoose.Types.ObjectId(id);
+			});
+		}
+		const sellerListing = await Order.aggregate([
+			{
+				$match: { _id: { $in: ids } },
+			},
 			{
 				$lookup: {
 					from: "users",
-					localField: "buyer",
-					foreignField: "_id",
+					let: { buyerId: "$buyer" },
+					pipeline: [
+						{ $match: { $expr: { $eq: ["$_id", "$$buyerId"] } } },
+						{
+							$project: {
+								_id: 1,
+								fullName: 1,
+								email: 1,
+							},
+						},
+					],
 					as: "buyer",
 				},
 			},
-			{ $unwind: { path: "$buyer" } },
+			{ $unwind: { path: "$buyer", preserveNullAndEmptyArrays: true } },
+
 			{
 				$lookup: {
-					from: "listings",
-					localField: "listing",
-					foreignField: "_id",
-					as: "listing",
+					from: "orderitems",
+					let: { adderId: "$_id" },
+					pipeline: [{ $match: { $expr: { $eq: ["$parent", "$$adderId"] } } }],
+					as: "items",
 				},
 			},
-			{ $unwind: { path: "$listing" } },
+			{ $unwind: { path: "$items", preserveNullAndEmptyArrays: true } },
 			{
-				$project: {
+				$lookup: {
+					from: "addresses",
+					let: { addressId: "$items.address" },
+					pipeline: [{ $match: { $expr: { $eq: ["$_id", "$$addressId"] } } }],
+					as: "items.address",
+				},
+			},
+			{ $unwind: { path: "$items.address", preserveNullAndEmptyArrays: true } },
+			{
+				$lookup: {
+					from: "users",
+					let: { buyerId: "$items.buyer" },
+					pipeline: [
+						{ $match: { $expr: { $eq: ["$_id", "$$buyerId"] } } },
+						{
+							$project: {
+								_id: 1,
+								fullName: 1,
+								email: 1,
+							},
+						},
+					],
+					as: "items.buyer",
+				},
+			},
+			{ $unwind: { path: "$items.buyer", preserveNullAndEmptyArrays: true } },
+			{
+				$group: {
 					_id: "$_id",
-					status: "$status",
-					seller: "$seller",
-					date: "$createdAt",
-					orderId: "$orderId",
-					buyer: {
-						_id: "$buyer._id",
-						fullName: "$buyer.fullName",
-						email: "$buyer.email",
-					},
-					listing: "$listing",
+					status: { $first: "$status" },
+					address: { $first: "$address" },
+					price: { $first: "$price" },
+					orderId: { $first: "$orderId" },
+					createdAt: { $first: "$createdAt" },
+					updatedAt: { $first: "$updatedAt" },
+					buyer: { $first: "$buyer" },
+					items: { $push: "$items" },
 				},
 			},
 			{ $skip: (pageNumber - 1) * pageSize },
@@ -855,7 +912,7 @@ router.get(
 		]);
 
 		return res.send(
-			createResObject(true, buyingListing, stringConstants.FETCH_SUCESSFUL)
+			createResObject(true, sellerListing, stringConstants.FETCH_SUCESSFUL)
 		);
 	}
 );

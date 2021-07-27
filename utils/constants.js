@@ -185,7 +185,7 @@ module.exports.stringConstants = {
 	ADDRESS_TYPE_CONFLICT: "Please make another default address first",
 	REMVOE_DEFAULT_ADDRESS: "You cannot delete the default address.",
 	CARD_OWN_ERROR: "You are not able to purchase your own card.",
-	CARD_ALREADY_CART: "You have already into your cart.",
+	CARD_ALREADY_CART: "This card is already into your cart.",
 	STRIPE_ACCOUNT_CONNECT_SUCCESSFULLY: "Stripe account connect successfully.",
 	SAVE_CARD_REMOVE: "Save card remove successfully.",
 	ORDER_SUCCESSFULLY: "Your order has been successfully submitted.",
@@ -219,6 +219,7 @@ module.exports.stringConstants = {
 		ADDRESS_COLLECTION: "Address",
 		STRIPE_CONNECT_COLLECTION: "StripeConnect",
 		ORDER_LOG_COLLECTION: "OrderLog",
+		ORDER_ITEM_COLLECTION: "OrderItem",
 	},
 
 	deletionType: {

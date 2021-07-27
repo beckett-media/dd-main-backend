@@ -14,6 +14,7 @@ const { Cart } = require("../../models/cart");
 const config = require("config");
 const { StripeConnect } = require("../../models/stripeConnect");
 const { OrderLog } = require("../../models/orderLog");
+const { OrderItem } = require("../../models/orderItem");
 const { valPageSizeNumber } = require("../../middlewares/validation");
 const stripe = require("stripe")(config.get(stringConstants.STRIPE_TEST_KEY));
 
@@ -91,6 +92,11 @@ router.post("/checkout", [appAuth, auth], async (req, res) => {
 				customer: cusId,
 				// card: cardId,
 			});
+			const createOrder = await Order.create({
+				buyer: userId,
+				address: addressId,
+				price: amount[0].totalAmount,
+			});
 			for (const list of listings) {
 				let fee =
 					(list.price * stringConstants.APPLICATION_FEE_PERCENTAGE) / 100;
@@ -124,12 +130,15 @@ router.post("/checkout", [appAuth, auth], async (req, res) => {
 					);
 				}
 
-				const createOrder = await Order.create({
+				const createOrderItem = await OrderItem.create({
 					buyer: userId,
 					seller: list.user.toString(),
 					listing: list.id,
 					address: addressId,
+					price: list.price,
+					title: list.title,
 					status: "pending",
+					parent: createOrder._id,
 					quantity: cart.quantity,
 				});
 				const orderLog = await OrderLog.create({
@@ -140,10 +149,16 @@ router.post("/checkout", [appAuth, auth], async (req, res) => {
 				});
 				await Cart.remove({ _id: cart._id });
 			}
+			await Order.findByIdAndUpdate(createOrder._id, {
+				$set: { status: "completed" },
+			});
 			return res.send(
 				createResObject(true, {}, stringConstants.ORDER_SUCCESSFULLY)
 			);
 		} else {
+			await Order.findByIdAndUpdate(createOrder._id, {
+				$set: { status: "incomplete" },
+			});
 			return res.send(
 				createResObject(true, {}, stringConstants.LISTING_NOT_FOUND)
 			);
