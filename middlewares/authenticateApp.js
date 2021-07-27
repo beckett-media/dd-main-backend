@@ -6,37 +6,36 @@ const { stringConstants } = require("../utils/constants");
 const { errorObjects } = require("../utils/errorObjects");
 
 module.exports = (req, res, next) => {
-	next();
-	// const token = req.header(stringConstants.APP_TOKEN_STRING);
-	// if (!token) {
-	// 	return res
-	// 		.status(401)
-	// 		.send(
-	// 			createResObject(
-	// 				false,
-	// 				{},
-	// 				stringConstants.APP_TOKEN_INVALID_OR_EXPIRED,
-	// 				errorObjects.APP_TOKEN_INVALID_OR_EXPIRED
-	// 			)
-	// 		);
-	// }
+	const token = req.header(stringConstants.APP_TOKEN_STRING);
+	if (!token) {
+		return res
+			.status(401)
+			.send(
+				createResObject(
+					false,
+					{},
+					stringConstants.APP_TOKEN_INVALID_OR_EXPIRED,
+					errorObjects.APP_TOKEN_INVALID_OR_EXPIRED
+				)
+			);
+	}
 
-	// try {
-	// 	jwt.verify(token, config.get(stringConstants.JWT_APP_KEY), {
-	// 		ignoreExpiration: true,
-	// 	});
-	// 	return next();
-	// } catch (error) {
-	// 	SimpleLogger.error(error);
-	// 	return res
-	// 		.status(401)
-	// 		.send(
-	// 			createResObject(
-	// 				false,
-	// 				{},
-	// 				stringConstants.APP_TOKEN_INVALID_OR_EXPIRED,
-	// 				errorObjects.APP_TOKEN_INVALID_OR_EXPIRED
-	// 			)
-	// 		);
-	// }
+	try {
+		jwt.verify(token, config.get(stringConstants.JWT_APP_KEY), {
+			ignoreExpiration: true,
+		});
+		return next();
+	} catch (error) {
+		SimpleLogger.error(error);
+		return res
+			.status(401)
+			.send(
+				createResObject(
+					false,
+					{},
+					stringConstants.APP_TOKEN_INVALID_OR_EXPIRED,
+					errorObjects.APP_TOKEN_INVALID_OR_EXPIRED
+				)
+			);
+	}
 };

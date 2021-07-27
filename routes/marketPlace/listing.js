@@ -728,7 +728,7 @@ router.post(
  */
 router.get(
 	"/invoices/:pageSize/:pageNumber",
-	[auth, valPageSizeNumber],
+	[appAuth, auth, valPageSizeNumber],
 	async (req, res) => {
 		const pageSize = parseInt(req.params.pageSize);
 		const pageNumber = parseInt(req.params.pageNumber);
