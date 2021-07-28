@@ -14,6 +14,11 @@ const listingSchema = new mongoose.Schema(
 		},
 		quantity: {
 			type: Number,
+			required: true,
+		},
+		availableQuantity: {
+			type: Number,
+			required: true,
 		},
 		price: {
 			type: Number,
@@ -91,7 +96,8 @@ const listingSchema = new mongoose.Schema(
 			required: true,
 		},
 		card: {
-			type: String,
+			type: Schema.Types.ObjectId,
+			ref: stringConstants.collectionNames.CARD_COLLECTION,
 			required: false,
 		},
 	},

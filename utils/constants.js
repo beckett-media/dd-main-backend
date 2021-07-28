@@ -122,11 +122,11 @@ module.exports.stringConstants = {
 	PENDING_DELETION_TYPE_NOT_HANDLED:
 		"Deletion type not handling by pending deletion",
 
-  NO_PEDNING_CARDS_FOUND_FOR_USER: "No pending cards found for the user",
-  NO_CARDS_LEFT_IN_PLAN: "No cards left in plan. Please upgrade your subscription and try again.",
-  NO_CARD: 'No Card Found for given Id',
-  NO_CARD_FOR_USER: 'No Card Found or trying to delete not owned card.',
-  API_ERROR: 'Not able to fetch grade at this moment. Please try again',
+	NO_PEDNING_CARDS_FOUND_FOR_USER: "No pending cards found for the user",
+	NO_CARDS_LEFT_IN_PLAN: "No cards left in plan. Please upgrade your subscription and try again.",
+	NO_CARD: 'No Card Found for given Id',
+	NO_CARD_FOR_USER: 'No Card Found or trying to delete not owned card.',
+	API_ERROR: 'Not able to fetch grade at this moment. Please try again',
 
 	NO_STRIPE_ID_FOUND_FOR_USER: "No stripe ID found for user: ",
 
@@ -159,8 +159,13 @@ module.exports.stringConstants = {
 	NO_EBAY_REFRESH_TOKEN_FOUND: "No ebay refresh token found",
 	CARD_ADD_MARKETPLACE_SUCCESSFULLY: "Card add successfully into marketplace",
 	CARD_ADD_LISTING_SUCCESSFULLY: "Create listing successfully",
+	CARD_UPDATE_LISTING_SUCCESSFULLY: "listing update successfully",
+	LISTING_DELETE_SUCCESSFULLY: "listing delete successfully",
 	PRODUCT_NOT_FOUND: "Products not found",
 	PRODUCT_ID_NOT_FOUND: "Product with the given ID not found",
+	LISTING_ID_NOT_FOUND: "Listing with the given ID not found",
+	LISTING_ALREADY_SOLD:
+		"Listing is already sold. you can't update the listing.",
 	GRADE_ID_NOT_FOUND: "Grade with the given ID not found",
 	GRADE_NOT_FOUND: "Grades not found",
 	UNAUTHENTICATE_USER: "unauthenticate user",
@@ -180,11 +185,17 @@ module.exports.stringConstants = {
 	ADDRESS_TYPE_CONFLICT: "Please make another default address first",
 	REMVOE_DEFAULT_ADDRESS: "You cannot delete the default address.",
 	CARD_OWN_ERROR: "You are not able to purchase your own card.",
-	CARD_ALREADY_CART: "You have already into your cart.",
+	CARD_ALREADY_CART: "This card is already into your cart.",
 	STRIPE_ACCOUNT_CONNECT_SUCCESSFULLY: "Stripe account connect successfully.",
+	SAVE_CARD_REMOVE: "Save card remove successfully.",
 	ORDER_SUCCESSFULLY: "Your order has been successfully submitted.",
 	APPLICATION_FEE_PERCENTAGE: 5,
 	STRIPE_CONNECT_ERROR: "Please attach stripe id.",
+	LISTING_NOT_FOUND: "Listing not found with given id's",
+	LISTING_QUANTITY_LOW: "Sorry , we don't have enough stock.",
+	UNRECOGNISE_QUANTITY: "Please add some quantity.",
+	STRIPE_CLIENTID_NOT_FOUND: "Client Id not found, please send a card token.",
+	IMAGE_REMOVE_SUCCESSFULLY: "Image remove successfully.",
 
 	collectionNames: {
 		USER_COLLECTION: "User",
@@ -208,6 +219,7 @@ module.exports.stringConstants = {
 		ADDRESS_COLLECTION: "Address",
 		STRIPE_CONNECT_COLLECTION: "StripeConnect",
 		ORDER_LOG_COLLECTION: "OrderLog",
+		ORDER_ITEM_COLLECTION: "OrderItem",
 	},
 
 	deletionType: {

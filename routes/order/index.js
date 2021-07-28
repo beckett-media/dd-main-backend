@@ -10,9 +10,12 @@ const { stringConstants } = require("../../utils/constants");
 const { errorObjects } = require("../../utils/errorObjects");
 const { Listing } = require("../../models/listing");
 const { User } = require("../../models/user");
+const { Cart } = require("../../models/cart");
 const config = require("config");
 const { StripeConnect } = require("../../models/stripeConnect");
 const { OrderLog } = require("../../models/orderLog");
+const { OrderItem } = require("../../models/orderItem");
+const { valPageSizeNumber } = require("../../middlewares/validation");
 const stripe = require("stripe")(config.get(stringConstants.STRIPE_TEST_KEY));
 
 /**
@@ -21,9 +24,9 @@ const stripe = require("stripe")(config.get(stringConstants.STRIPE_TEST_KEY));
 router.post("/checkout", [appAuth, auth], async (req, res) => {
 	const userId = req.user._id;
 	const cardToken = req.body.cardToken;
-	const cardId = req.body.cardId;
+	// const customerId = req.body.customerId;
 	const addressId = req.body.addressId;
-	const listingIds = req.body.listingIds;
+	const isCardSave = req.body.isCardSave;
 	const user = await User.findById(userId);
 	if (!user)
 		return res
@@ -37,39 +40,106 @@ router.post("/checkout", [appAuth, auth], async (req, res) => {
 				)
 			);
 	try {
-		const listings = await Listing.find({ _id: { $in: listingIds } });
-		if (listings.length > 0) {
+		const listingsIds = await Cart.find({ user: userId }).distinct("listing");
+		const amount = await Listing.aggregate([
+			{ $match: { _id: { $in: listingsIds } } },
+			{
+				$group: {
+					_id: "sum amount",
+					totalAmount: { $sum: "$price" },
+					count: { $sum: 1 },
+				},
+			},
+		]);
+		let cusId = "";
+		if (cardToken !== "") {
 			const createCustomer = await stripe.customers.create({
+				email: user.email,
 				source: cardToken,
-				description: "For purchasing sports card",
+				description: "Purchasing sports card",
+				metadata: {
+					userId: user._id.toString(),
+				},
+			});
+			cusId = createCustomer.id;
+			if (isCardSave) {
+				await User.findByIdAndUpdate(userId, {
+					$set: {
+						stripeId: cusId,
+					},
+				});
+			}
+		} else {
+			cusId = user.stripeId;
+			if (cusId === "") {
+				return res
+					.status(404)
+					.send(
+						createResObject(
+							false,
+							{},
+							stringConstants.STRIPE_CLIENTID_NOT_FOUND,
+							errorObjects.STRIPE_CLIENTID_NOT_FOUND
+						)
+					);
+			}
+		}
+		const listings = await Listing.find({ _id: { $in: listingsIds } });
+		if (listings.length > 0) {
+			const charge = await stripe.charges.create({
+				amount: amount[0].totalAmount * 100,
+				currency: "usd",
+				customer: cusId,
+				// card: cardId,
+			});
+			const createOrder = await Order.create({
+				buyer: userId,
+				address: addressId,
+				price: amount[0].totalAmount,
 			});
 			for (const list of listings) {
+				let fee =
+					(list.price * stringConstants.APPLICATION_FEE_PERCENTAGE) / 100;
+				const cart = await Cart.findOne({
+					listing: mongoose.Types.ObjectId(list.id),
+				});
 				const stripeObj = await StripeConnect.findOne({
 					user: list.user.toString(),
 				});
-				const charge = await stripe.charges.create({
-					amount: list.price,
+				const transfer = await stripe.transfers.create({
+					amount: (list.price - fee) * 100,
 					currency: "usd",
-					customer: createCustomer.id,
-					card: cardId,
-					application_fee_amount:
-						(list.price * stringConstants.APPLICATION_FEE_PERCENTAGE) / 100,
-					transfer_data: {
-						destination: stripeObj.stripeUserId,
-					},
+					source_transaction: charge.id,
+					destination: stripeObj.stripeUserId,
 				});
-				const updateListing = await Listing.findByIdAndUpdate(
-					list.id,
-					{ $set: { status: "sold" } },
-					{ new: true }
-				);
 
-				const createOrder = await Order.create({
+				const item = await Listing.findById(list.id);
+				if (item.quantity === cart.quantity) {
+					const updateListing = await Listing.findByIdAndUpdate(
+						list.id,
+						{ $set: { status: "sold", availableQuantity: 0 } },
+						{ new: true }
+					);
+				}
+				if (item.quantity > cart.quantity) {
+					let q = item.quantity - cart.quantity;
+					const updateListing = await Listing.findByIdAndUpdate(
+						list.id,
+						{ $set: { availableQuantity: q } },
+						{ new: true }
+					);
+				}
+
+				const createOrderItem = await OrderItem.create({
 					buyer: userId,
 					seller: list.user.toString(),
 					listing: list.id,
 					address: addressId,
+					price: list.price,
+					title: list.title,
 					status: "pending",
+					parent: createOrder._id,
+					quantity: cart.quantity,
 				});
 				const orderLog = await OrderLog.create({
 					response: charge,
@@ -77,9 +147,20 @@ router.post("/checkout", [appAuth, auth], async (req, res) => {
 					buyer: userId,
 					listing: list.id,
 				});
+				await Cart.remove({ _id: cart._id });
 			}
+			await Order.findByIdAndUpdate(createOrder._id, {
+				$set: { status: "completed" },
+			});
 			return res.send(
 				createResObject(true, {}, stringConstants.ORDER_SUCCESSFULLY)
+			);
+		} else {
+			await Order.findByIdAndUpdate(createOrder._id, {
+				$set: { status: "incomplete" },
+			});
+			return res.send(
+				createResObject(true, {}, stringConstants.LISTING_NOT_FOUND)
 			);
 		}
 	} catch (e) {
