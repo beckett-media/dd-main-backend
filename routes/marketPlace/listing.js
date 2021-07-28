@@ -65,7 +65,7 @@ router.get(
  * Route to get list/card detail
  */
 
-router.get("/:cardId", [appAuth], async (req, res) => {
+router.get("/:cardId", async (req, res) => {
 	const cardId = req.params.cardId;
 	const cardDetail = await Listing.aggregate([
 		{ $match: { _id: mongoose.Types.ObjectId(cardId) } },
@@ -78,15 +78,6 @@ router.get("/:cardId", [appAuth], async (req, res) => {
 			},
 		},
 		{ $unwind: { path: "$seller" } },
-		{
-			$lookup: {
-				from: "cards",
-				localField: "card",
-				foreignField: "_id",
-				as: "card",
-			},
-		},
-		{ $unwind: { path: "$card" } },
 		{
 			$project: {
 				_id: "$_id",
