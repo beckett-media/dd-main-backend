@@ -90,7 +90,7 @@ const cardFrontStorage = multer.diskStorage({
     );
     const userPath = path.join(
       __dirname,
-      `./public/${userId}/`
+      `../public/${userId}/`
     );
   
     if (!fs.existsSync(userPath)) {
@@ -137,7 +137,7 @@ const cardBackStorage = multer.diskStorage({
     );
     const userPath = path.join(
       __dirname,
-      `./public/${userId}/`
+      `../public/${userId}/`
     );
   
     if (!fs.existsSync(userPath)) {
