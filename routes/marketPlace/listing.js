@@ -67,19 +67,6 @@ router.get(
 
 router.get("/:cardId", [appAuth], async (req, res) => {
 	const cardId = req.params.cardId;
-	const userId = req.user._id;
-	const user = await User.findById(userId);
-	if (!user)
-		return res
-			.status(404)
-			.send(
-				createResObject(
-					false,
-					{},
-					stringConstants.USER_ID_DOEST_NOT_EXISTS,
-					errorObjects.USER_ID_DOEST_NOT_EXISTS
-				)
-			);
 	const cardDetail = await Listing.aggregate([
 		{ $match: { _id: mongoose.Types.ObjectId(cardId) } },
 		{
