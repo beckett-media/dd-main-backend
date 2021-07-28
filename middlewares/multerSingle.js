@@ -88,6 +88,15 @@ const cardFrontStorage = multer.diskStorage({
       __dirname,
       `../public/${userId}/cards/${cardId}/`
     );
+    const userPath = path.join(
+      __dirname,
+      `./public/${userId}/`
+    );
+  
+    if (!fs.existsSync(userPath)) {
+      fs.mkdirSync(userPath);
+      fs.mkdirSync(`${userPath}cards/`);
+    }
     const dirs = [parentDir, fileDestination];
     try {
       for (const dir of dirs) {
@@ -126,6 +135,15 @@ const cardBackStorage = multer.diskStorage({
       __dirname,
       `../public/${userId}/cards/${cardId}/`
     );
+    const userPath = path.join(
+      __dirname,
+      `./public/${userId}/`
+    );
+  
+    if (!fs.existsSync(userPath)) {
+      fs.mkdirSync(userPath);
+      fs.mkdirSync(`${userPath}cards/`);
+    }
     const dirs = [parentDir, fileDestination];
     try {
       for (const dir of dirs) {
