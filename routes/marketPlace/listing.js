@@ -198,25 +198,6 @@ router.post(
 						errorObjects.PRODUCT_ID_NOT_FOUND
 					)
 				);
-		// if (productOptionId !== "") {
-		// 	const productOption = await Product.findOne({
-		// 		_id: productId,
-		// 		options: { $elemMatch: { _id: productOptionId } },
-		// 	});
-
-		// 	if (!productOption)
-		// 		return res
-		// 			.status(400)
-		// 			.send(
-		// 				createResObject(
-		// 					false,
-		// 					{},
-		// 					stringConstants.PRODUCT_ID_NOT_FOUND,
-		// 					errorObjects.PRODUCT_ID_NOT_FOUND
-		// 				)
-		// 			);
-		// }
-
 		const grade = await Grade.findById(gradeId);
 		if (!grade)
 			return res
@@ -234,7 +215,6 @@ router.post(
 			user: userId,
 			card: cardId === "" ? null : cardId,
 			product: productId,
-			// productOption: productOptionId,
 			grade: gradeId,
 			title: title,
 			description: description,
@@ -274,7 +254,7 @@ router.post(
  */
 router.put(
 	"/:listingId",
-	[appAuth, auth, valObjectIdInUrl, valLisitngCardData],
+	[auth, valObjectIdInUrl, valLisitngCardData],
 	async (req, res) => {
 		const listingId = req.params.listingId;
 
@@ -370,7 +350,7 @@ router.put(
 			{
 				$set: {
 					user: userId,
-					card: cardId,
+					card: cardId === "" ? null : cardId,
 					product: productId,
 					grade: gradeId,
 					title: title,
@@ -559,7 +539,13 @@ router.post(
 					images.push(path.join(`${userId}/listing/${cardId}/`, file.filename));
 				}
 			}
-			listing.images = images;
+			if (listing.images && listing.images.length > 0) {
+				let arr = [...listing.images, ...images];
+				listing.images = arr;
+			} else {
+				listing.images = images;
+			}
+
 			listing = await listing.save();
 
 			return res.send(
