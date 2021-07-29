@@ -490,7 +490,7 @@ router.post(
 						);
 				}
 				// Otherwise return unsuspected error
-				return next(err);
+				return res.status(400).send(createResObject(false, {}, err, err));
 			}
 
 			// Check files exists
