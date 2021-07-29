@@ -440,7 +440,7 @@ router.delete(
  */
 router.post(
 	"/update-lsiting-images/:listingId",
-	[appAuth, auth, valObjectIdInUrl],
+	[auth, valObjectIdInUrl],
 	async (req, res) => {
 		const cardId = req.params.listingId;
 		const userId = req.user._id;

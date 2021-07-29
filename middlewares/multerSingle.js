@@ -159,7 +159,16 @@ const multiImageStorage = multer.diskStorage({
 		if (!cardId) cb(new Error(stringConstants.CARD_ID_NOT_FOUND), false);
 		if (!userId)
 			cb(new Error(stringConstants.USER_ID_NOT_FOUND_IN_REQUEST), false);
-
+		const userDir = path.join(__dirname, `../public/${userId}`);
+		const uDirs = [userDir];
+		try {
+			for (const dir of uDirs) {
+				const exists = fs.existsSync(dir);
+				if (!exists) fs.mkdirSync(dir);
+			}
+		} catch (error) {
+			return cb(error, false);
+		}
 		const parentDir = path.join(__dirname, `../public/${userId}/listing/`);
 		const fileDestination = path.join(
 			__dirname,
