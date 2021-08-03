@@ -122,7 +122,7 @@ router.post('/add-all', [appAuth, auth], async (req, res, next) => {
       const modelNo = req.body.modelNo;
       const cardType = req.body.cardType;
 
-      if (!year || !brand || !cardNumber || !playerNames || !serialNo || !modelNo || !cardType) {
+      if (!year || !brand || !playerNames) {
             cardHelper.unlinkCard(req.files, userId, cardId);
             return res
                 .status(400)
