@@ -212,6 +212,51 @@ const multiImageStorage = multer.diskStorage({
 });
 
 /**
+ * Storage for game card back
+ */
+const cardStorage = multer.diskStorage({
+    destination: async function (req, file, cb) {
+      const cardId = req.cardId;
+      const userId = req.user._id;
+  
+      if (!cardId) cb(new Error(stringConstants.CARD_ID_NOT_FOUND), false);
+      if (!userId)
+        cb(new Error(stringConstants.USER_ID_NOT_FOUND_IN_REQUEST), false);
+  
+      const parentDir = path.join(__dirname, `../public/${userId}/cards/`);
+      const fileDestination = path.join(
+        __dirname,
+        `../public/${userId}/cards/${cardId}/`
+      );
+      const userPath = path.join(
+        __dirname,
+        `../public/${userId}/`
+      );
+    
+      if (!fs.existsSync(userPath)) {
+        fs.mkdirSync(userPath);
+        fs.mkdirSync(`${userPath}cards/`);
+      }
+      const dirs = [parentDir, fileDestination];
+      try {
+        for (const dir of dirs) {
+          const exists = fs.existsSync(dir);
+          if (!exists) fs.mkdirSync(dir);
+        }
+      } catch (error) {
+        return cb(error, false);
+      }
+  
+      cb(null, fileDestination);
+    },
+    filename: function (req, file, cb) {
+      const extension = path.extname(file.originalname).toLowerCase();
+      const fileName = `${file.fieldname}${extension}`;
+      cb(null, fileName);
+    },
+  });
+
+/**
  * Storage to upload the video of the card
  */
 const cardVideoStorage = multer.diskStorage({
@@ -286,6 +331,22 @@ module.exports.uploadCardGrading = multer({
 		cb(null, true);
 	},
 }).single("cardGrading");
+
+module.exports.uploadCardFields = multer({
+    storage: cardStorage,
+    fileFilter: function (req, file, cb) {
+        const ext = path.extname(file.originalname).toLowerCase();
+        if (
+            ext !== stringConstants.iType.PNG &&
+            ext !== stringConstants.iType.JPG &&
+            ext !== stringConstants.iType.GIF &&
+            ext !== stringConstants.iType.JPEG
+        ) {
+            return cb(new Error(stringConstants.NOT_A_VALID_FILE_TYPE), false);
+        }
+        cb(null, true);
+  },
+  }).any();
 
 /**
  * Multer function for upload front of game card
