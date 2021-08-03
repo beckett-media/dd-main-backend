@@ -21,16 +21,141 @@ const {
   uploadCardFront,
   uploadCardBack,
   uploadCardVideo,
-  uploadCardGrading
+  uploadCardGrading,
+  uploadCardFields
 } = require("../../middlewares/multerSingle");
 const {
   valObjectIdInUrl,
   valUpdateCardData,
-  valPageSizeNumber,
+  valPageSizeNumber
 } = require("../../middlewares/validation");
 const sightengine = require('sightengine')('1635467598', 'i3u4TqqhAnoxcSgAxgv5');
 const centerGrading = require('../../grading/center');
 const cornerGrading = require('../../grading/corner');
+const cardHelper = require("../../helpers/cardHelper");
+
+/**
+ * Step 0: Create a new card and upload card details at once
+ */
+router.post('/add-all', [appAuth, auth], async (req, res, next) => {
+    const userId = req.user._id;
+    const user = await User.findById(userId);
+    if (!user)
+      return res
+        .status(404)
+        .send(
+          createResObject(
+            false,
+            {},
+            stringConstants.USER_ID_DOEST_NOT_EXISTS,
+            errorObjects.USER_ID_DOEST_NOT_EXISTS
+          )
+        );
+    // Create a new card
+    let card = new Card({
+      user: userId,
+    });
+    const cardId = card._id;
+  
+    // Send card ID to multer
+    req.cardId = cardId;
+
+    uploadCardFields(req, res, async function (err) {
+      if (err) {
+        cardHelper.unlinkCard(req.files, userId, cardId);
+        SimpleLogger.error(err);
+        // If file type error return relavent message
+        if (err.message === stringConstants.NOT_A_VALID_FILE_TYPE) {
+          return res
+            .status(415)
+            .send(
+              createResObject(
+                false,
+                {},
+                stringConstants.FILE_TYPE_NOT_ACCEPTED,
+                errorObjects.FILE_TYPE_NOT_ACCEPTED
+              )
+            );
+        }
+        // Otherwise return unsuspected error
+        return next(err);
+      }
+
+      // Check file exists
+      if (!req.files) {
+            cardHelper.unlinkCard(req.files, userId, cardId);
+            return res
+                .status(400)
+                .send(
+                    createResObject(
+                    false,
+                    {},
+                    stringConstants.NO_FILE_FOUND,
+                    errorObjects.NO_FILE_FOUND
+                    )
+                );
+      }
+      // Check file size if corrupt delete the uploaded file
+      if (req.files.length !== 2 || req.files[0].size <= 0 || req.files[1].size <= 0) {
+        cardHelper.unlinkCard(req.files, userId, cardId);
+        return res
+          .status(400)
+          .send(
+            createResObject(
+              false,
+              {},
+              stringConstants.FILE_CORRUPTED,
+              errorObjects.FILE_CORRUPTED
+            )
+          );
+      }
+
+      card.front = path.join(`${userId}/cards/${cardId}/`, req.files[0].filename);
+      card.back = path.join(`${userId}/cards/${cardId}/`, req.files[1].filename);
+
+      // adding details
+      const year = req.body.year;
+      const brand = req.body.brand;
+      const cardNumber = req.body.cardNumber;
+      const playerNames = req.body.playerNames ? JSON.parse(req.body.playerNames) : null;
+      const serialNo = req.body.serialNo;
+      const modelNo = req.body.modelNo;
+      const cardType = req.body.cardType;
+
+      if (!year || !brand || !cardNumber || !playerNames || !serialNo || !modelNo || !cardType) {
+            cardHelper.unlinkCard(req.files, userId, cardId);
+            return res
+                .status(400)
+                .send(
+                createResObject(
+                    false,
+                    { errorMessage: stringConstants.KEYS_MISSING },
+                    stringConstants.REQUEST_VALIDATION_FAILED,
+                    errorObjects.REQUEST_VALIDATION_ERROR(stringConstants.KEYS_MISSING)
+                )
+            );
+      }
+
+      card.year = year;
+      card.brand = brand;
+      card.cardNumber = cardNumber;
+      card.playerNames = playerNames;
+      card.serialNo = serialNo;
+      card.modelNo = modelNo;
+      card.cardType = cardType;
+
+      card.isCompleted = card.checkIfCompleted();
+
+      card = await card.save();
+
+      card = card.getCardDetailsWithGrading();
+
+      return res.send(
+          createResObject(true, { card }, stringConstants.UPDATE_SUCCESSFUL)
+      );
+
+    });
+});
 
 /**
  * Step 1: Create a new card and upload card front
@@ -118,38 +243,6 @@ router.post("/add-front", [appAuth, auth], async (req, res, next) => {
           )
         );
     }
-
-    // Check file quality is not good
-    // const cardDestination = path.join(
-    //   __dirname,
-    //   "../../public/",
-    //   `${userId}/cards/${cardId}/`,
-    //   `${req.file.filename}`
-    // );
-    // const { brightness = 0, contrast = 0, sharpness = 0 } = await sightengine.check(['properties']).set_file(cardDestination) || {};
-    // const badCondition = brightness <= 0.3 || sharpness <= 0.6 || contrast <=0.3;
-
-    // if (badCondition) {
-    //   try {
-    //     await fsPromises.unlink(cardDestination);
-    //   } catch (err) {
-    //     SimpleLogger.error(err);
-    //     await new PendingDeletion({
-    //       deletionType: stringConstants.deletionType.FILE,
-    //       data: cardDestination,
-    //     }).save();
-    //   }
-    //   return res
-    //     .status(400)
-    //     .send(
-    //       createResObject(
-    //         false,
-    //         {},
-    //         stringConstants.BAD_QUALITY,
-    //         errorObjects.BAD_QUALITY
-    //       )
-    //     );
-    // }
 
     card.front = path.join(`${userId}/cards/${cardId}/`, req.file.filename);
     card = await card.save();
@@ -259,58 +352,6 @@ router.post(
             )
           );
       }
-
-      // Check file quality is not good
-    // const cardDestination = path.join(
-    //   __dirname,
-    //   "../../public/",
-    //   `${userId}/cards/${cardId}/`,
-    //   `${req.file.filename}`
-    // );
-    // const { brightness = 0, contrast = 0, sharpness = 0 } = await sightengine.check(['properties']).set_file(cardDestination) || {};
-    // const badCondition = brightness <= 0.3 || sharpness <= 0.6 || contrast <=0.3;
-
-    // if (badCondition) {
-    //   try {
-    //     await fsPromises.unlink(cardDestination);
-    //   } catch (err) {
-    //     SimpleLogger.error(err);
-    //     await new PendingDeletion({
-    //       deletionType: stringConstants.deletionType.FILE,
-    //       data: cardDestination,
-    //     }).save();
-    //   }
-    //   return res
-    //     .status(400)
-    //     .send(
-    //       createResObject(
-    //         false,
-    //         {},
-    //         stringConstants.BAD_QUALITY,
-    //         errorObjects.BAD_QUALITY
-    //       )
-    //     );
-    // }
-
-      // All the check completed delete the old card and update the new
-      /*
-      if (card.front) {
-        const pathToCardFront = path.join(
-          __dirname,
-          "../../public/",
-          card.front
-        );
-        try {
-          await fsPromises.unlink(pathToCardFront);
-        } catch (error) {
-          SimpleLogger.error(error);
-          await new PendingDeletion({
-            deletionType: stringConstants.deletionType.FILE,
-            data: pathToCardFront,
-          }).save();
-        }
-      }
-      */
 
       card.front = path.join(`${userId}/cards/${cardId}/`, req.file.filename);
       card = await card.save();
@@ -423,57 +464,6 @@ router.post(
           );
       }
 
-      // Check file quality is not good
-    // const cardDestination = path.join(
-    //   __dirname,
-    //   "../../public/",
-    //   `${userId}/cards/${cardId}/`,
-    //   `${req.file.filename}`
-    // );
-    // const { brightness = 0, contrast = 0, sharpness = 0 } = await sightengine.check(['properties']).set_file(cardDestination) || {};
-    // const badCondition = brightness <= 0.3 || sharpness <= 0.6 || contrast <=0.3;
-
-    // if (badCondition) {
-    //   try {
-    //     await fsPromises.unlink(cardDestination);
-    //   } catch (err) {
-    //     SimpleLogger.error(err);
-    //     await new PendingDeletion({
-    //       deletionType: stringConstants.deletionType.FILE,
-    //       data: cardDestination,
-    //     }).save();
-    //   }
-    //   return res
-    //     .status(400)
-    //     .send(
-    //       createResObject(
-    //         false,
-    //         {},
-    //         stringConstants.BAD_QUALITY,
-    //         errorObjects.BAD_QUALITY
-    //       )
-    //     );
-    // }
-
-      // Delete previous picture if any
-      /*
-      if (card.back) {
-        try {
-          const cardBackPath = path.join(__dirname, "../../public/", card.back);
-          await fsPromises.unlink(cardBackPath);
-        } catch (error) {
-          SimpleLogger.error(error);
-          await new PendingDeletion({
-            deletionType: stringConstants.deletionType.FILE,
-            data: path.join(
-              __dirname,
-              "../../public/card_backs/",
-              `${req.file.filename}`
-            ),
-          }).save();
-        }
-      }
-      */
       card.back = path.join(`${userId}/cards/${cardId}/`, req.file.filename);
       card = await card.save();
 
@@ -598,21 +588,6 @@ router.post(
           );
       }
 
-      // Check if already has card video if yes the delete the old and replace with new
-      /*
-      if (card.video) {
-        try {
-          const videoPath = path.join(__dirname, "../../public/", card.video);
-          await fsPromises.unlink(videoPath);
-        } catch (error) {
-          SimpleLogger.error(error);
-          await new PendingDeletion({
-            deletionType: stringConstants.deletionType.FILE,
-            data: path.join(__dirname, "../../public/", card.video),
-          }).save();
-        }
-      }
-      */
       card.video = path.join(
         `${userId}/cards/${cardId}/`,
         `${req.file.filename}`
@@ -774,8 +749,6 @@ router.get(
     }).lean();
     /**
      * Card pricing:
-     * $4.99 for <= 100
-     * $7.99 for > 100
      */
     let pendingAmount = 0,
       price = 0;
