@@ -40,7 +40,7 @@ module.exports.stringConstants = {
 
 	REQUEST_VALIDATION_FAILED: "Request validation failed",
 
-	KEYS_MISSING: 'Year, Brand, Card Number, Players Name, Serial Number, Card Type, Model Number are required fields',
+  KEYS_MISSING: 'Year, Brand, and Players Name are required fields',
 
 	USER_EMAIL_ALREADY_EXISTS: "User with the given email already exists",
 
