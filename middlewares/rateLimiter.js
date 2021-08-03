@@ -23,7 +23,7 @@ module.exports.globalLimiter = new RateLimit({
     },
   }),
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 200,
+  max: 2000,
   message: createResObject(
     false,
     {},
@@ -38,7 +38,7 @@ module.exports.wrongSigninLimiter = new RateLimit({
     collectionName: stringConstants.collectionNames.WRONG_SIGNIN_REQ_RECORDS,
   }),
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 5,
+  max: 50,
   skipSuccessfulRequests: true,
   message: createResObject(
     false,
