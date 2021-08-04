@@ -29,7 +29,6 @@ const {
   valUpdateCardData,
   valPageSizeNumber
 } = require("../../middlewares/validation");
-const sightengine = require('sightengine')('1635467598', 'i3u4TqqhAnoxcSgAxgv5');
 const centerGrading = require('../../grading/center');
 const cornerGrading = require('../../grading/corner');
 const cardHelper = require("../../helpers/cardHelper");
