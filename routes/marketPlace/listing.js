@@ -131,6 +131,12 @@ router.post(
 		const tags = req.body.tags;
 		const isPublic = req.body.isPublic;
 		const playerNames = req.body.playerNames;
+		const cardType = req.body.cardType;
+		const sport = req.body.sport;
+		const cardNumber = req.body.cardNumber;
+		const year = req.body.year;
+		const brand = req.body.brand;
+		const modelNo = req.body.modelNo;
 		const user = await User.findById(userId);
 		const stripe = await StripeConnect.findOne({
 			user: mongoose.Types.ObjectId(userId),
@@ -226,6 +232,12 @@ router.post(
 			tags: tags,
 			isPublic: isPublic,
 			playerNames: playerNames,
+			cardType: cardType,
+			sport: sport,
+			cardNumber: cardNumber,
+			year: year,
+			brand: brand,
+			modelNo: modelNo,
 		});
 		listing = await listing.save();
 		if (isPublic) {
@@ -272,6 +284,12 @@ router.put(
 		const tags = req.body.tags;
 		const isPublic = req.body.isPublic;
 		const playerNames = req.body.playerNames;
+		const cardType = req.body.cardType;
+		const sport = req.body.sport;
+		const cardNumber = req.body.cardNumber;
+		const year = req.body.year;
+		const brand = req.body.brand;
+		const modelNo = req.body.modelNo;
 		const user = await User.findById(userId);
 
 		const listing = await Listing.findById(listingId);
@@ -363,6 +381,12 @@ router.put(
 					tags: tags,
 					isPublic: isPublic,
 					playerNames: playerNames,
+					cardType: cardType,
+					sport: sport,
+					cardNumber: cardNumber,
+					year: year,
+					brand: brand,
+					modelNo: modelNo,
 				},
 			},
 			{ new: true }

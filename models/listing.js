@@ -29,7 +29,28 @@ const listingSchema = new mongoose.Schema(
 			required: true,
 		},
 		playerNames: { type: [String], default: [], required: false },
-
+		cardType: {
+			type: String,
+			required: true,
+		},
+		sport: {
+			type: String,
+			required: true,
+		},
+		cardNumber: {
+			type: String,
+		},
+		year: {
+			type: String,
+			required: true,
+		},
+		brand: {
+			type: String,
+			required: true,
+		},
+		modelNo: {
+			type: String,
+		},
 		serialNumber: {
 			type: String,
 			required: false,

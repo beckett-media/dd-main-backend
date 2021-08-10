@@ -621,6 +621,12 @@ module.exports = {
 			tags: Joi.allow(""),
 			isPublic: Joi.required(),
 			playerNames: Joi.allow(""),
+			cardType: Joi.string().required(),
+			sport: Joi.string().required(),
+			cardNumber: Joi.allow(""),
+			year: Joi.string().required().min(4).max(4),
+			brand: Joi.string().required(),
+			modelNo: Joi.allow(""),
 		});
 
 		const { error } = schema.validate(req.body);
