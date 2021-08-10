@@ -266,7 +266,7 @@ router.post(
  */
 router.put(
 	"/:listingId",
-	[auth, valObjectIdInUrl, valLisitngCardData],
+	[appAuth, auth, valObjectIdInUrl, valLisitngCardData],
 	async (req, res) => {
 		const listingId = req.params.listingId;
 
