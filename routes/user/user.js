@@ -348,7 +348,8 @@ router.get("/user-details", [auth], async (req, res) => {
 		user: user._id,
 	});
 	let userDetails = user.getUserDetails();
-	userDetails.stripeUserId = userConnect.stripeUserId;
+	userDetails.stripeUserId =
+		userConnect !== null ? userConnect.stripeUserId : "";
 	return res.send(
 		createResObject(
 			true,
