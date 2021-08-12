@@ -96,6 +96,12 @@ router.get("/:cardId", [appAuth], async (req, res) => {
 				status: "$status",
 				playerNames: "$playerNames",
 				serialNumber: "$serialNumber",
+				cardType: "$cardType",
+				sport: "$sport",
+				cardNumber: "$cardNumber",
+				year: "$year",
+				brand: "$brand",
+				modelNo: "$modelNo",
 				seller: {
 					_id: "$seller._id",
 					fullName: "$seller.fullName",

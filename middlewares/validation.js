@@ -607,6 +607,7 @@ module.exports = {
 		return next();
 	},
 	valLisitngCardData: (req, res, next) => {
+		const year = new Date().getFullYear();
 		const schema = Joi.object({
 			title: Joi.string().required().min(1).max(255),
 			description: Joi.string().required().min(1).max(500),
@@ -624,7 +625,7 @@ module.exports = {
 			cardType: Joi.string().required(),
 			sport: Joi.string().required(),
 			cardNumber: Joi.allow(""),
-			year: Joi.string().required().min(4).max(4),
+			year: Joi.number().required().min(year).max(9999),
 			brand: Joi.string().required(),
 			modelNo: Joi.allow(""),
 		});

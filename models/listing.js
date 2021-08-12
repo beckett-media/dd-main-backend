@@ -41,7 +41,7 @@ const listingSchema = new mongoose.Schema(
 			type: String,
 		},
 		year: {
-			type: String,
+			type: Number,
 			required: true,
 		},
 		brand: {
