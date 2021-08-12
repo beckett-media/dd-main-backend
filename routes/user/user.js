@@ -342,11 +342,14 @@ router.post(
 /**
  * GET route to fetch user details including settins
  */
-router.get("/user-details", [appAuth, auth], async (req, res) => {
+router.get("/user-details", [auth], async (req, res) => {
 	const user = await User.findById(req.user._id);
-
-	const userDetails = user.getUserDetails();
-
+	const userConnect = await StripeConnect.findOne({
+		user: user._id,
+	});
+	let userDetails = user.getUserDetails();
+	userDetails.stripeUserId =
+		userConnect !== null ? userConnect.stripeUserId : "";
 	return res.send(
 		createResObject(
 			true,
