@@ -628,6 +628,7 @@ module.exports = {
 			year: Joi.number().min(1000).max(9999).required(),
 			brand: Joi.string().required(),
 			modelNo: Joi.allow(""),
+			images: Joi.allow(""),
 		});
 
 		const { error } = schema.validate(req.body);

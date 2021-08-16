@@ -79,6 +79,23 @@ router.get("/:cardId", [appAuth], async (req, res) => {
 		},
 		{ $unwind: { path: "$seller" } },
 		{
+			$lookup: {
+				let: {
+					cardObjId: {
+						$cond: {
+							if: { card: { $ne: ["$card", ""] } },
+							then: "$card",
+							else: { $toObjectId: "$card" },
+						},
+					},
+				},
+				from: "cards",
+				pipeline: [{ $match: { $expr: { $eq: ["$_id", "$$cardObjId"] } } }],
+				as: "cardDetail",
+			},
+		},
+		{ $unwind: { path: "$cardDetail", preserveNullAndEmptyArrays: true } },
+		{
 			$project: {
 				_id: "$_id",
 				tags: "$tags",
@@ -86,7 +103,7 @@ router.get("/:cardId", [appAuth], async (req, res) => {
 				product: "$product",
 				grade: "$grade",
 				title: "$title",
-				card: "$card",
+				card: "$cardDetail",
 				description: "$description",
 				price: "$price",
 				quantity: "$quantity",
@@ -118,150 +135,156 @@ router.get("/:cardId", [appAuth], async (req, res) => {
 /**
  * POST route to add card to listing
  */
-router.post("/create", [auth, valLisitngCardData], async (req, res) => {
-	const userId = req.user._id;
-	const cardId = req.body.cardId;
-	const productId = req.body.productId;
-	// const productOptionId = req.body.productOptionId;
-	const gradeId = req.body.gradeId;
-	const title = req.body.title;
-	const description = req.body.description;
-	const quantity = req.body.quantity;
-	const availableQuantity = quantity;
-	const price = req.body.price;
-	const condition = req.body.condition;
-	const serialNumber = req.body.serialNumber;
-	const tags = req.body.tags;
-	const isPublic = req.body.isPublic;
-	const playerNames = req.body.playerNames;
-	const cardType = req.body.cardType;
-	const sport = req.body.sport;
-	const cardNumber = req.body.cardNumber;
-	const year = req.body.year;
-	const brand = req.body.brand;
-	const modelNo = req.body.modelNo;
-	const user = await User.findById(userId);
-	const stripe = await StripeConnect.findOne({
-		user: mongoose.Types.ObjectId(userId),
-	});
-	if (!user)
-		return res
-			.status(400)
-			.send(
-				createResObject(
-					false,
-					{},
-					stringConstants.USER_ID_DOEST_NOT_EXISTS,
-					errorObjects.USER_ID_DOEST_NOT_EXISTS
-				)
-			);
-	if (!stripe)
-		return res
-			.status(400)
-			.send(
-				createResObject(
-					false,
-					{},
-					stringConstants.STRIPE_CONNECT_ERROR,
-					errorObjects.STRIPE_CONNECT_ERROR
-				)
-			);
-	if (cardId !== "") {
-		const card = await Card.findById(cardId);
-		if (!card)
+router.post(
+	"/create",
+	[appAuth, auth, valLisitngCardData],
+	async (req, res) => {
+		const userId = req.user._id;
+		const cardId = req.body.cardId;
+		const productId = req.body.productId;
+		// const productOptionId = req.body.productOptionId;
+		const gradeId = req.body.gradeId;
+		const title = req.body.title;
+		const description = req.body.description;
+		const quantity = req.body.quantity;
+		const availableQuantity = quantity;
+		const price = req.body.price;
+		const condition = req.body.condition;
+		const serialNumber = req.body.serialNumber;
+		const tags = req.body.tags;
+		const isPublic = req.body.isPublic;
+		const playerNames = req.body.playerNames;
+		const cardType = req.body.cardType;
+		const sport = req.body.sport;
+		const cardNumber = req.body.cardNumber;
+		const year = req.body.year;
+		const brand = req.body.brand;
+		const modelNo = req.body.modelNo;
+		const images = req.body.images ? req.body.images : [];
+		const user = await User.findById(userId);
+		const stripe = await StripeConnect.findOne({
+			user: mongoose.Types.ObjectId(userId),
+		});
+		if (!user)
 			return res
 				.status(400)
 				.send(
 					createResObject(
 						false,
 						{},
-						stringConstants.CARD_ID_NOT_FOUND,
-						errorObjects.CARD_ID_NOT_FOUND
+						stringConstants.USER_ID_DOEST_NOT_EXISTS,
+						errorObjects.USER_ID_DOEST_NOT_EXISTS
 					)
 				);
-		const cardInLisitng = await Listing.find({
-			card: cardId,
-		}).lean();
-		if (cardInLisitng && cardInLisitng.length)
+		if (!stripe)
 			return res
 				.status(400)
 				.send(
 					createResObject(
 						false,
 						{},
-						stringConstants.CARD_ALREADY_EXIST,
-						errorObjects.CARD_ALREADY_EXIST
+						stringConstants.STRIPE_CONNECT_ERROR,
+						errorObjects.STRIPE_CONNECT_ERROR
 					)
 				);
-	}
-
-	const product = await Product.findById(productId);
-	if (!product)
-		return res
-			.status(400)
-			.send(
-				createResObject(
-					false,
-					{},
-					stringConstants.PRODUCT_ID_NOT_FOUND,
-					errorObjects.PRODUCT_ID_NOT_FOUND
-				)
-			);
-	const grade = await Grade.findById(gradeId);
-	if (!grade)
-		return res
-			.status(400)
-			.send(
-				createResObject(
-					false,
-					{},
-					stringConstants.GRADE_ID_NOT_FOUND,
-					errorObjects.GRADE_ID_NOT_FOUND
-				)
-			);
-	// Create a new card in listing
-	let listing = new Listing({
-		user: userId,
-		card: cardId === "" ? null : cardId,
-		product: productId,
-		grade: gradeId,
-		title: title,
-		description: description,
-		quantity: quantity,
-		availableQuantity: availableQuantity,
-		price: price,
-		condition: condition,
-		serialNumber: serialNumber,
-		tags: tags,
-		isPublic: isPublic,
-		playerNames: playerNames,
-		cardType: cardType,
-		sport: sport,
-		cardNumber: cardNumber,
-		year: year,
-		brand: brand,
-		modelNo: modelNo,
-	});
-	listing = await listing.save();
-	if (isPublic) {
-		let marketplace = await Marketplace.findOne({ listing: listing._id });
-		console.log("marketplace", marketplace);
-		if (!marketplace) {
-			let addListingMarket = await Marketplace.create({
-				listing: listing._id,
-				user: userId,
-			});
+		if (cardId !== "") {
+			const card = await Card.findById(cardId);
+			if (!card)
+				return res
+					.status(400)
+					.send(
+						createResObject(
+							false,
+							{},
+							stringConstants.CARD_ID_NOT_FOUND,
+							errorObjects.CARD_ID_NOT_FOUND
+						)
+					);
+			const cardInLisitng = await Listing.find({
+				card: cardId,
+			}).lean();
+			if (cardInLisitng && cardInLisitng.length)
+				return res
+					.status(400)
+					.send(
+						createResObject(
+							false,
+							{},
+							stringConstants.CARD_ALREADY_EXIST,
+							errorObjects.CARD_ALREADY_EXIST
+						)
+					);
 		}
-	}
 
-	return res.send(
-		createResObject(
-			true,
-			{ listing },
-			stringConstants.CARD_ADD_LISTING_SUCCESSFULLY
-		)
-	);
-});
+		const product = await Product.findById(productId);
+		if (!product)
+			return res
+				.status(400)
+				.send(
+					createResObject(
+						false,
+						{},
+						stringConstants.PRODUCT_ID_NOT_FOUND,
+						errorObjects.PRODUCT_ID_NOT_FOUND
+					)
+				);
+		const grade = await Grade.findById(gradeId);
+		if (!grade)
+			return res
+				.status(400)
+				.send(
+					createResObject(
+						false,
+						{},
+						stringConstants.GRADE_ID_NOT_FOUND,
+						errorObjects.GRADE_ID_NOT_FOUND
+					)
+				);
+		// Create a new card in listing
+		let listing = new Listing({
+			user: userId,
+			card: cardId === "" ? null : cardId,
+			product: productId,
+			grade: gradeId,
+			title: title,
+			description: description,
+			quantity: quantity,
+			availableQuantity: availableQuantity,
+			price: price,
+			condition: condition,
+			serialNumber: serialNumber,
+			tags: tags,
+			isPublic: isPublic,
+			playerNames: playerNames,
+			cardType: cardType,
+			sport: sport,
+			cardNumber: cardNumber,
+			year: year,
+			brand: brand,
+			modelNo: modelNo,
+			images: images,
+		});
+		listing = await listing.save();
+		if (isPublic) {
+			let marketplace = await Marketplace.findOne({ listing: listing._id });
+			console.log("marketplace", marketplace);
+			if (!marketplace) {
+				let addListingMarket = await Marketplace.create({
+					listing: listing._id,
+					user: userId,
+				});
+			}
+		}
+
+		return res.send(
+			createResObject(
+				true,
+				{ listing },
+				stringConstants.CARD_ADD_LISTING_SUCCESSFULLY
+			)
+		);
+	}
+);
 
 /**
  * Put route to edit the listing
@@ -292,6 +315,8 @@ router.put(
 		const year = req.body.year;
 		const brand = req.body.brand;
 		const modelNo = req.body.modelNo;
+		const images = req.body.images ? req.body.images : [];
+
 		const user = await User.findById(userId);
 
 		const listing = await Listing.findById(listingId);
@@ -389,6 +414,7 @@ router.put(
 					year: year,
 					brand: brand,
 					modelNo: modelNo,
+					images: images && images.length > 0 ? images : listing.images,
 				},
 			},
 			{ new: true }
@@ -620,7 +646,10 @@ router.delete(
 		try {
 			const filePath = path.join(__dirname, "../../public/", fileName);
 			console.log("filePath", filePath);
-			await fs.unlinkSync(filePath);
+			if (fs.existsSync(filePath)) {
+				await fs.unlinkSync(filePath);
+			}
+
 			await Listing.updateOne(
 				{ _id: listing._id },
 				{ $pull: { images: fileName } }

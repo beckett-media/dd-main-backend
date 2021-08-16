@@ -38,7 +38,7 @@ const teamSetCard = {
 };
 const caseCard = {
 	_id: "caseCard",
-	name: "Cases",
+	name: "Case",
 	desc: "Cases Box",
 	options: [
 		{ _id: "1BoxCase", name: "1 Box Case", desc: "1 Box Case Card" },
@@ -50,9 +50,9 @@ const productArray = [singleCard, boxCard, packCard, teamSetCard, caseCard];
 
 module.exports = async () => {
 	try {
+		await Product.remove({});
 		const savedProduct = await Product.find({}).lean();
 		if (productArray.length > savedProduct.length) {
-			await Product.remove({});
 			for (const product of productArray) {
 				let p = new Product({
 					_id: product._id,
