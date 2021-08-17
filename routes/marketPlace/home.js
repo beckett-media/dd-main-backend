@@ -582,6 +582,23 @@ let filterData = async (condition, pageSize, pageNumber) => {
 		},
 		{ $unwind: { path: "$seller" } },
 		{
+			$lookup: {
+				let: {
+					cardObjId: {
+						$cond: {
+							if: { card: { $ne: ["$card", ""] } },
+							then: "$card",
+							else: { $toObjectId: "$card" },
+						},
+					},
+				},
+				from: "cards",
+				pipeline: [{ $match: { $expr: { $eq: ["$_id", "$$cardObjId"] } } }],
+				as: "cardDetail",
+			},
+		},
+		{ $unwind: { path: "$cardDetail", preserveNullAndEmptyArrays: true } },
+		{
 			$project: {
 				_id: "$_id",
 				tags: "$tags",
@@ -595,6 +612,8 @@ let filterData = async (condition, pageSize, pageNumber) => {
 				isPublic: "$isPublic",
 				status: "$status",
 				playerNames: "$playerNames",
+				updatedAt: "$updatedAt",
+				card: "$cardDetail",
 				seller: {
 					_id: "$seller._id",
 					fullName: "$seller.fullName",
@@ -603,7 +622,7 @@ let filterData = async (condition, pageSize, pageNumber) => {
 			},
 		},
 		{ $skip: (pageNumber - 1) * pageSize },
-		{ $sort: { createdAt: 1 } },
+		{ $sort: { updatedAt: -1 } },
 		{ $limit: pageSize },
 	]);
 	return data;

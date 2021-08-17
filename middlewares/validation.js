@@ -625,9 +625,10 @@ module.exports = {
 			cardType: Joi.string().required(),
 			sport: Joi.string().required(),
 			cardNumber: Joi.allow(""),
-			year: Joi.number().required().min(year).max(9999),
+			year: Joi.number().min(1000).max(9999).required(),
 			brand: Joi.string().required(),
 			modelNo: Joi.allow(""),
+			images: Joi.allow(""),
 		});
 
 		const { error } = schema.validate(req.body);

@@ -79,6 +79,23 @@ router.get("/:cardId", [appAuth], async (req, res) => {
 		},
 		{ $unwind: { path: "$seller" } },
 		{
+			$lookup: {
+				let: {
+					cardObjId: {
+						$cond: {
+							if: { card: { $ne: ["$card", ""] } },
+							then: "$card",
+							else: { $toObjectId: "$card" },
+						},
+					},
+				},
+				from: "cards",
+				pipeline: [{ $match: { $expr: { $eq: ["$_id", "$$cardObjId"] } } }],
+				as: "cardDetail",
+			},
+		},
+		{ $unwind: { path: "$cardDetail", preserveNullAndEmptyArrays: true } },
+		{
 			$project: {
 				_id: "$_id",
 				tags: "$tags",
@@ -86,7 +103,7 @@ router.get("/:cardId", [appAuth], async (req, res) => {
 				product: "$product",
 				grade: "$grade",
 				title: "$title",
-				card: "$card",
+				card: "$cardDetail",
 				description: "$description",
 				price: "$price",
 				quantity: "$quantity",
@@ -143,6 +160,7 @@ router.post(
 		const year = req.body.year;
 		const brand = req.body.brand;
 		const modelNo = req.body.modelNo;
+		const images = req.body.images ? req.body.images : [];
 		const user = await User.findById(userId);
 		const stripe = await StripeConnect.findOne({
 			user: mongoose.Types.ObjectId(userId),
@@ -244,6 +262,7 @@ router.post(
 			year: year,
 			brand: brand,
 			modelNo: modelNo,
+			images: images,
 		});
 		listing = await listing.save();
 		if (isPublic) {
@@ -296,6 +315,8 @@ router.put(
 		const year = req.body.year;
 		const brand = req.body.brand;
 		const modelNo = req.body.modelNo;
+		const images = req.body.images ? req.body.images : [];
+
 		const user = await User.findById(userId);
 
 		const listing = await Listing.findById(listingId);
@@ -393,6 +414,7 @@ router.put(
 					year: year,
 					brand: brand,
 					modelNo: modelNo,
+					images: images && images.length > 0 ? images : listing.images,
 				},
 			},
 			{ new: true }
@@ -624,7 +646,10 @@ router.delete(
 		try {
 			const filePath = path.join(__dirname, "../../public/", fileName);
 			console.log("filePath", filePath);
-			await fs.unlinkSync(filePath);
+			if (fs.existsSync(filePath)) {
+				await fs.unlinkSync(filePath);
+			}
+
 			await Listing.updateOne(
 				{ _id: listing._id },
 				{ $pull: { images: fileName } }
