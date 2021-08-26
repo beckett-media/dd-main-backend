@@ -14,6 +14,7 @@ const { User } = require("../../models/user");
 const { Card } = require("../../models/card");
 const { Collection } = require("../../models/collection");
 const { PendingDeletion } = require("../../models/pendingDeletion");
+const { Listing } = require('../../models/listing');
 const { stringConstants } = require("../../utils/constants");
 const { errorObjects } = require("../../utils/errorObjects");
 const { createResObject } = require("../../utils/utilFunctions");
@@ -881,12 +882,29 @@ router.get(
     const [onlyCollection = {}] = collectionCards || [];
     const { card: innerCards = [] } = onlyCollection;
     const stringCards = innerCards.length > 0 ? JSON.stringify(innerCards.map(card => card.toString())) : [];
+
+    // getting card Ids
+    const cardIds = cards.map(card => card.id);
+
+    const inListing = await Listing.aggregate([
+			{ $match: { card: { $in: cardIds } } },
+      { $group: {
+            _id: { user: "$user" },
+            card: { $addToSet: "$card" }
+        }
+      }
+		]);
+
+    const [userList = {}] = inListing || [];
+    const { card: listingCards = [] } = userList;
+    const stringListingCards = listingCards.length > 0 ? JSON.stringify(listingCards.map(card => card.toString())) : [];
     
     cards = cards.map(card => {
       const { id = '' } = card;
       return {
         ...card,
-        inCollection: stringCards.includes(id.toString())
+        inCollection: stringCards.includes(id.toString()),
+        inListing: stringListingCards.includes(id.toString())
       }
     })
 
