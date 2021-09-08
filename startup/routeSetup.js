@@ -1,5 +1,6 @@
 const user = require("../routes/user/user");
 const subscription = require("../routes/user/subscription");
+const cardGrading = require("../routes/user/cardGrading");
 const collection = require("../routes/myCollection/collection");
 const authenticate = require("../routes/user/authenticate");
 const payment = require("../routes/user/payment");
@@ -26,6 +27,7 @@ module.exports = (app) => {
 	// Import route and use app.use();
 	app.use("/user", user);
 	app.use("/subscription", subscription);
+	app.use("/cardGrading", cardGrading);
 	app.use("/collection", collection);
 	app.use("/authenticate", authenticate);
 	app.use("/payment", payment);
