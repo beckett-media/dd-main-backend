@@ -71,11 +71,14 @@ router.post(
             overallGrade: '',
             gradingComps: {}
         };
+
+        const cardData = card.getCardDetailsWithGrading();
     
         return res.send(
             createResObject(
             true,
             {
+                ...cardData,
                 ...overallGrade
             },
             'Grade Fetch Success'
