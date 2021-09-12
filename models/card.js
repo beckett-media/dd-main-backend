@@ -65,7 +65,7 @@ const cardSchema = new mongoose.Schema(
       default: false,
     },
     grading: {
-      centering: { type: String },
+      centering: { type: Object },
       corners: { type: Object },
       surface: { type: Object }
     },
