@@ -88,9 +88,10 @@ const checkIfExist = (val) => {
 }
 
 const centerGradeAvg = (centering) => {
+    const { letter_grade = '' } = centering;
     return {
-        compare: scoreMapper[centering] ? true : false,
-        val: scoreMapper[centering] ? scoreMapper[centering] : 0
+        compare: scoreMapper[letter_grade] ? true : false,
+        val: scoreMapper[letter_grade] ? scoreMapper[letter_grade] : 0
     }
 }
 
