@@ -67,7 +67,8 @@ const cardSchema = new mongoose.Schema(
     grading: {
       centering: { type: Object },
       corners: { type: Object },
-      surface: { type: Object }
+      surface: { type: Object },
+      edges: { type: Object }
     },
   },
   { timestamps: true, toJSON: { getters: true } }
@@ -195,7 +196,8 @@ function gradingEmpty(grading) {
   return (
     !grading.centering &&
     !grading.corners &&
-    !grading.surface
+    !grading.surface &&
+    !grading.edges
   );
 }
 
