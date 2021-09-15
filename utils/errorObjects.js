@@ -210,6 +210,12 @@ module.exports.errorObjects = {
 		errorMessage: stringConstants.API_ERROR,
 	},
 
+	GRADE_NOT_FOUND: {
+		errorCode: 332,
+		errorSubCode: getKey(stringConstants, stringConstants.GRADE_NOT_FOUND),
+		errorMessage: stringConstants.GRADE_NOT_FOUND,
+	},
+
 	NO_CARDS_LEFT_IN_PLAN: {
 		errorCode: 221,
 		errorSubCode: getKey(
