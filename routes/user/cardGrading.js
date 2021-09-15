@@ -6,14 +6,12 @@ const { Card } = require('../../models/card');
 const { createResObject } = require('../../utils/utilFunctions');
 const { stringConstants } = require('../../utils/constants');
 const { errorObjects } = require('../../utils/errorObjects');
-const combinedGrading = require('../../grading/combined');
 const { totalGradeAvg } = require('../../grading/helper');
 
 router.post(
     '/fetch',
     [appAuth, auth],
     async (req, res) => {
-        const userId = req.user._id;
         const cardId = req.body.cardId;
         const card = await Card.findById(cardId);
   
@@ -31,9 +29,8 @@ router.post(
             );
     
             // grading of card
-            const { front: filePath = '' } = card;
+            const { grading = {} } = card;
     
-            const grading = await combinedGrading(cardId, filePath, userId);
             if (grading === 0) {
                 return res
                 .status(500)
@@ -47,19 +44,15 @@ router.post(
                 );
             }
     
-            if (!grading.success) {
+            if (!(grading.surface && grading.surface.success)) {
                 return res
                 .status(500)
                 .send(
                     createResObject(
                         false,
                         {},
-                        grading.error,
-                        {
-                            errorCode: 444,
-                            errorSubCode: 'API_ERROR',
-                            errorMessage: grading.error
-                        }
+                        stringConstants.GRADE_NOT_FOUND,
+                        errorObjects.GRADE_NOT_FOUND
                     )
                 );
             }
