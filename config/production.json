@@ -13,6 +13,6 @@
   "eBayClientId": "AndrewMe-DCGS-PRD-7c8eaa0db-3dd3575f",
   "eBayClientSecret": "PRD-c8eaa0db1088-4b77-486e-a146-fb6c",
   "eBayRuname": "Andrew_Medal-AndrewMe-DCGS-P-fvrbfbntm",
-  "gradeAPI": "http://65.2.7.211:5000/get_score",
+  "gradeAPI": "http://65.2.7.211:5001/get_score",
   "skipPayment": true
 }
