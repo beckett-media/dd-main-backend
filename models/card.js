@@ -65,10 +65,10 @@ const cardSchema = new mongoose.Schema(
       default: false,
     },
     grading: {
-      centering: { type: Object, default: {} },
-      corners: { type: Object, default: {} },
-      surface: { type: Object, default: {} },
-      edges: { type: Object, default: {} }
+      centering: { type: Object },
+      corners: { type: Object },
+      surface: { type: Object },
+      edges: { type: Object }
     },
   },
   { timestamps: true, toJSON: { getters: true } }
