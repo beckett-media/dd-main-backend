@@ -27,7 +27,7 @@ module.exports = (app) => {
 	// Import route and use app.use();
 	app.use("/user", user);
 	app.use("/subscription", subscription);
-	app.use("/cardGrading", cardGrading);
+	app.use("/card-grading", cardGrading);
 	app.use("/collection", collection);
 	app.use("/authenticate", authenticate);
 	app.use("/payment", payment);
