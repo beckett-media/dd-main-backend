@@ -16,7 +16,7 @@ const _ = require("lodash");
 const Jimp = require("jimp");
 
 const { valPageSizeNumber } = require("../../middlewares/validation");
-const { StoreListing } = require("../../models/store-listing");
+const { Listing } = require("../../models/listing");
 const { Marketplace } = require("../../models/marketplace");
 const { User } = require("../../models/user");
 const { Store } = require("../../models/store");
@@ -32,45 +32,13 @@ const { StripeConnect } = require("../../models/stripeConnect");
 const { OrderItem } = require("../../models/orderItem");
 
 /**
- * Route to get listing by user
- */
-router.get(
-	"/:store/:pageSize/:pageNumber",
-	[appAuth, auth, valPageSizeNumber],
-	async (req, res) => {
-		const pageSize = parseInt(req.params.pageSize);
-		const pageNumber = parseInt(req.params.pageNumber);
-		const userId = req.user._id;
-		const storeId = req.params.store;
-
-		const totalListing = await StoreListing.find({ user: userId, store: storeId })
-			.sort({ createdAt: 1 })
-			.skip((pageNumber - 1) * pageSize)
-			.limit(pageSize);
-		if (totalListing.length > 0) {
-			return res.send(
-				createResObject(
-					true,
-					{ listing: totalListing },
-					stringConstants.FETCH_SUCESSFUL
-				)
-			);
-		} else {
-			return res.send(
-				createResObject(true, { listing: [] }, stringConstants.FETCH_SUCESSFUL)
-			);
-		}
-	}
-);
-
-/**
  * Route to get list/card detail
  */
 
-router.get("/:cardId", [appAuth], async (req, res) => {
-	const cardId = req.params.cardId;
-	const cardDetail = await StoreListing.aggregate([
-		{ $match: { _id: mongoose.Types.ObjectId(cardId) } },
+router.get("/:storeProductId", [appAuth], async (req, res) => {
+	const storeProductId = req.params.storeProductId;
+	const cardDetail = await Listing.aggregate([
+		{ $match: { _id: mongoose.Types.ObjectId(storeProductId) } },
 		{
 			$lookup: {
 				from: "users",
@@ -121,6 +89,7 @@ router.get("/:cardId", [appAuth], async (req, res) => {
 				year: "$year",
 				brand: "$brand",
 				modelNo: "$modelNo",
+				store: "$store",
 				seller: {
 					_id: "$seller._id",
 					fullName: "$seller.fullName",
@@ -218,7 +187,7 @@ router.get("/:cardId", [appAuth], async (req, res) => {
 							errorObjects.CARD_ID_NOT_FOUND
 						)
 					);
-			const cardInLisitng = await StoreListing.find({
+			const cardInLisitng = await Listing.find({
 				card: cardId,
 			}).lean();
 			if (cardInLisitng && cardInLisitng.length)
@@ -259,7 +228,7 @@ router.get("/:cardId", [appAuth], async (req, res) => {
 					)
 				);
 		// Create a new card in listing
-		let listing = new StoreListing({
+		let listing = new Listing({
 			user: userId,
 			store: storeId,
 			card: cardId === "" ? null : cardId,
@@ -309,10 +278,11 @@ router.get("/:cardId", [appAuth], async (req, res) => {
  * Put route to edit the listing
  */
 router.put(
-	"/:listingId",
+	"/:storeId/:listingId",
 	[appAuth, auth, valObjectIdInUrl, valLisitngCardData],
 	async (req, res) => {
 		const listingId = req.params.listingId;
+		const storeId = req.params.storeId;
 
 		const userId = req.user._id;
 		const cardId = req.body.cardId;
@@ -338,7 +308,8 @@ router.put(
 
 		const user = await User.findById(userId);
 
-		const listing = await StoreListing.findById(listingId);
+		const listing = await Listing.findById(listingId);
+		const store = await Store.findById(storeId);
 		if (!user)
 			return res
 				.status(400)
@@ -350,6 +321,17 @@ router.put(
 						errorObjects.USER_ID_DOEST_NOT_EXISTS
 					)
 				);
+		if (!store)
+		return res
+			.status(400)
+			.send(
+				createResObject(
+					false,
+					{},
+					stringConstants.STORE_ID_DOEST_NOT_EXISTS,
+					errorObjects.STORE_ID_DOEST_NOT_EXISTS
+				)
+			);
 		if (!listing)
 			return res
 				.status(400)
@@ -409,7 +391,7 @@ router.put(
 						errorObjects.GRADE_ID_NOT_FOUND
 					)
 				);
-		let updateListing = await StoreListing.findByIdAndUpdate(
+		let updateListing = await Listing.findByIdAndUpdate(
 			listingId,
 			{
 				$set: {
@@ -461,7 +443,7 @@ router.delete(
 		const userId = req.user._id;
 		const user = await User.findById(userId);
 
-		const listing = await StoreListing.findById(listingId);
+		const listing = await Listing.findById(listingId);
 		if (!user)
 			return res
 				.status(400)
@@ -496,7 +478,7 @@ router.delete(
 						errorObjects.UNAUTHENTICATE_USER
 					)
 				);
-		await StoreListing.deleteOne({
+		await Listing.deleteOne({
 			_id: mongoose.Types.ObjectId(listingId),
 		});
 
@@ -509,13 +491,13 @@ router.delete(
 /**
  *  route to update listing by images
  */
-router.post(
-	"/update-lsiting-images/:listingId",
+ router.post(
+	"/update-listing-images/:listingId",
 	[auth, valObjectIdInUrl],
 	async (req, res) => {
 		const cardId = req.params.listingId;
 		const userId = req.user._id;
-		let listing = await StoreListing.findById(cardId);
+		let listing = await Listing.findById(cardId);
 		if (!listing) {
 			return res
 				.status(404)
@@ -629,14 +611,14 @@ router.post(
 /**
  *  route to remove the image of a listing
  */
-router.delete(
+router.post(
 	"/image/:listingId",
 	[appAuth, auth, valObjectIdInUrl],
 	async (req, res) => {
 		const cardId = req.params.listingId;
 		const userId = req.user._id;
 		const fileName = req.body.fileName;
-		let listing = await StoreListing.findById(cardId);
+		let listing = await Listing.findById(cardId);
 		if (!listing) {
 			return res
 				.status(404)
@@ -669,7 +651,7 @@ router.delete(
 				await fs.unlinkSync(filePath);
 			}
 
-			await StoreListing.updateOne(
+			await Listing.updateOne(
 				{ _id: listing._id },
 				{ $pull: { images: fileName } }
 			);
@@ -692,7 +674,7 @@ router.post(
 	async (req, res) => {
 		const cardId = req.params.listingId;
 		const userId = req.user._id;
-		let listing = await StoreListing.findById(cardId);
+		let listing = await Listing.findById(cardId);
 		if (!listing) {
 			return res
 				.status(404)
@@ -746,7 +728,7 @@ router.post(
 			listing: cardId,
 			user: userId,
 		});
-		let updateListing = await StoreListing.findByIdAndUpdate(
+		let updateListing = await Listing.findByIdAndUpdate(
 			cardId,
 			{ $set: { isPublic: true } },
 			{ new: true }

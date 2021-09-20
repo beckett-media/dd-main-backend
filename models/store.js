@@ -11,6 +11,7 @@ const storeSchema = new mongoose.Schema(
 			type: String,
 			required: true,
 		},
+		images: { type: [String], default: [], required: false },
 		desc: {
 			type: String,
 			required: true,

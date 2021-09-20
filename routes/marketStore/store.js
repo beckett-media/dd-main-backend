@@ -18,6 +18,7 @@ const Jimp = require("jimp");
 const { valPageSizeNumber } = require("../../middlewares/validation");
 const { Store } = require("../../models/store");
 const { Marketplace } = require("../../models/marketplace");
+const { Listing } = require("../../models/listing");
 const { User } = require("../../models/user");
 const { Card } = require("../../models/card");
 const { Product } = require("../../models/product");
@@ -25,13 +26,73 @@ const { Grade } = require("../../models/grade");
 const { createResObject } = require("../../utils/utilFunctions");
 const { stringConstants } = require("../../utils/constants");
 const { errorObjects } = require("../../utils/errorObjects");
-const { uploadMultiImage } = require("../../middlewares/multerSingle");
+const { uploadMultiImageStore } = require("../../middlewares/multerSingle");
 const { Order } = require("../../models/order");
 const { StripeConnect } = require("../../models/stripeConnect");
 const { OrderItem } = require("../../models/orderItem");
 
 /**
- * POST route to add store
+ * Route to get store products by user of admin side
+ */
+ router.get(
+	"/:store/:pageSize/:pageNumber",
+	[appAuth, auth, valPageSizeNumber],
+	async (req, res) => {
+		const pageSize = parseInt(req.params.pageSize);
+		const pageNumber = parseInt(req.params.pageNumber);
+		const userId = req.user._id;
+		const storeId = req.params.store;
+
+		const totalListing = await Listing.find({ user: userId, store: storeId })
+			.sort({ createdAt: 1 })
+			.skip((pageNumber - 1) * pageSize)
+			.limit(pageSize);
+		if (totalListing.length > 0) {
+			return res.send(
+				createResObject(
+					true,
+					{ listing: totalListing },
+					stringConstants.FETCH_SUCESSFUL
+				)
+			);
+		} else {
+			return res.send(
+				createResObject(true, { listing: [] }, stringConstants.FETCH_SUCESSFUL)
+			);
+		}
+	}
+);
+
+/**
+ * Route to get store products on client side
+ */
+ router.get(
+	"/public/:store",
+	[appAuth, auth],
+	async (req, res) => {
+		const storeId = req.params.store;
+
+		const totalListing = await Listing.find({ store: storeId })
+		const store = await Store.findById(storeId)
+			.sort({ createdAt: 1 })
+		if (totalListing.length > 0) {
+			return res.send(
+				createResObject(
+					true,
+					{ listing: totalListing, store },
+					stringConstants.FETCH_SUCESSFUL
+				)
+			);
+		} else {
+			return res.send(
+				createResObject(true, { listing: [], store }, stringConstants.FETCH_SUCESSFUL)
+			);
+		}
+	}
+);
+
+/**
+ * POST route to create store
  */
  router.post(
 	"/create",
@@ -121,7 +182,7 @@ router.get(
 );
 
 /**
- *  route to update listing by images
+ *  route to update store logo
  */
  router.post(
 	"/update-store-images/:storeId",
@@ -155,10 +216,9 @@ router.get(
 						errorObjects.USER_ID_DOEST_NOT_EXISTS
 					)
 				);
-
 		// Upload the images of the listing
 		req.storeId = storeId;
-		uploadMultiImage(req, res, async function (err) {
+		uploadMultiImageStore(req, res, async function (err) {
 			if (err) {
 				SimpleLogger.error(err);
 				// If file type error return relavent message
@@ -198,7 +258,7 @@ router.get(
 						const cardDestination = path.join(
 							__dirname,
 							"../../public/",
-							`${userId}/store/${storeId}/`,
+							`${userId}/stores/${storeId}/`,
 							`${req.file.filename}`
 						);
 						try {
@@ -221,7 +281,7 @@ router.get(
 								)
 							);
 					}
-					images.push(path.join(`${userId}/store/${storeId}/`, file.filename));
+					images.push(path.join(`${userId}/stores/${storeId}/`, file.filename));
 				}
 			}
 			if (listing.images && listing.images.length > 0) {

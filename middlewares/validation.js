@@ -615,6 +615,7 @@ module.exports = {
 			price: Joi.number().required().min(1),
 			cardId: Joi.string().allow(""),
 			productId: Joi.string().required(),
+			store: Joi.string().allow(""),
 			productOptionId: Joi.string().allow(""),
 			gradeId: Joi.string().required(),
 			condition: Joi.string().required(),
