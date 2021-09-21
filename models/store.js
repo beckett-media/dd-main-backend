@@ -7,24 +7,24 @@ const storeSchema = new mongoose.Schema(
     logo: {
       type: String,
     },
-		title: {
-			type: String,
-			required: true,
-		},
-		images: { type: [String], default: [], required: false },
-		desc: {
-			type: String,
-			required: true,
-		},
+    title: {
+      type: String,
+      required: true,
+    },
+    images: { type: [String], default: [], required: false },
+    desc: {
+      type: String,
+      required: true,
+    },
     isPublic: {
-			type: Boolean,
-			default: true,
-		},
+      type: Boolean,
+      default: true,
+    },
     user: {
       type: Schema.Types.ObjectId,
       ref: stringConstants.collectionNames.USER_COLLECTION,
       required: true,
-    }
+    },
   },
   { timestamps: true, toJSON: { getters: true } }
 );
