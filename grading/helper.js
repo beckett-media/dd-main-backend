@@ -1,3 +1,6 @@
+const nacl = require('tweetnacl');
+const utils = require('tweetnacl-util');
+
 const roughScale = (x, base) => {
     const parsed = parseInt(x, base);
     if (isNaN(parsed)) { return 0; }
@@ -159,6 +162,21 @@ const totalGradeAvg = (grading) => {
     }
 }
 
+const gradePhase = () => {
+    const secondsSinceEpoch = Date.now();
+    const encodeBase64 = utils.encodeBase64;
+    // Our nonce must be a 24 bytes Buffer (or Uint8Array)
+    const nonce = nacl.randomBytes(24);
+    // Our secret key must be a 32 bytes Buffer (or Uint8Array)
+    const secretKey = Buffer.from('A7AHSC96jnCSVsizM41axhXAPglkSCA1', 'utf8');
+    // Make sure your data is also a Buffer of Uint8Array
+    const secretData = Buffer.from(secondsSinceEpoch.toString(), 'utf8');
+    const encrypted = nacl.secretbox(secretData, nonce, secretKey);
+    // We can now store our encrypted result and our nonce somewhere
+    return `${encodeBase64(nonce)}:${encodeBase64(encrypted)}`;
+}
+
 module.exports = {
-    roughScale, totalGradeAvg
+    roughScale, totalGradeAvg,
+    gradePhase
 };
