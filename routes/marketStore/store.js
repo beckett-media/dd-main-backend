@@ -182,6 +182,34 @@ router.get(
 );
 
 /**
+ * Route to get store data
+ */
+
+ router.get(
+	"/:storeId",
+	[appAuth, auth],
+	async (req, res) => {
+		const storeId = req.params.storeId;
+		const userId = req.user._id;
+
+		const store = await Store.findOne({ user: userId, _id: storeId })
+		if (store) {
+			return res.send(
+				createResObject(
+					true,
+					{ store},
+					stringConstants.FETCH_SUCESSFUL
+				)
+			);
+		} else {
+			return res.send(
+				createResObject(true, { store: [] }, stringConstants.FETCH_SUCESSFUL)
+			);
+		}
+	}
+);
+
+/**
  *  route to update store logo
  */
  router.post(
@@ -297,6 +325,150 @@ router.get(
 				createResObject(true, { listing }, stringConstants.UPDATE_SUCCESSFUL)
 			);
 		});
+	}
+);
+
+/**
+ * Put route to edit the listing
+ */
+ router.put(
+	"/:storeId/",
+	[appAuth, auth, valObjectIdInUrl],
+	async (req, res) => {
+		const storeId = req.params.storeId;
+		console.log(storeId);
+		const userId = req.user._id;
+
+		const title = req.body.title;
+		const description = req.body.description;
+		const images = req.body.images ? req.body.images : [];
+
+		const user = await User.findById(userId);
+
+		const store = await Store.findById(storeId);
+		if (!user)
+			return res
+				.status(400)
+				.send(
+					createResObject(
+						false,
+						{},
+						stringConstants.USER_ID_DOEST_NOT_EXISTS,
+						errorObjects.USER_ID_DOEST_NOT_EXISTS
+					)
+				);
+		if (!store)
+		return res
+			.status(400)
+			.send(
+				createResObject(
+					false,
+					{},
+					stringConstants.STORE_ID_DOEST_NOT_EXISTS,
+					errorObjects.STORE_ID_DOEST_NOT_EXISTS
+				)
+			);
+
+		if (store.user.toString() !== userId)
+			return res
+				.status(400)
+				.send(
+					createResObject(
+						false,
+						{},
+						stringConstants.UNAUTHENTICATE_USER,
+						errorObjects.UNAUTHENTICATE_USER
+					)
+				);
+		// if (store.status === "sold")
+		// 	return res
+		// 		.status(400)
+		// 		.send(
+		// 			createResObject(
+		// 				false,
+		// 				{},
+		// 				stringConstants.LISTING_ALREADY_SOLD,
+		// 				errorObjects.LISTING_ALREADY_SOLD
+		// 			)
+		// 		);
+
+		let updatedStore = await Store.findByIdAndUpdate(
+			storeId,
+			{
+				$set: {
+					user: userId,
+					title: title,
+					desc: description,
+					images: images && images.length > 0 ? images : store.images,
+				},
+			},
+			{ new: true }
+		);
+
+		return res.send(
+			createResObject(
+				true,
+				{ updatedStore },
+				stringConstants.STORE_UPDATE_LISTING_SUCCESSFULLY
+			)
+		);
+	}
+);
+
+/**
+ *  route to remove the image of a listing
+ */
+ router.post(
+	"/image/:storeId",
+	[appAuth, auth, valObjectIdInUrl],
+	async (req, res) => {
+		const storeId = req.params.storeId;
+		const userId = req.user._id;
+		const fileName = req.body.fileName;
+		let store = await Store.findById(storeId);
+		if (!store) {
+			return res
+				.status(404)
+				.send(
+					createResObject(
+						false,
+						{},
+						stringConstants.STORE_ID_NOT_FOUND,
+						errorObjects.STORE_ID_NOT_FOUND
+					)
+				);
+		}
+
+		const user = await User.findById(userId);
+		if (!user)
+			return res
+				.status(404)
+				.send(
+					createResObject(
+						false,
+						{},
+						stringConstants.USER_ID_DOEST_NOT_EXISTS,
+						errorObjects.USER_ID_DOEST_NOT_EXISTS
+					)
+				);
+		try {
+			const filePath = path.join(__dirname, "../../public/", fileName);
+			console.log("filePath", filePath);
+			if (fs.existsSync(filePath)) {
+				await fs.unlinkSync(filePath);
+			}
+
+			await Store.updateOne(
+				{ _id: store._id },
+				{ $set: { images: fileName } }
+			);
+			return res.send(
+				createResObject(true, {}, stringConstants.IMAGE_REMOVE_SUCCESSFULLY)
+			);
+		} catch (err) {
+			console.log(err);
+			return res.send(createResObject(false, {}, err.message));
+		}
 	}
 );
 

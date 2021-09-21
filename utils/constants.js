@@ -201,6 +201,7 @@ module.exports.stringConstants = {
 	UNRECOGNISE_QUANTITY: "Please add some quantity.",
 	STRIPE_CLIENTID_NOT_FOUND: "Client Id not found, please send a card token.",
 	IMAGE_REMOVE_SUCCESSFULLY: "Image remove successfully.",
+	STORE_UPDATE_LISTING_SUCCESSFULLY: "STORE_UPDATE_LISTING_SUCCESSFULLY",
 
 	collectionNames: {
 		USER_COLLECTION: "User",
