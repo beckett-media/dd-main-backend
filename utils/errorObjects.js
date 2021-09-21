@@ -349,5 +349,10 @@ module.exports.errorObjects = {
 		errorCode: 114,
 		errorSubCode: getKey(stringConstants, stringConstants.PRODUCT_ID_NOT_FOUND),
 		errorMessage: stringConstants.PRODUCT_ID_NOT_FOUND,
+	},
+	STORE_ID_NOT_FOUND: {
+		errorCode: 139,
+		errorSubCode: getKey(stringConstants, stringConstants.STORE_ID_NOT_FOUND),
+		errorMessage: stringConstants.STORE_ID_NOT_FOUND,
 	}
 };

@@ -9,7 +9,7 @@ const { createResObject } = require("../../utils/utilFunctions");
 const { errorObjects } = require("../../utils/errorObjects");
 
 /**
- * Route to get all card stores
+ * Route to get stores
  */
 router.get("/", async (req, res) => {
   let stores = await Store.find();

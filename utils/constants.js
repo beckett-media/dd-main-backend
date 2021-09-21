@@ -221,7 +221,6 @@ module.exports.stringConstants = {
 		GRADES_COLLECTION: "Grade",
 		MARKETPLACE_COLLECTION: "Marketplace",
 		Listing_COLLECTION: "Listing",
-		STORE_LISTING_COLLECTION: "StoreListing",
 		ORDER_COLLECTION: "Order",
 		CART_COLLECTION: "Cart",
 		ADDRESS_COLLECTION: "Address",
