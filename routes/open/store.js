@@ -22,7 +22,7 @@ router.get("/", async (req, res) => {
           false,
           {},
           stringConstants.STORE_NOT_FOUND,
-          errorObjects.PRODUCT_ID_NOT_FOUND
+          errorObjects.STORE_ID_NOT_FOUND
         )
       );
 
