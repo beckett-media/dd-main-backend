@@ -211,6 +211,52 @@ const multiImageStorage = multer.diskStorage({
 	},
 });
 
+
+/**
+ * Storage for stores
+ */
+ const multiImageStorageStore = multer.diskStorage({
+	destination: async function (req, file, cb) {
+		const storeId = req.storeId;
+		const userId = req.user._id;
+
+		if (!storeId) return cb(new Error(stringConstants.STORE_ID_NOT_FOUND), false);
+		if (!userId)
+			return cb(new Error(stringConstants.USER_ID_NOT_FOUND_IN_REQUEST), false);
+		const userDir = path.join(__dirname, `../public/${userId}`);
+		const uDirs = [userDir];
+		try {
+			for (const dir of uDirs) {
+				const exists = fs.existsSync(dir);
+				if (!exists) fs.mkdirSync(dir);
+			}
+		} catch (error) {
+			return cb(error, false);
+		}
+		const parentDir = path.join(__dirname, `../public/${userId}/stores/`);
+		const fileDestination = path.join(
+			__dirname,
+			`../public/${userId}/stores/${storeId}/`
+		);
+		const dirs = [parentDir, fileDestination];
+		try {
+			for (const dir of dirs) {
+				const exists = fs.existsSync(dir);
+				if (!exists) fs.mkdirSync(dir);
+			}
+		} catch (error) {
+			return cb(error, false);
+		}
+
+		cb(null, fileDestination);
+	},
+	filename: function (req, file, cb) {
+		const extension = path.extname(file.originalname).toLowerCase();
+		const fileName = `${Date.now()}-listing_image${extension}`;
+		cb(null, fileName);
+	},
+});
+
 /**
  * Storage for game card back
  */
@@ -407,6 +453,22 @@ module.exports.uploadCardVideo = multer({
 }).single("cardVideo");
 module.exports.uploadMultiImage = multer({
 	storage: multiImageStorage,
+	fileFilter: function (req, file, cb) {
+		const ext = path.extname(file.originalname).toLowerCase();
+		if (
+			ext !== stringConstants.iType.PNG &&
+			ext !== stringConstants.iType.JPG &&
+			ext !== stringConstants.iType.GIF &&
+			ext !== stringConstants.iType.JPEG
+		) {
+			return cb(new Error(stringConstants.NOT_A_VALID_FILE_TYPE), false);
+		}
+		cb(null, true);
+	},
+}).array("images", 5);
+
+module.exports.uploadMultiImageStore = multer({
+	storage: multiImageStorageStore,
 	fileFilter: function (req, file, cb) {
 		const ext = path.extname(file.originalname).toLowerCase();
 		if (

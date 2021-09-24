@@ -39,6 +39,14 @@ module.exports.errorObjects = {
 		),
 		errorMessage: stringConstants.USER_ID_DOEST_NOT_EXISTS,
 	},
+	STORE_ID_DOEST_NOT_EXISTS: {
+		errorCode: 133,
+		errorSubCode: getKey(
+			stringConstants,
+			stringConstants.STORE_ID_DOEST_NOT_EXISTS
+		),
+		errorMessage: stringConstants.STORE_ID_DOEST_NOT_EXISTS,
+	},
 	REFRESH_TOKEN_INVALID_OR_EXPIRED: {
 		errorCode: 106,
 		errorSubCode: getKey(
@@ -347,5 +355,10 @@ module.exports.errorObjects = {
 		errorCode: 114,
 		errorSubCode: getKey(stringConstants, stringConstants.PRODUCT_ID_NOT_FOUND),
 		errorMessage: stringConstants.PRODUCT_ID_NOT_FOUND,
+	},
+	STORE_ID_NOT_FOUND: {
+		errorCode: 139,
+		errorSubCode: getKey(stringConstants, stringConstants.STORE_ID_NOT_FOUND),
+		errorMessage: stringConstants.STORE_ID_NOT_FOUND,
 	}
 };
