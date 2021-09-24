@@ -220,9 +220,9 @@ const multiImageStorage = multer.diskStorage({
 		const storeId = req.storeId;
 		const userId = req.user._id;
 
-		if (!storeId) cb(new Error(stringConstants.STORE_ID_NOT_FOUND), false);
+		if (!storeId) return cb(new Error(stringConstants.STORE_ID_NOT_FOUND), false);
 		if (!userId)
-			cb(new Error(stringConstants.USER_ID_NOT_FOUND_IN_REQUEST), false);
+			return cb(new Error(stringConstants.USER_ID_NOT_FOUND_IN_REQUEST), false);
 		const userDir = path.join(__dirname, `../public/${userId}`);
 		const uDirs = [userDir];
 		try {

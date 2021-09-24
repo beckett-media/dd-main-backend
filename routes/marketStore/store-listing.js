@@ -110,28 +110,31 @@ router.post(
   "/:store/create",
   [appAuth, auth, valLisitngCardData],
   async (req, res) => {
-    const storeId = req.params.store;
     const userId = req.user._id;
-    const cardId = req.body.cardId;
-    const productId = req.body.productId;
-    // const productOptionId = req.body.productOptionId;
-    const gradeId = req.body.gradeId;
-    const title = req.body.title;
-    const description = req.body.description;
-    const quantity = req.body.quantity;
+    const storeId = req.params.store;
+
+    const {
+      cardId,
+      productId,
+      gradeId,
+      title,
+      description,
+      quantity,
+      price,
+      condition,
+      serialNumber,
+      tags,
+      isPublic,
+      playerNames,
+      cardType,
+      sport,
+      cardNumber,
+      year,
+      brand,
+      modelNo
+    } = req.body;
+
     const availableQuantity = quantity;
-    const price = req.body.price;
-    const condition = req.body.condition;
-    const serialNumber = req.body.serialNumber;
-    const tags = req.body.tags;
-    const isPublic = req.body.isPublic;
-    const playerNames = req.body.playerNames;
-    const cardType = req.body.cardType;
-    const sport = req.body.sport;
-    const cardNumber = req.body.cardNumber;
-    const year = req.body.year;
-    const brand = req.body.brand;
-    const modelNo = req.body.modelNo;
     const images = req.body.images ? req.body.images : [];
     const user = await User.findById(userId);
     const store = await Store.findOne({
@@ -234,23 +237,23 @@ router.post(
       card: cardId === "" ? null : cardId,
       product: productId,
       grade: gradeId,
-      title: title,
-      description: description,
-      quantity: quantity,
-      availableQuantity: availableQuantity,
-      price: price,
-      condition: condition,
-      serialNumber: serialNumber,
-      tags: tags,
-      isPublic: isPublic,
-      playerNames: playerNames,
-      cardType: cardType,
-      sport: sport,
-      cardNumber: cardNumber,
-      year: year,
-      brand: brand,
-      modelNo: modelNo,
-      images: images,
+      title,
+      description,
+      quantity,
+      availableQuantity,
+      price,
+      condition,
+      serialNumber,
+      tags,
+      isPublic,
+      playerNames,
+      cardType,
+      sport,
+      cardNumber,
+      year,
+      brand,
+      modelNo,
+      images,
     });
     listing = await listing.save();
     if (isPublic) {
@@ -283,27 +286,31 @@ router.put(
   async (req, res) => {
     const listingId = req.params.listingId;
     const storeId = req.params.storeId;
-
     const userId = req.user._id;
-    const cardId = req.body.cardId;
-    const productId = req.body.productId;
-    const gradeId = req.body.gradeId;
-    const title = req.body.title;
-    const description = req.body.description;
-    const quantity = req.body.quantity;
+    
+
+    const {
+      cardId,
+      productId,
+      gradeId,
+      title,
+      description,
+      quantity,
+      price,
+      condition,
+      serialNumber,
+      tags,
+      isPublic,
+      playerNames,
+      cardType,
+      sport,
+      cardNumber,
+      year,
+      brand,
+      modelNo
+    } = req.body;
+
     const availableQuantity = quantity;
-    const price = req.body.price;
-    const condition = req.body.condition;
-    const serialNumber = req.body.serialNumber;
-    const tags = req.body.tags;
-    const isPublic = req.body.isPublic;
-    const playerNames = req.body.playerNames;
-    const cardType = req.body.cardType;
-    const sport = req.body.sport;
-    const cardNumber = req.body.cardNumber;
-    const year = req.body.year;
-    const brand = req.body.brand;
-    const modelNo = req.body.modelNo;
     const images = req.body.images ? req.body.images : [];
 
     const user = await User.findById(userId);

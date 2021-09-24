@@ -191,7 +191,7 @@ router.get("/:storeId", [appAuth, auth], async (req, res) => {
     );
   } else {
     return res.send(
-      createResObject(true, { store: [] }, stringConstants.FETCH_SUCESSFUL)
+      createResObject(true, { store: null }, stringConstants.FETCH_SUCESSFUL)
     );
   }
 });
@@ -367,17 +367,6 @@ router.put(
             errorObjects.UNAUTHENTICATE_USER
           )
         );
-    // if (store.status === "sold")
-    // 	return res
-    // 		.status(400)
-    // 		.send(
-    // 			createResObject(
-    // 				false,
-    // 				{},
-    // 				stringConstants.LISTING_ALREADY_SOLD,
-    // 				errorObjects.LISTING_ALREADY_SOLD
-    // 			)
-    // 		);
 
     let updatedStore = await Store.findByIdAndUpdate(
       storeId,
