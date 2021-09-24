@@ -10,7 +10,10 @@ const pay = require("../routes/user/pay");
 const notificaiton = require("../routes/user/testNotifications");
 const marketplace = require("../routes/marketPlace/home");
 const listing = require("../routes/marketPlace/listing");
+const storeListing = require("../routes/marketStore/store-listing");
+const marketStore = require("../routes/marketStore/store");
 const product = require("../routes/open/product");
+const store = require("../routes/open/store");
 const grade = require("../routes/open/grade");
 const cart = require("../routes/cart/cart");
 const order = require("../routes/order/index");
@@ -35,6 +38,8 @@ module.exports = (app) => {
 	app.use("/pay", pay);
 	app.use("/marketplace", marketplace);
 	app.use("/listing", listing);
+	app.use("/store-listing", storeListing);
+	app.use("/store", marketStore);
 	app.use("/cart", cart);
 	app.use("/order", order);
 	app.use("/address", address);
@@ -47,5 +52,6 @@ module.exports = (app) => {
 	// Public routes
 	app.use("/public-cards", publicSportsCard);
 	app.use("/public-products", product);
+	app.use("/public-stores", store);
 	app.use("/public-grade", grade);
 };
