@@ -121,6 +121,11 @@ const listingSchema = new mongoose.Schema(
 			ref: stringConstants.collectionNames.CARD_COLLECTION,
 			required: false,
 		},
+		store: {
+			type: Schema.Types.ObjectId,
+			ref: stringConstants.collectionNames.STORES_COLLECTION,
+			required: false,
+		}
 	},
 	{ timestamps: true, toJSON: { getters: true } }
 );
