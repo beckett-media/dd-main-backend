@@ -28,10 +28,11 @@ const combinedGrading = (cardId, imagePath, userId) => {
             } else {
                 try {
                     const data = typeof body === 'string' && !body.includes('error') ? JSON.parse(body) : body;
+                    console.log('********** Data from python API **********', data);
                     resolve(data);
                 }catch (error) {
-                    resolve(0);
                     console.log(error);
+                    resolve(0);
                 }
                 resolve(body);
             }
