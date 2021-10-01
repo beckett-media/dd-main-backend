@@ -66,7 +66,7 @@ router.get(
 /**
  * Route to get store products on client side
  */
-router.get("/public/:store", [appAuth, auth], async (req, res) => {
+router.get("/public/:store", async (req, res) => {
   const storeId = req.params.store;
 
   const totalListing = await Listing.find({ store: storeId });
