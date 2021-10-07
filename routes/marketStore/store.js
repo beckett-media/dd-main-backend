@@ -66,7 +66,7 @@ router.get(
 /**
  * Route to get store products on client side
  */
-router.get("/public/:store", [appAuth, auth], async (req, res) => {
+router.get("/public/:store", async (req, res) => {
   const storeId = req.params.store;
 
   const totalListing = await Listing.find({ store: storeId });
@@ -441,6 +441,71 @@ router.post(
     } catch (err) {
       console.log(err);
       return res.send(createResObject(false, {}, err.message));
+    }
+  }
+);
+
+/**
+ *  route to delete the store by id
+ */
+router.delete(
+  "/:storeId",
+  [appAuth, auth, valObjectIdInUrl],
+  async (req, res) => {
+    const storeId = req.params.storeId;
+
+    const userId = req.user._id;
+    const user = await User.findById(userId);
+
+    const store = await Store.findById(storeId);
+    if (!user)
+      return res
+        .status(400)
+        .send(
+          createResObject(
+            false,
+            {},
+            stringConstants.USER_ID_DOEST_NOT_EXISTS,
+            errorObjects.USER_ID_DOEST_NOT_EXISTS
+          )
+        );
+    if (!store)
+      return res
+        .status(400)
+        .send(
+          createResObject(
+            false,
+            {},
+            stringConstants.STORE_ID_NOT_FOUND,
+            errorObjects.STORE_ID_NOT_FOUND
+          )
+        );
+
+    if (store.user.toString() !== userId)
+      return res
+        .status(400)
+        .send(
+          createResObject(
+            false,
+            {},
+            stringConstants.UNAUTHENTICATE_USER,
+            errorObjects.UNAUTHENTICATE_USER
+          )
+        );
+    const totalListing = await Listing.find({ store: storeId });
+
+    if (totalListing.length > 0) {
+      return res.send(
+        createResObject(false, {}, "STORE NOT DELETED")
+      );
+    } else {
+      await store.deleteOne({
+        _id: mongoose.Types.ObjectId(storeId),
+      });
+
+      return res.send(
+        createResObject(true, {}, stringConstants.STORE_DELETE_SUCCESSFULLY)
+      );
     }
   }
 );
