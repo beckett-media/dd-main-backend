@@ -9,6 +9,7 @@ const fs = require("fs");
 const SimpleLogger = require("../../utils/simpleLogger");
 const appAuth = require("../../middlewares/authenticateApp");
 const auth = require("../../middlewares/authenticateUser");
+const authAdminOrUser = require("../../middlewares/authenticateAdminOrUser");
 const authAppleTokenMiddleware = require("../../middlewares/authenticateAppleToken");
 const { User } = require("../../models/user");
 const { stringConstants } = require("../../utils/constants");
@@ -44,7 +45,7 @@ router.post(
 
     const role = user.role;
 
-    if (role !== stringConstants.role.USER || role !== user.role) {
+    if ((role !== stringConstants.role.ADMIN && role !== stringConstants.role.USER) || role !== user.role) {
       //   Forbidden resource
       return res
         .status(403)
@@ -269,6 +270,12 @@ router.post(
     user.addDeviceToken(deviceToken);
     user = await user.save();
 
+    if(req.body.claimStore){
+      let store = await Store.findById(req.body.claimStore);
+      store.user = user;
+      await store.save();
+    }
+
     const returnObject = {
       ...user.getUserBasicInfo(),
       authTokenExpiry: authToken.expiry,
@@ -446,7 +453,7 @@ router.post(
   }
 );
 
-router.post("/sign-out", [appAuth, auth, valSignOutReq], async (req, res) => {
+router.post("/sign-out", [appAuth, authAdminOrUser, valSignOutReq], async (req, res) => {
   const deviceToken = req.body.deviceToken;
   const userId = req.user._id;
 

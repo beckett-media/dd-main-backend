@@ -43,6 +43,7 @@ module.exports = {
 				)
 				.required(),
 			deviceToken: Joi.string().required(),
+			claimStoreId: Joi.string(),
 		});
 
 		const { error } = schema.validate(req.body);

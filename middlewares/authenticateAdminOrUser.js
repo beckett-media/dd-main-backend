@@ -49,7 +49,7 @@ module.exports = async (req, res, next) => {
           )
         );
 
-    if (role !== stringConstants.role.ADMIN || role !== user.role) {
+    if ((role !== stringConstants.role.ADMIN && role !== stringConstants.role.USER) || role !== user.role) {
       //   Forbidden resource
       return res
         .status(403)

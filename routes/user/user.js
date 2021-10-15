@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcrypt");
 const auth = require("../../middlewares/authenticateUser");
+const authAdminOrUser = require("../../middlewares/authenticateAdminOrUser");
 const appAuth = require("../../middlewares/authenticateApp");
 const { uploadProfilePic } = require("../../middlewares/multerSingle");
 const fs = require("fs");
@@ -10,6 +11,7 @@ const path = require("path");
 const SimpleLogger = require("../../utils/simpleLogger");
 const _ = require("lodash");
 const { User } = require("../../models/user");
+const { Store } = require("../../models/store");
 const { PendingDeletion } = require("../../models/pendingDeletion");
 const {
 	valRegisterRequest,
@@ -75,6 +77,14 @@ router.post(
 
 		user = await user.save();
 
+		if(req.body.claimStoreId){
+			let store = await Store.findById(req.body.claimStoreId);
+			if(store && !store.user){
+				store.user = user;
+				await store.save();
+			}
+		}
+
 		res.header(stringConstants.AUTH_TOKEN_STRING, token.token);
 		res.header(stringConstants.REFRESH_TOKEN_STRING, refreshToken.token);
 
@@ -100,7 +110,7 @@ router.post(
 
 router.post(
 	"/add-update-profile-picture",
-	[appAuth, auth],
+	[appAuth, authAdminOrUser],
 	async (req, res, next) => {
 		const userId = req.user._id;
 		let user = await User.findById(userId);
@@ -190,7 +200,7 @@ router.post(
 
 router.post(
 	"/add-update-username",
-	[appAuth, auth, valUsernameRequest],
+	[appAuth, authAdminOrUser , valUsernameRequest],
 	async (req, res) => {
 		const userId = req.user._id;
 		const username = req.body.username.toLowerCase();
@@ -342,7 +352,7 @@ router.post(
 /**
  * GET route to fetch user details including settins
  */
-router.get("/user-details", [auth], async (req, res) => {
+router.get("/user-details", [authAdminOrUser], async (req, res) => {
 	const user = await User.findById(req.user._id);
 	const userConnect = await StripeConnect.findOne({
 		user: user._id,
