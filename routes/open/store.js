@@ -12,7 +12,7 @@ const { errorObjects } = require("../../utils/errorObjects");
  * Route to get stores
  */
 router.get("/", async (req, res) => {
-  let stores = await Store.find();
+  let stores = await Store.find({ 'user' : { $exists: true, $ne: null } });
 
   if (!stores)
     return res
