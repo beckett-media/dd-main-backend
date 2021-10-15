@@ -23,7 +23,7 @@ const storeSchema = new mongoose.Schema(
     user: {
       type: Schema.Types.ObjectId,
       ref: stringConstants.collectionNames.USER_COLLECTION,
-      required: true,
+      required: false,
     },
   },
   { timestamps: true, toJSON: { getters: true } }

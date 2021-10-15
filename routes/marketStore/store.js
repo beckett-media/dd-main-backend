@@ -2,6 +2,8 @@ const express = require("express");
 const mongoose = require("mongoose");
 const router = express.Router();
 const auth = require("../../middlewares/authenticateUser");
+const authAdmin = require("../../middlewares/authenticateAdmin");
+const authAdminOrUser = require("../../middlewares/authenticateAdminOrUser");
 const appAuth = require("../../middlewares/authenticateApp");
 const fs = require("fs");
 const {
@@ -32,7 +34,7 @@ const { StripeConnect } = require("../../models/stripeConnect");
 const { OrderItem } = require("../../models/orderItem");
 
 /**
- * Route to get store products by user of admin side
+ * Route to get store products by user of seller side
  */
 router.get(
   "/:store/:pageSize/:pageNumber",
@@ -58,6 +60,38 @@ router.get(
     } else {
       return res.send(
         createResObject(true, { listing: [] }, stringConstants.FETCH_SUCESSFUL)
+      );
+    }
+  }
+);
+
+/**
+ * Route to get stores of admin side
+ */
+
+router.get(
+  "/get-stores/admin/:pageSize/:pageNumber",
+  [appAuth, authAdmin, valPageSizeNumber],
+  async (req, res) => {
+    const pageSize = parseInt(req.params.pageSize);
+    const pageNumber = parseInt(req.params.pageNumber);
+    const userId = req.user._id;
+
+    const totalStores = await Store.find({ user: null })
+      .sort({ createdAt: 1 })
+      .skip((pageNumber - 1) * pageSize)
+      .limit(pageSize);
+    if (totalStores.length > 0) {
+      return res.send(
+        createResObject(
+          true,
+          { stores: totalStores },
+          stringConstants.FETCH_SUCESSFUL
+        )
+      );
+    } else {
+      return res.send(
+        createResObject(true, { stores: [] }, stringConstants.FETCH_SUCESSFUL)
       );
     }
   }
@@ -91,7 +125,7 @@ router.get("/public/:store", async (req, res) => {
 });
 
 /**
- * POST route to create store
+ * POST route to create store for seller
  */
 router.post("/create", [appAuth, auth, valStoreData], async (req, res) => {
   const userId = req.user._id;
@@ -145,7 +179,65 @@ router.post("/create", [appAuth, auth, valStoreData], async (req, res) => {
 });
 
 /**
- * Route to get stores by user
+ * POST route to create store for admin side
+ */
+router.post(
+  "/admin/create",
+  [appAuth, authAdmin, valStoreData],
+  async (req, res) => {
+    const userId = req.user._id;
+    const title = req.body.title;
+    const description = req.body.description;
+    const isPublic = req.body.isPublic;
+    const images = req.body.images ? req.body.images : [];
+    const user = await User.findById(userId);
+    const stripe = await StripeConnect.findOne({
+      user: mongoose.Types.ObjectId(userId),
+    });
+    if (!user)
+      return res
+        .status(400)
+        .send(
+          createResObject(
+            false,
+            {},
+            stringConstants.USER_ID_DOEST_NOT_EXISTS,
+            errorObjects.USER_ID_DOEST_NOT_EXISTS
+          )
+        );
+    if (!stripe)
+      return res
+        .status(400)
+        .send(
+          createResObject(
+            false,
+            {},
+            stringConstants.STRIPE_CONNECT_ERROR,
+            errorObjects.STRIPE_CONNECT_ERROR
+          )
+        );
+    // Create a new card in listing
+    let store = new Store({
+      user: null, //skipped because it is created for a user to be claimed
+      title: title,
+      desc: description,
+      isPublic: isPublic,
+      images: images,
+    });
+    store = await store.save();
+
+    return res.send(
+      createResObject(
+        true,
+        { store },
+        stringConstants.CARD_ADD_LISTING_SUCCESSFULLY
+      )
+    );
+  }
+);
+
+/**
+ * Route to get stores by user of seller side
  */
 
 router.get(
@@ -201,7 +293,7 @@ router.get("/:storeId", [appAuth, auth], async (req, res) => {
  */
 router.post(
   "/update-store-images/:storeId",
-  [auth, valObjectIdInUrl],
+  [authAdminOrUser, valObjectIdInUrl],
   async (req, res) => {
     const storeId = req.params.storeId;
     const userId = req.user._id;
@@ -396,7 +488,7 @@ router.put(
  */
 router.post(
   "/image/:storeId",
-  [appAuth, auth, valObjectIdInUrl],
+  [appAuth, authAdminOrUser, valObjectIdInUrl],
   async (req, res) => {
     const storeId = req.params.storeId;
     const userId = req.user._id;
@@ -429,7 +521,6 @@ router.post(
         );
     try {
       const filePath = path.join(__dirname, "../../public/", fileName);
-      console.log("filePath", filePath);
       if (fs.existsSync(filePath)) {
         await fs.unlinkSync(filePath);
       }
@@ -450,7 +541,7 @@ router.post(
  */
 router.delete(
   "/:storeId",
-  [appAuth, auth, valObjectIdInUrl],
+  [appAuth, authAdminOrUser, valObjectIdInUrl],
   async (req, res) => {
     const storeId = req.params.storeId;
 
@@ -481,23 +572,35 @@ router.delete(
           )
         );
 
-    if (store.user.toString() !== userId)
-      return res
-        .status(400)
-        .send(
-          createResObject(
-            false,
-            {},
-            stringConstants.UNAUTHENTICATE_USER,
-            errorObjects.UNAUTHENTICATE_USER
-          )
-        );
+    if (user.role === "admin") {
+      if (store.user)
+        return res
+          .status(400)
+          .send(
+            createResObject(
+              false,
+              {},
+              stringConstants.UNAUTHENTICATE_USER,
+              errorObjects.UNAUTHENTICATE_USER
+            )
+          );
+    } else {
+      if (store.user.toString() !== userId)
+        return res
+          .status(400)
+          .send(
+            createResObject(
+              false,
+              {},
+              stringConstants.UNAUTHENTICATE_USER,
+              errorObjects.UNAUTHENTICATE_USER
+            )
+          );
+    }
     const totalListing = await Listing.find({ store: storeId });
 
     if (totalListing.length > 0) {
-      return res.send(
-        createResObject(false, {}, "STORE NOT DELETED")
-      );
+      return res.send(createResObject(false, {}, "STORE NOT DELETED"));
     } else {
       await store.deleteOne({
         _id: mongoose.Types.ObjectId(storeId),
