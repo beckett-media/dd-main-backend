@@ -75,9 +75,20 @@ router.get("/:cardId", [appAuth], async (req, res) => {
 				localField: "user",
 				foreignField: "_id",
 				as: "seller",
+			}
+		},
+		{
+			$lookup: {
+				from: "stores",
+				localField: "store",
+				foreignField: "_id",
+				as: "storeDetails",
 			},
 		},
 		{ $unwind: { path: "$seller" } },
+		{ $unwind: { path: "$storeDetails",
+					 preserveNullAndEmptyArrays: true}
+		},
 		{
 			$lookup: {
 				let: {
@@ -115,6 +126,7 @@ router.get("/:cardId", [appAuth], async (req, res) => {
 				serialNumber: "$serialNumber",
 				cardType: "$cardType",
 				sport: "$sport",
+				store: "$store",
 				cardNumber: "$cardNumber",
 				year: "$year",
 				brand: "$brand",
@@ -123,6 +135,10 @@ router.get("/:cardId", [appAuth], async (req, res) => {
 					_id: "$seller._id",
 					fullName: "$seller.fullName",
 					email: "$seller.email",
+				},
+				storeDetails: {
+					_id: "$storeDetails._id",
+					title: "$storeDetails.title",
 				},
 			},
 		},
