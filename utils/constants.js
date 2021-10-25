@@ -164,6 +164,7 @@ module.exports.stringConstants = {
 	CARD_ADD_LISTING_SUCCESSFULLY: "Create listing successfully",
 	CARD_UPDATE_LISTING_SUCCESSFULLY: "listing update successfully",
 	LISTING_DELETE_SUCCESSFULLY: "listing delete successfully",
+	STORE_DELETE_SUCCESSFULLY: "store delete successfully",
 	PRODUCT_NOT_FOUND: "Products not found",
 	STORE_NOT_FOUND: "Stores not found",
 	PRODUCT_ID_NOT_FOUND: "Product with the given ID not found",
