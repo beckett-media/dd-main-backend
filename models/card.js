@@ -68,7 +68,8 @@ const cardSchema = new mongoose.Schema(
       centering: { type: Object },
       corners: { type: Object },
       surface: { type: Object },
-      edges: { type: Object }
+      edges: { type: Object },
+      overallGrade: { type: String }
     },
   },
   { timestamps: true, toJSON: { getters: true } }
