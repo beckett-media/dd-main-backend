@@ -57,10 +57,10 @@ router.post(
                 );
             }
 
-        const { surface = {} } = grading;
+        const { surface = {}, card_grade = '' } = grading;
         const { success = false } = surface;
 
-        const overallGrade = success ? totalGradeAvg(grading) : {
+        const overallGrade = success ? totalGradeAvg(grading, card_grade) : {
             overallGrade: '',
             gradingComps: {}
         };
