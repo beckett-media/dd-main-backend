@@ -142,7 +142,7 @@ const surfaceGradeAvg = (surface) => {
     }
 }
 
-const totalGradeAvg = (grading) => {
+const totalGradeAvg = (grading, card_grade) => {
     const { centering = {}, corners = {}, edges = {}, surface = {} } = grading;
     const centerGrade = centerGradeAvg(centering);
     const cornerGrade = cornerGradeAvg(corners);
@@ -157,7 +157,7 @@ const totalGradeAvg = (grading) => {
     const overallGrade = getGrade(avgVal);
     const gradingComps = compsMapper[overallGrade];
     return {
-        overallGrade,
+        overallGrade: card_grade,
         gradingComps
     }
 }
