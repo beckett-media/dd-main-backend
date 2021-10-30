@@ -98,6 +98,18 @@ router.get(
 );
 
 /**
+ * Route to get unclaim store
+ */
+ router.get("/publicunclaimed/:store", async (req, res) => {
+  const storeId = req.params.store;
+  const store = await Store.findById(storeId);
+
+  return res.send(
+    createResObject(true, { store }, stringConstants.FETCH_SUCESSFUL)
+  );
+});
+
+/**
  * Route to get store products on client side
  */
 router.get("/public/:store", async (req, res) => {
