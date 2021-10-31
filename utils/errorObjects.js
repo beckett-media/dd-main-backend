@@ -55,6 +55,14 @@ module.exports.errorObjects = {
 		),
 		errorMessage: stringConstants.REFRESH_TOKEN_INVALID_OR_EXPIRED,
 	},
+	STORE_TITLE_ALREADY_EXISTS: {
+		errorCode: 148,
+		errorSubCode: getKey(
+			stringConstants,
+			stringConstants.STORE_TITLE_ALREADY_EXISTS
+		),
+		errorMessage: stringConstants.STORE_TITLE_ALREADY_EXISTS,
+	},
 	NO_REFRESH_TOKEN_FOUND_FOR_USER: {
 		errorCode: 107,
 		errorSubCode: getKey(
@@ -79,7 +87,7 @@ module.exports.errorObjects = {
 		errorMessage: stringConstants.NO_FILE_FOUND,
 	},
 	FILE_TYPE_NOT_ACCEPTED: {
-		errorCode: 110,
+		errorCode: 9,
 		errorSubCode: getKey(
 			stringConstants,
 			stringConstants.FILE_TYPE_NOT_ACCEPTED
