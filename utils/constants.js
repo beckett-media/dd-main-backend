@@ -43,6 +43,7 @@ module.exports.stringConstants = {
   KEYS_MISSING: 'Year, Brand, and Players Name are required fields',
 
 	USER_EMAIL_ALREADY_EXISTS: "User with the given email already exists",
+	STORE_TITLE_ALREADY_EXISTS: "Store with the given title already exists",
 
 	USER_EMAIL_NOT_FOUND: "User with the given email not found",
 	OTP_NOT_VERIFIED: "Please verify the OTP first and try again",

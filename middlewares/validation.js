@@ -652,6 +652,9 @@ module.exports = {
 		const schema = Joi.object({
 			title: Joi.string().required().min(1).max(255),
 			description: Joi.string().required().min(1).max(500),
+			email: Joi.string().email().required().min(5).max(255),
+			phoneNumber: Joi.string().min(5).max(15),
+			address: Joi.string().min(5).max(500),
 			isPublic: Joi.required(),
 			images: Joi.allow(""),
 		});
