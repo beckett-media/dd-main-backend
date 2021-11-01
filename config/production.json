@@ -3,7 +3,7 @@
   "ebayGetUserUrl": "https://apiz.ebay.com/commerce/identity/v1/user/",
   "ebayGetRefreshToken": "https://api.ebay.com/identity/v1/oauth2/token",
   "qrBaseUrl": "https://api.duedilly.co/",
-  "dbConnectionString": "mongodb://localhost:27017/snap_grade_prod",
+  "dbConnectionString": "mongodb+srv://admin:iib878pOwPwFc832@due-dilly-production.wytqf.mongodb.net/snap_grade_prod",
   "snapGradeJwtPrivateKey": "SNAP_GRADE_JWT_PRIVATE_KEY",
   "snapGradeJwtRefreshKey": "SNAP_GRADE_JWT_REFRESH_KEY",
   "snapGradeJwtAppKey": "SNAP_GRADE_JWT_APP_KEY",
