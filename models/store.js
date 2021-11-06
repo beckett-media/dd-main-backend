@@ -21,7 +21,6 @@ const storeSchema = new mongoose.Schema(
       maxlength: 70,
       trim: true,
       lowercase: true,
-      unique: true,
     },
     phoneNumber: {
       type: String,
