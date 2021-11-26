@@ -16,12 +16,16 @@ const orderSchema = new mongoose.Schema(
 		address: {
 			type: Schema.Types.ObjectId,
 			ref: stringConstants.collectionNames.ADDRESS_COLLECTION,
-			required: true,
+			required: false,
+		},
+		completeAddress: {
+			type: String,
+			required: false,
 		},
 		buyer: {
 			type: Schema.Types.ObjectId,
 			ref: stringConstants.collectionNames.USER_COLLECTION,
-			required: true,
+			required: false,
 		},
 		orderId: {
 			type: String,
