@@ -1,43 +1,43 @@
-const express = require('express');
-const mongoose = require('mongoose');
+const express = require("express");
+const mongoose = require("mongoose");
 const router = express.Router();
-const auth = require('../../middlewares/authenticateUser');
-const appAuth = require('../../middlewares/authenticateApp');
-const { valCard } = require('../../middlewares/validation');
-const SimpleLogger = require('../../utils/simpleLogger');
-const path = require('path');
-const fsPromises = require('fs').promises;
-const _ = require('lodash');
-const currency = require('../../utils/currency');
-const Jimp = require('jimp');
-const { User } = require('../../models/user');
-const { Card } = require('../../models/card');
-const { Collection } = require('../../models/collection');
-const { PendingDeletion } = require('../../models/pendingDeletion');
-const { Listing } = require('../../models/listing');
-const { stringConstants } = require('../../utils/constants');
-const { errorObjects } = require('../../utils/errorObjects');
-const { createResObject } = require('../../utils/utilFunctions');
+const auth = require("../../middlewares/authenticateUser");
+const appAuth = require("../../middlewares/authenticateApp");
+const { valCard } = require("../../middlewares/validation");
+const SimpleLogger = require("../../utils/simpleLogger");
+const path = require("path");
+const fsPromises = require("fs").promises;
+const _ = require("lodash");
+const currency = require("../../utils/currency");
+const Jimp = require("jimp");
+const { User } = require("../../models/user");
+const { Card } = require("../../models/card");
+const { Collection } = require("../../models/collection");
+const { PendingDeletion } = require("../../models/pendingDeletion");
+const { Listing } = require("../../models/listing");
+const { stringConstants } = require("../../utils/constants");
+const { errorObjects } = require("../../utils/errorObjects");
+const { createResObject } = require("../../utils/utilFunctions");
 const {
   uploadCardFront,
   uploadCardBack,
   uploadCardVideo,
   uploadCardGrading,
   uploadCardFields,
-} = require('../../middlewares/multerSingle');
+} = require("../../middlewares/multerSingle");
 const {
   valObjectIdInUrl,
   valUpdateCardData,
   valPageSizeNumber,
-} = require('../../middlewares/validation');
-const centerGrading = require('../../grading/center');
-const cornerGrading = require('../../grading/corner');
-const cardHelper = require('../../helpers/cardHelper');
+} = require("../../middlewares/validation");
+const centerGrading = require("../../grading/center");
+const cornerGrading = require("../../grading/corner");
+const cardHelper = require("../../helpers/cardHelper");
 
 /**
  * Step 0: Create a new card and upload card details at once
  */
-router.post('/add-all', [appAuth, auth], async (req, res, next) => {
+router.post("/add-all", [appAuth, auth], async (req, res, next) => {
   const userId = req.user._id;
   const user = await User.findById(userId);
   if (!user)
@@ -165,7 +165,7 @@ router.post('/add-all', [appAuth, auth], async (req, res, next) => {
 /**
  * Step 1: Create a new card and upload card front
  */
-router.post('/add-front', [appAuth, auth], async (req, res, next) => {
+router.post("/add-front", [appAuth, auth], async (req, res, next) => {
   const userId = req.user._id;
   const user = await User.findById(userId);
   if (!user)
@@ -224,7 +224,7 @@ router.post('/add-front', [appAuth, auth], async (req, res, next) => {
     if (req.file.size <= 0) {
       const cardDestination = path.join(
         __dirname,
-        '../../public/',
+        "../../public/",
         `${userId}/cards/${cardId}/`,
         `${req.file.filename}`
       );
@@ -265,7 +265,7 @@ router.post('/add-front', [appAuth, auth], async (req, res, next) => {
  * separte route is used for updating front
  */
 router.post(
-  '/update-front/:cardId',
+  "/update-front/:cardId",
   [appAuth, auth, valObjectIdInUrl],
   async (req, res, next) => {
     const userId = req.user._id;
@@ -333,7 +333,7 @@ router.post(
       if (req.file.size <= 0) {
         const cardDestination = path.join(
           __dirname,
-          '../../public/',
+          "../../public/",
           `${userId}/cards/${cardId}/`,
           `${req.file.filename}`
         );
@@ -374,7 +374,7 @@ router.post(
  * requires the card id in request
  */
 router.post(
-  '/add-update-back/:cardId',
+  "/add-update-back/:cardId",
   [appAuth, auth, valObjectIdInUrl],
   async (req, res) => {
     const cardId = req.params.cardId;
@@ -444,7 +444,7 @@ router.post(
       if (req.file.size <= 0) {
         const cardDestination = path.join(
           __dirname,
-          '../../public/',
+          "../../public/",
           `${userId}/cards/${cardId}/`,
           `${req.file.filename}`
         );
@@ -485,7 +485,7 @@ router.post(
  * Step 3: This is where the user will upload the video for the game card
  */
 router.post(
-  '/add-update-video/:cardId',
+  "/add-update-video/:cardId",
   [appAuth, auth, valObjectIdInUrl],
   async (req, res) => {
     const cardId = req.params.cardId;
@@ -534,7 +534,7 @@ router.post(
               )
             );
         }
-        if (err.message === 'Unexpected field') {
+        if (err.message === "Unexpected field") {
           return res
             .status(400)
             .send(
@@ -543,7 +543,7 @@ router.post(
                 {},
                 stringConstants.REQUEST_VALIDATION_FAILED,
                 errorObjects.REQUEST_VALIDATION_ERROR(
-                  new Error('Key not valid')
+                  new Error("Key not valid")
                 )
               )
             );
@@ -568,7 +568,7 @@ router.post(
       if (req.file.size <= 0) {
         const cardDestination = path.join(
           __dirname,
-          '../../public/',
+          "../../public/",
           `${userId}/cards/${cardId}/`,
           `${req.file.filename}`
         );
@@ -613,7 +613,7 @@ router.post(
  * be pending. It will only change to submitted once we receive the payment
  */
 router.post(
-  '/add-card-data/:cardId',
+  "/add-card-data/:cardId",
   [appAuth, auth, valObjectIdInUrl, valUpdateCardData],
   async (req, res) => {
     const userId = req.user._id;
@@ -654,11 +654,11 @@ router.post(
     if (card.isCompleted) {
       let image;
 
-      const cardFront = path.join(__dirname, '../../public/', card.front);
+      const cardFront = path.join(__dirname, "../../public/", card.front);
       const extension = path.extname(card.front).toLowerCase();
       const thumbnailDest = path.join(
         __dirname,
-        '../../public/',
+        "../../public/",
         `${userId}/cards/${card._id}/`,
         `card_thumbnail${extension}`
       );
@@ -693,7 +693,7 @@ router.post(
  * API endpoint to delete card with the card ID
  */
 router.delete(
-  '/delete-card/:cardId',
+  "/delete-card/:cardId",
   [appAuth, auth, valObjectIdInUrl],
   async (req, res, next) => {
     const cardId = req.params.cardId;
@@ -739,7 +739,7 @@ router.delete(
  * Checks if status is pending and isComplete is true
  */
 router.get(
-  '/pending-payment-cards/:pageSize/:pageNumber',
+  "/pending-payment-cards/:pageSize/:pageNumber",
   [appAuth, auth, valPageSizeNumber],
   async (req, res) => {
     const pageSize = parseInt(req.params.pageSize);
@@ -759,10 +759,10 @@ router.get(
       price = 0;
     const numCards = cards.length;
     if (numCards <= 100) {
-      price = '4.99';
+      price = "4.99";
       pendingAmount = currency(price).multiply(numCards);
     } else if (numCards > 100) {
-      price = '7.99';
+      price = "7.99";
       pendingAmount = currency(price).multiply(numCards);
     }
 
@@ -796,7 +796,7 @@ router.get(
  * Route to get all cards pending grading for user
  */
 router.get(
-  '/pending-grading-cards/:pageSize/:pageNumber',
+  "/pending-grading-cards/:pageSize/:pageNumber",
   [appAuth, auth, valPageSizeNumber],
   async (req, res) => {
     const pageSize = parseInt(req.params.pageSize);
@@ -840,7 +840,7 @@ router.get(
  * Get all graded cards for the user
  */
 router.get(
-  '/graded-cards/:pageSize/:pageNumber',
+  "/graded-cards/:pageSize/:pageNumber",
   [appAuth, auth, valPageSizeNumber],
   async (req, res) => {
     const pageSize = parseInt(req.params.pageSize);
@@ -876,9 +876,9 @@ router.get(
       { $match: { user: mongoose.Types.ObjectId(userId) } },
       {
         $group: {
-          _id: { user: '$user' },
-          user: { $first: '$user' },
-          card: { $addToSet: '$card' },
+          _id: { user: "$user" },
+          user: { $first: "$user" },
+          card: { $addToSet: "$card" },
         },
       },
       { $skip: (pageNumber - 1) * pageSize },
@@ -899,8 +899,8 @@ router.get(
       { $match: { card: { $in: cardIds } } },
       {
         $group: {
-          _id: { user: '$user' },
-          card: { $addToSet: '$card' },
+          _id: { user: "$user" },
+          card: { $addToSet: "$card" },
         },
       },
     ]);
@@ -913,7 +913,7 @@ router.get(
         : [];
 
     cards = cards.map((card) => {
-      const { id = '' } = card;
+      const { id = "" } = card;
       return {
         ...card,
         inCollection: stringCards.includes(id.toString()),
@@ -934,7 +934,7 @@ router.get(
 /**
  * Step 1: Create a new card and upload card front
  */
-router.post('/add-grading', [appAuth, auth], async (req, res, next) => {
+router.post("/add-grading", [appAuth, auth], async (req, res, next) => {
   const userId = req.user._id;
   const user = await User.findById(userId);
   if (!user)
@@ -993,7 +993,7 @@ router.post('/add-grading', [appAuth, auth], async (req, res, next) => {
     if (req.file.size <= 0) {
       const cardDestination = path.join(
         __dirname,
-        '../../public/',
+        "../../public/",
         `${userId}/cards/${cardId}/`,
         `${req.file.filename}`
       );
@@ -1022,7 +1022,7 @@ router.post('/add-grading', [appAuth, auth], async (req, res, next) => {
     card = await card.save();
     card = card.getCardDetailsWithGrading();
 
-    const { id = '' } = card;
+    const { id = "" } = card;
 
     let cenGrading = await centerGrading(id, filePath);
     let corGrading = await cornerGrading(id, filePath);
@@ -1041,10 +1041,10 @@ router.post('/add-grading', [appAuth, auth], async (req, res, next) => {
 });
 
 router.get(
-  '/card-details/:cardId',
+  "/card-details/:cardId",
   [appAuth, auth, valCard],
   async (req, res, next) => {
-    const { cardId = '' } = req.params;
+    const { cardId = "" } = req.params;
     try {
       let card = await Card.findById(cardId);
       if (!card)
@@ -1075,8 +1075,8 @@ router.get(
   }
 );
 
-router.get('/card-fac/:cardId', [valCard], async (req, res, next) => {
-  const { cardId = '' } = req.params;
+router.get("/card-fac/:cardId", [valCard], async (req, res, next) => {
+  const { cardId = "" } = req.params;
   try {
     // card details fetching
     let card = await Card.findById(cardId);
@@ -1092,6 +1092,7 @@ router.get('/card-fac/:cardId', [valCard], async (req, res, next) => {
 
     // user details fetching
     const userId = card.user;
+    const listing = await Listing.findById(cardId);
     const user = await User.findById(userId);
 
     card = card.getCardDetailsWithGrading();
@@ -1099,7 +1100,12 @@ router.get('/card-fac/:cardId', [valCard], async (req, res, next) => {
     return res.send(
       createResObject(
         true,
-        { card, user: user ? user.getUserBasicInfo() : {} },
+        {
+          card,
+          user: user ? user.getUserBasicInfo() : {},
+          price: listing ? listing.price : null,
+          quantity: listing ? listing.availableQuantity : null,
+        },
         stringConstants.CARD_FAC
       )
     );
@@ -1119,10 +1125,10 @@ router.get('/card-fac/:cardId', [valCard], async (req, res, next) => {
  * Private card route accesible to authenticated users
  */
 router.get(
-  '/card-fac-report/:cardId',
+  "/card-fac-report/:cardId",
   [appAuth, auth, valCard],
   async (req, res, next) => {
-    const { cardId = '' } = req.params;
+    const { cardId = "" } = req.params;
     try {
       // card details fetching
       let card = await Card.findById(cardId);

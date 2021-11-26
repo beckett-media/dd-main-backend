@@ -75,7 +75,6 @@ router.get(
   async (req, res) => {
     const pageSize = parseInt(req.params.pageSize);
     const pageNumber = parseInt(req.params.pageNumber);
-    const userId = req.user._id;
 
     const totalStores = await Store.find({ user: null })
       .sort({ createdAt: 1 })
@@ -100,9 +99,22 @@ router.get(
 /**
  * Route to get unclaim store
  */
- router.get("/publicunclaimed/:store", async (req, res) => {
+router.get("/publicunclaimed/:store", async (req, res) => {
   const storeId = req.params.store;
   const store = await Store.findById(storeId);
+
+  // if (store.user) {
+  //   return res
+  //     .status(400)
+  //     .send(
+  //       createResObject(
+  //         false,
+  //         {store: "Already claimed"},
+  //         stringConstants.STORE_ALREADY_CLAIMED,
+  //         errorObjects.STORE_ALREADY_CLAIMED
+  //       )
+  //     );
+  // }
 
   return res.send(
     createResObject(true, { store }, stringConstants.FETCH_SUCESSFUL)
@@ -141,14 +153,32 @@ router.get("/public/:store", async (req, res) => {
  */
 router.post("/create", [appAuth, auth, valStoreData], async (req, res) => {
   const userId = req.user._id;
-  const title = req.body.title;
+  const title = req.body.title.toLowerCase().trim();
   const description = req.body.description;
+  const email = req.body.email;
+  const address = req.body.address;
+  const phoneNumber = req.body.phoneNumber;
   const isPublic = req.body.isPublic;
   const images = req.body.images ? req.body.images : [];
   const user = await User.findById(userId);
   const stripe = await StripeConnect.findOne({
     user: mongoose.Types.ObjectId(userId),
   });
+
+  let alreadyStore = await Store.findOne({ title });
+
+  if (alreadyStore)
+    return res
+      .status(400)
+      .send(
+        createResObject(
+          false,
+          {},
+          stringConstants.STORE_TITLE_ALREADY_EXISTS,
+          errorObjects.STORE_TITLE_ALREADY_EXISTS
+        )
+      );
+
   if (!user)
     return res
       .status(400)
@@ -178,6 +208,9 @@ router.post("/create", [appAuth, auth, valStoreData], async (req, res) => {
     desc: description,
     isPublic: isPublic,
     images: images,
+    address,
+    phoneNumber,
+    email,
   });
   store = await store.save();
 
@@ -198,14 +231,32 @@ router.post(
   [appAuth, authAdmin, valStoreData],
   async (req, res) => {
     const userId = req.user._id;
-    const title = req.body.title;
+    const title = req.body.title.toLowerCase().trim();
     const description = req.body.description;
+    const email = req.body.email;
+    const address = req.body.address;
+    const phoneNumber = req.body.phoneNumber;
     const isPublic = req.body.isPublic;
     const images = req.body.images ? req.body.images : [];
     const user = await User.findById(userId);
-    const stripe = await StripeConnect.findOne({
-      user: mongoose.Types.ObjectId(userId),
-    });
+    // const stripe = await StripeConnect.findOne({
+    //   user: mongoose.Types.ObjectId(userId),
+    // });
+
+    let alreadyStore = await Store.findOne({ title });
+
+    if (alreadyStore)
+      return res
+        .status(400)
+        .send(
+          createResObject(
+            false,
+            {},
+            stringConstants.STORE_TITLE_ALREADY_EXISTS,
+            errorObjects.STORE_TITLE_ALREADY_EXISTS
+          )
+        );
+
     if (!user)
       return res
         .status(400)
@@ -217,17 +268,17 @@ router.post(
             errorObjects.USER_ID_DOEST_NOT_EXISTS
           )
         );
-    if (!stripe)
-      return res
-        .status(400)
-        .send(
-          createResObject(
-            false,
-            {},
-            stringConstants.STRIPE_CONNECT_ERROR,
-            errorObjects.STRIPE_CONNECT_ERROR
-          )
-        );
+    // if (!stripe)
+    //   return res
+    //     .status(400)
+    //     .send(
+    //       createResObject(
+    //         false,
+    //         {},
+    //         stringConstants.STRIPE_CONNECT_ERROR,
+    //         errorObjects.STRIPE_CONNECT_ERROR
+    //       )
+    //     );
     // Create a new card in listing
     let store = new Store({
       user: null, //skipped because it is created for a user to be claimed
@@ -235,6 +286,9 @@ router.post(
       desc: description,
       isPublic: isPublic,
       images: images,
+      email,
+      address,
+      phoneNumber,
     });
     store = await store.save();
 
@@ -432,6 +486,9 @@ router.put(
 
     const title = req.body.title;
     const description = req.body.description;
+    const email = req.body.email;
+    const address = req.body.address;
+    const phoneNumber = req.body.phoneNumber;
     const images = req.body.images ? req.body.images : [];
 
     const user = await User.findById(userId);
@@ -479,6 +536,9 @@ router.put(
           user: userId,
           title: title,
           desc: description,
+          email,
+          phoneNumber,
+          address,
           images: images && images.length > 0 ? images : store.images,
         },
       },
