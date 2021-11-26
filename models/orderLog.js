@@ -16,7 +16,7 @@ const orderLogSchema = new mongoose.Schema(
 		buyer: {
 			type: Schema.Types.ObjectId,
 			ref: stringConstants.collectionNames.USER_COLLECTION,
-			required: true,
+			required: false,
 		},
 		listing: {
 			type: Schema.Types.ObjectId,
