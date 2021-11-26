@@ -1,5 +1,5 @@
-const express = require('express');
-const mongoose = require('mongoose');
+const express = require("express");
+const mongoose = require("mongoose");
 const router = express.Router();
 const auth = require("../../middlewares/authenticateUser");
 const appAuth = require("../../middlewares/authenticateApp");
@@ -165,7 +165,7 @@ router.post("/add-all", [appAuth, auth], async (req, res, next) => {
 /**
  * Step 1: Create a new card and upload card front
  */
-router.post('/add-front', [appAuth, auth], async (req, res, next) => {
+router.post("/add-front", [appAuth, auth], async (req, res, next) => {
   const userId = req.user._id;
   const user = await User.findById(userId);
   if (!user)
@@ -224,7 +224,7 @@ router.post('/add-front', [appAuth, auth], async (req, res, next) => {
     if (req.file.size <= 0) {
       const cardDestination = path.join(
         __dirname,
-        '../../public/',
+        "../../public/",
         `${userId}/cards/${cardId}/`,
         `${req.file.filename}`
       );
@@ -265,7 +265,7 @@ router.post('/add-front', [appAuth, auth], async (req, res, next) => {
  * separte route is used for updating front
  */
 router.post(
-  '/update-front/:cardId',
+  "/update-front/:cardId",
   [appAuth, auth, valObjectIdInUrl],
   async (req, res, next) => {
     const userId = req.user._id;
@@ -333,7 +333,7 @@ router.post(
       if (req.file.size <= 0) {
         const cardDestination = path.join(
           __dirname,
-          '../../public/',
+          "../../public/",
           `${userId}/cards/${cardId}/`,
           `${req.file.filename}`
         );
@@ -374,7 +374,7 @@ router.post(
  * requires the card id in request
  */
 router.post(
-  '/add-update-back/:cardId',
+  "/add-update-back/:cardId",
   [appAuth, auth, valObjectIdInUrl],
   async (req, res) => {
     const cardId = req.params.cardId;
@@ -444,7 +444,7 @@ router.post(
       if (req.file.size <= 0) {
         const cardDestination = path.join(
           __dirname,
-          '../../public/',
+          "../../public/",
           `${userId}/cards/${cardId}/`,
           `${req.file.filename}`
         );
@@ -485,7 +485,7 @@ router.post(
  * Step 3: This is where the user will upload the video for the game card
  */
 router.post(
-  '/add-update-video/:cardId',
+  "/add-update-video/:cardId",
   [appAuth, auth, valObjectIdInUrl],
   async (req, res) => {
     const cardId = req.params.cardId;
@@ -534,7 +534,7 @@ router.post(
               )
             );
         }
-        if (err.message === 'Unexpected field') {
+        if (err.message === "Unexpected field") {
           return res
             .status(400)
             .send(
@@ -543,7 +543,7 @@ router.post(
                 {},
                 stringConstants.REQUEST_VALIDATION_FAILED,
                 errorObjects.REQUEST_VALIDATION_ERROR(
-                  new Error('Key not valid')
+                  new Error("Key not valid")
                 )
               )
             );
@@ -568,7 +568,7 @@ router.post(
       if (req.file.size <= 0) {
         const cardDestination = path.join(
           __dirname,
-          '../../public/',
+          "../../public/",
           `${userId}/cards/${cardId}/`,
           `${req.file.filename}`
         );
@@ -613,7 +613,7 @@ router.post(
  * be pending. It will only change to submitted once we receive the payment
  */
 router.post(
-  '/add-card-data/:cardId',
+  "/add-card-data/:cardId",
   [appAuth, auth, valObjectIdInUrl, valUpdateCardData],
   async (req, res) => {
     const userId = req.user._id;
@@ -654,11 +654,11 @@ router.post(
     if (card.isCompleted) {
       let image;
 
-      const cardFront = path.join(__dirname, '../../public/', card.front);
+      const cardFront = path.join(__dirname, "../../public/", card.front);
       const extension = path.extname(card.front).toLowerCase();
       const thumbnailDest = path.join(
         __dirname,
-        '../../public/',
+        "../../public/",
         `${userId}/cards/${card._id}/`,
         `card_thumbnail${extension}`
       );
@@ -693,7 +693,7 @@ router.post(
  * API endpoint to delete card with the card ID
  */
 router.delete(
-  '/delete-card/:cardId',
+  "/delete-card/:cardId",
   [appAuth, auth, valObjectIdInUrl],
   async (req, res, next) => {
     const cardId = req.params.cardId;
@@ -739,7 +739,7 @@ router.delete(
  * Checks if status is pending and isComplete is true
  */
 router.get(
-  '/pending-payment-cards/:pageSize/:pageNumber',
+  "/pending-payment-cards/:pageSize/:pageNumber",
   [appAuth, auth, valPageSizeNumber],
   async (req, res) => {
     const pageSize = parseInt(req.params.pageSize);
@@ -759,10 +759,10 @@ router.get(
       price = 0;
     const numCards = cards.length;
     if (numCards <= 100) {
-      price = '4.99';
+      price = "4.99";
       pendingAmount = currency(price).multiply(numCards);
     } else if (numCards > 100) {
-      price = '7.99';
+      price = "7.99";
       pendingAmount = currency(price).multiply(numCards);
     }
 
@@ -796,7 +796,7 @@ router.get(
  * Route to get all cards pending grading for user
  */
 router.get(
-  '/pending-grading-cards/:pageSize/:pageNumber',
+  "/pending-grading-cards/:pageSize/:pageNumber",
   [appAuth, auth, valPageSizeNumber],
   async (req, res) => {
     const pageSize = parseInt(req.params.pageSize);
@@ -840,7 +840,7 @@ router.get(
  * Get all graded cards for the user
  */
 router.get(
-  '/graded-cards/:pageSize/:pageNumber',
+  "/graded-cards/:pageSize/:pageNumber",
   [appAuth, auth, valPageSizeNumber],
   async (req, res) => {
     const pageSize = parseInt(req.params.pageSize);
@@ -934,7 +934,7 @@ router.get(
 /**
  * Step 1: Create a new card and upload card front
  */
-router.post('/add-grading', [appAuth, auth], async (req, res, next) => {
+router.post("/add-grading", [appAuth, auth], async (req, res, next) => {
   const userId = req.user._id;
   const user = await User.findById(userId);
   if (!user)
@@ -993,7 +993,7 @@ router.post('/add-grading', [appAuth, auth], async (req, res, next) => {
     if (req.file.size <= 0) {
       const cardDestination = path.join(
         __dirname,
-        '../../public/',
+        "../../public/",
         `${userId}/cards/${cardId}/`,
         `${req.file.filename}`
       );
@@ -1076,10 +1076,15 @@ router.get(
 );
 
 router.get("/card-fac/:cardId", [valCard], async (req, res, next) => {
+  console.log(req.params);
   const { cardId = "" } = req.params;
+  console.log(cardId);
   try {
     // card details fetching
+    let cards = await Card.find();
+    console.log(cards);
     let card = await Card.findById(cardId);
+    console.log(card);
     if (!card)
       return res.send(
         createResObject(
@@ -1125,10 +1130,10 @@ router.get("/card-fac/:cardId", [valCard], async (req, res, next) => {
  * Private card route accesible to authenticated users
  */
 router.get(
-  '/card-fac-report/:cardId',
+  "/card-fac-report/:cardId",
   [appAuth, auth, valCard],
   async (req, res, next) => {
-    const { cardId = '' } = req.params;
+    const { cardId = "" } = req.params;
     try {
       // card details fetching
       let card = await Card.findById(cardId);
