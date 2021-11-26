@@ -63,6 +63,14 @@ module.exports.errorObjects = {
 		),
 		errorMessage: stringConstants.STORE_TITLE_ALREADY_EXISTS,
 	},
+	STORE_ALREADY_CLAIMED: {
+		errorCode: 149,
+		errorSubCode: getKey(
+			stringConstants,
+			stringConstants.STORE_ALREADY_CLAIMED
+		),
+		errorMessage: stringConstants.STORE_ALREADY_CLAIMED,
+	},
 	NO_REFRESH_TOKEN_FOUND_FOR_USER: {
 		errorCode: 107,
 		errorSubCode: getKey(

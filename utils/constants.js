@@ -44,6 +44,7 @@ module.exports.stringConstants = {
 
 	USER_EMAIL_ALREADY_EXISTS: "User with the given email already exists",
 	STORE_TITLE_ALREADY_EXISTS: "Store with the given title already exists",
+	STORE_ALREADY_CLAIMED: "Store with the given title already claimed",
 
 	USER_EMAIL_NOT_FOUND: "User with the given email not found",
 	OTP_NOT_VERIFIED: "Please verify the OTP first and try again",
@@ -171,6 +172,7 @@ module.exports.stringConstants = {
 	PRODUCT_ID_NOT_FOUND: "Product with the given ID not found",
 	STORE_ID_NOT_FOUND: "Store with the given ID not found",
 	LISTING_ID_NOT_FOUND: "Listing with the given ID not found",
+	LISTING_ID_SOLD: "Listing with the given ID is Sold",
 	LISTING_ALREADY_SOLD:
 		"Listing is already sold. you can't update the listing.",
 	GRADE_ID_NOT_FOUND: "Grade with the given ID not found",

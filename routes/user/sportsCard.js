@@ -1,43 +1,43 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const router = express.Router();
-const auth = require('../../middlewares/authenticateUser');
-const appAuth = require('../../middlewares/authenticateApp');
-const { valCard } = require('../../middlewares/validation');
-const SimpleLogger = require('../../utils/simpleLogger');
-const path = require('path');
-const fsPromises = require('fs').promises;
-const _ = require('lodash');
-const currency = require('../../utils/currency');
-const Jimp = require('jimp');
-const { User } = require('../../models/user');
-const { Card } = require('../../models/card');
-const { Collection } = require('../../models/collection');
-const { PendingDeletion } = require('../../models/pendingDeletion');
-const { Listing } = require('../../models/listing');
-const { stringConstants } = require('../../utils/constants');
-const { errorObjects } = require('../../utils/errorObjects');
-const { createResObject } = require('../../utils/utilFunctions');
+const auth = require("../../middlewares/authenticateUser");
+const appAuth = require("../../middlewares/authenticateApp");
+const { valCard } = require("../../middlewares/validation");
+const SimpleLogger = require("../../utils/simpleLogger");
+const path = require("path");
+const fsPromises = require("fs").promises;
+const _ = require("lodash");
+const currency = require("../../utils/currency");
+const Jimp = require("jimp");
+const { User } = require("../../models/user");
+const { Card } = require("../../models/card");
+const { Collection } = require("../../models/collection");
+const { PendingDeletion } = require("../../models/pendingDeletion");
+const { Listing } = require("../../models/listing");
+const { stringConstants } = require("../../utils/constants");
+const { errorObjects } = require("../../utils/errorObjects");
+const { createResObject } = require("../../utils/utilFunctions");
 const {
   uploadCardFront,
   uploadCardBack,
   uploadCardVideo,
   uploadCardGrading,
   uploadCardFields,
-} = require('../../middlewares/multerSingle');
+} = require("../../middlewares/multerSingle");
 const {
   valObjectIdInUrl,
   valUpdateCardData,
   valPageSizeNumber,
-} = require('../../middlewares/validation');
-const centerGrading = require('../../grading/center');
-const cornerGrading = require('../../grading/corner');
-const cardHelper = require('../../helpers/cardHelper');
+} = require("../../middlewares/validation");
+const centerGrading = require("../../grading/center");
+const cornerGrading = require("../../grading/corner");
+const cardHelper = require("../../helpers/cardHelper");
 
 /**
  * Step 0: Create a new card and upload card details at once
  */
-router.post('/add-all', [appAuth, auth], async (req, res, next) => {
+router.post("/add-all", [appAuth, auth], async (req, res, next) => {
   const userId = req.user._id;
   const user = await User.findById(userId);
   if (!user)
@@ -876,9 +876,9 @@ router.get(
       { $match: { user: mongoose.Types.ObjectId(userId) } },
       {
         $group: {
-          _id: { user: '$user' },
-          user: { $first: '$user' },
-          card: { $addToSet: '$card' },
+          _id: { user: "$user" },
+          user: { $first: "$user" },
+          card: { $addToSet: "$card" },
         },
       },
       { $skip: (pageNumber - 1) * pageSize },
@@ -899,8 +899,8 @@ router.get(
       { $match: { card: { $in: cardIds } } },
       {
         $group: {
-          _id: { user: '$user' },
-          card: { $addToSet: '$card' },
+          _id: { user: "$user" },
+          card: { $addToSet: "$card" },
         },
       },
     ]);
@@ -913,7 +913,7 @@ router.get(
         : [];
 
     cards = cards.map((card) => {
-      const { id = '' } = card;
+      const { id = "" } = card;
       return {
         ...card,
         inCollection: stringCards.includes(id.toString()),
@@ -1022,7 +1022,7 @@ router.post('/add-grading', [appAuth, auth], async (req, res, next) => {
     card = await card.save();
     card = card.getCardDetailsWithGrading();
 
-    const { id = '' } = card;
+    const { id = "" } = card;
 
     let cenGrading = await centerGrading(id, filePath);
     let corGrading = await cornerGrading(id, filePath);
@@ -1041,10 +1041,10 @@ router.post('/add-grading', [appAuth, auth], async (req, res, next) => {
 });
 
 router.get(
-  '/card-details/:cardId',
+  "/card-details/:cardId",
   [appAuth, auth, valCard],
   async (req, res, next) => {
-    const { cardId = '' } = req.params;
+    const { cardId = "" } = req.params;
     try {
       let card = await Card.findById(cardId);
       if (!card)
@@ -1075,8 +1075,8 @@ router.get(
   }
 );
 
-router.get('/card-fac/:cardId', [valCard], async (req, res, next) => {
-  const { cardId = '' } = req.params;
+router.get("/card-fac/:cardId", [valCard], async (req, res, next) => {
+  const { cardId = "" } = req.params;
   try {
     // card details fetching
     let card = await Card.findById(cardId);
@@ -1092,6 +1092,7 @@ router.get('/card-fac/:cardId', [valCard], async (req, res, next) => {
 
     // user details fetching
     const userId = card.user;
+    const listing = await Listing.findById(cardId);
     const user = await User.findById(userId);
 
     card = card.getCardDetailsWithGrading();
@@ -1099,7 +1100,12 @@ router.get('/card-fac/:cardId', [valCard], async (req, res, next) => {
     return res.send(
       createResObject(
         true,
-        { card, user: user ? user.getUserBasicInfo() : {} },
+        {
+          card,
+          user: user ? user.getUserBasicInfo() : {},
+          price: listing ? listing.price : null,
+          quantity: listing ? listing.availableQuantity : null,
+        },
         stringConstants.CARD_FAC
       )
     );
