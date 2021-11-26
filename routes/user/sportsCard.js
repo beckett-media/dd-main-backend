@@ -1076,15 +1076,10 @@ router.get(
 );
 
 router.get("/card-fac/:cardId", [valCard], async (req, res, next) => {
-  console.log(req.params);
   const { cardId = "" } = req.params;
-  console.log(cardId);
   try {
     // card details fetching
-    let cards = await Card.find();
-    console.log(cards);
     let card = await Card.findById(cardId);
-    console.log(card);
     if (!card)
       return res.send(
         createResObject(
