@@ -14,7 +14,7 @@ const { User } = require("../../models/user");
 const { Card } = require("../../models/card");
 const { Collection } = require("../../models/collection");
 const { PendingDeletion } = require("../../models/pendingDeletion");
-const { Listing } = require('../../models/listing');
+const { Listing } = require("../../models/listing");
 const { stringConstants } = require("../../utils/constants");
 const { errorObjects } = require("../../utils/errorObjects");
 const { createResObject } = require("../../utils/utilFunctions");
@@ -23,138 +23,143 @@ const {
   uploadCardBack,
   uploadCardVideo,
   uploadCardGrading,
-  uploadCardFields
+  uploadCardFields,
 } = require("../../middlewares/multerSingle");
 const {
   valObjectIdInUrl,
   valUpdateCardData,
-  valPageSizeNumber
+  valPageSizeNumber,
 } = require("../../middlewares/validation");
-const centerGrading = require('../../grading/center');
-const cornerGrading = require('../../grading/corner');
+const centerGrading = require("../../grading/center");
+const cornerGrading = require("../../grading/corner");
 const cardHelper = require("../../helpers/cardHelper");
 
 /**
  * Step 0: Create a new card and upload card details at once
  */
-router.post('/add-all', [appAuth, auth], async (req, res, next) => {
-    const userId = req.user._id;
-    const user = await User.findById(userId);
-    if (!user)
-      return res
-        .status(404)
-        .send(
-          createResObject(
-            false,
-            {},
-            stringConstants.USER_ID_DOEST_NOT_EXISTS,
-            errorObjects.USER_ID_DOEST_NOT_EXISTS
-          )
-        );
-    // Create a new card
-    let card = new Card({
-      user: userId,
-    });
-    const cardId = card._id;
-  
-    // Send card ID to multer
-    req.cardId = cardId;
+router.post("/add-all", [appAuth, auth], async (req, res, next) => {
+  const userId = req.user._id;
+  const user = await User.findById(userId);
+  if (!user)
+    return res
+      .status(404)
+      .send(
+        createResObject(
+          false,
+          {},
+          stringConstants.USER_ID_DOEST_NOT_EXISTS,
+          errorObjects.USER_ID_DOEST_NOT_EXISTS
+        )
+      );
+  // Create a new card
+  let card = new Card({
+    user: userId,
+  });
+  const cardId = card._id;
 
-    uploadCardFields(req, res, async function (err) {
-      if (err) {
-        cardHelper.unlinkCard(req.files, userId, cardId);
-        SimpleLogger.error(err);
-        // If file type error return relavent message
-        if (err.message === stringConstants.NOT_A_VALID_FILE_TYPE) {
-          return res
-            .status(415)
-            .send(
-              createResObject(
-                false,
-                {},
-                stringConstants.FILE_TYPE_NOT_ACCEPTED,
-                errorObjects.FILE_TYPE_NOT_ACCEPTED
-              )
-            );
-        }
-        // Otherwise return unsuspected error
-        return next(err);
-      }
+  // Send card ID to multer
+  req.cardId = cardId;
 
-      // Check file exists
-      if (!req.files) {
-            cardHelper.unlinkCard(req.files, userId, cardId);
-            return res
-                .status(400)
-                .send(
-                    createResObject(
-                    false,
-                    {},
-                    stringConstants.NO_FILE_FOUND,
-                    errorObjects.NO_FILE_FOUND
-                    )
-                );
-      }
-      // Check file size if corrupt delete the uploaded file
-      if (req.files.length !== 2 || req.files[0].size <= 0 || req.files[1].size <= 0) {
-        cardHelper.unlinkCard(req.files, userId, cardId);
+  uploadCardFields(req, res, async function (err) {
+    if (err) {
+      cardHelper.unlinkCard(req.files, userId, cardId);
+      SimpleLogger.error(err);
+      // If file type error return relavent message
+      if (err.message === stringConstants.NOT_A_VALID_FILE_TYPE) {
         return res
-          .status(400)
+          .status(415)
           .send(
             createResObject(
               false,
               {},
-              stringConstants.FILE_CORRUPTED,
-              errorObjects.FILE_CORRUPTED
+              stringConstants.FILE_TYPE_NOT_ACCEPTED,
+              errorObjects.FILE_TYPE_NOT_ACCEPTED
             )
           );
       }
+      // Otherwise return unsuspected error
+      return next(err);
+    }
 
-      card.front = path.join(`${userId}/cards/${cardId}/`, req.files[0].filename);
-      card.back = path.join(`${userId}/cards/${cardId}/`, req.files[1].filename);
+    // Check file exists
+    if (!req.files) {
+      cardHelper.unlinkCard(req.files, userId, cardId);
+      return res
+        .status(400)
+        .send(
+          createResObject(
+            false,
+            {},
+            stringConstants.NO_FILE_FOUND,
+            errorObjects.NO_FILE_FOUND
+          )
+        );
+    }
+    // Check file size if corrupt delete the uploaded file
+    if (
+      req.files.length !== 2 ||
+      req.files[0].size <= 0 ||
+      req.files[1].size <= 0
+    ) {
+      cardHelper.unlinkCard(req.files, userId, cardId);
+      return res
+        .status(400)
+        .send(
+          createResObject(
+            false,
+            {},
+            stringConstants.FILE_CORRUPTED,
+            errorObjects.FILE_CORRUPTED
+          )
+        );
+    }
 
-      // adding details
-      const year = req.body.year;
-      const brand = req.body.brand;
-      const cardNumber = req.body.cardNumber;
-      const playerNames = req.body.playerNames ? JSON.parse(req.body.playerNames) : null;
-      const serialNo = req.body.serialNo;
-      const modelNo = req.body.modelNo;
-      const cardType = req.body.cardType;
+    card.front = path.join(`${userId}/cards/${cardId}/`, req.files[0].filename);
+    card.back = path.join(`${userId}/cards/${cardId}/`, req.files[1].filename);
 
-      if (!year || !brand || !playerNames) {
-            cardHelper.unlinkCard(req.files, userId, cardId);
-            return res
-                .status(400)
-                .send(
-                createResObject(
-                    false,
-                    { errorMessage: stringConstants.KEYS_MISSING },
-                    stringConstants.REQUEST_VALIDATION_FAILED,
-                    errorObjects.REQUEST_VALIDATION_ERROR(stringConstants.KEYS_MISSING)
-                )
-            );
-      }
+    // adding details
+    const year = req.body.year;
+    const brand = req.body.brand;
+    const cardNumber = req.body.cardNumber;
+    const playerNames = req.body.playerNames
+      ? JSON.parse(req.body.playerNames)
+      : null;
+    const serialNo = req.body.serialNo;
+    const modelNo = req.body.modelNo;
+    const cardType = req.body.cardType;
 
-      card.year = year;
-      card.brand = brand;
-      card.cardNumber = cardNumber;
-      card.playerNames = playerNames;
-      card.serialNo = serialNo;
-      card.modelNo = modelNo;
-      card.cardType = cardType;
+    if (!year || !brand || !playerNames) {
+      cardHelper.unlinkCard(req.files, userId, cardId);
+      return res
+        .status(400)
+        .send(
+          createResObject(
+            false,
+            { errorMessage: stringConstants.KEYS_MISSING },
+            stringConstants.REQUEST_VALIDATION_FAILED,
+            errorObjects.REQUEST_VALIDATION_ERROR(stringConstants.KEYS_MISSING)
+          )
+        );
+    }
 
-      card.isCompleted = card.checkIfCompleted();
+    card.year = year;
+    card.brand = brand;
+    card.cardNumber = cardNumber;
+    card.playerNames = playerNames;
+    card.serialNo = serialNo;
+    card.modelNo = modelNo;
+    card.cardType = cardType;
 
-      card = await card.save();
+    card.isCompleted = card.checkIfCompleted();
 
-      card = card.getCardDetailsWithGrading();
+    card = await card.save();
 
-      return res.send(
-          createResObject(true, { card }, stringConstants.UPDATE_SUCCESSFUL)
-      );
+    card = card.getCardDetailsWithGrading();
 
-    });
+    return res.send(
+      createResObject(true, { card }, stringConstants.UPDATE_SUCCESSFUL)
+    );
+  });
 });
 
 /**
@@ -869,44 +874,52 @@ router.get(
 
     const collectionCards = await Collection.aggregate([
       { $match: { user: mongoose.Types.ObjectId(userId) } },
-      { $group: {
-              _id: { user: "$user" },
-              user:  { $first: "$user" },
-              card: { $addToSet: "$card" }
-          }
+      {
+        $group: {
+          _id: { user: "$user" },
+          user: { $first: "$user" },
+          card: { $addToSet: "$card" },
+        },
       },
       { $skip: (pageNumber - 1) * pageSize },
-      { $sort : { createdAt : 1 } },
-      { $limit: pageSize }
+      { $sort: { createdAt: 1 } },
+      { $limit: pageSize },
     ]);
     const [onlyCollection = {}] = collectionCards || [];
     const { card: innerCards = [] } = onlyCollection;
-    const stringCards = innerCards.length > 0 ? JSON.stringify(innerCards.map(card => card.toString())) : [];
+    const stringCards =
+      innerCards.length > 0
+        ? JSON.stringify(innerCards.map((card) => card.toString()))
+        : [];
 
     // getting card Ids
-    const cardIds = cards.map(card => card.id);
+    const cardIds = cards.map((card) => card.id);
 
     const inListing = await Listing.aggregate([
-			{ $match: { card: { $in: cardIds } } },
-      { $group: {
-            _id: { user: "$user" },
-            card: { $addToSet: "$card" }
-        }
-      }
-		]);
+      { $match: { card: { $in: cardIds } } },
+      {
+        $group: {
+          _id: { user: "$user" },
+          card: { $addToSet: "$card" },
+        },
+      },
+    ]);
 
     const [userList = {}] = inListing || [];
     const { card: listingCards = [] } = userList;
-    const stringListingCards = listingCards.length > 0 ? JSON.stringify(listingCards.map(card => card.toString())) : [];
-    
-    cards = cards.map(card => {
-      const { id = '' } = card;
+    const stringListingCards =
+      listingCards.length > 0
+        ? JSON.stringify(listingCards.map((card) => card.toString()))
+        : [];
+
+    cards = cards.map((card) => {
+      const { id = "" } = card;
       return {
         ...card,
         inCollection: stringCards.includes(id.toString()),
-        inListing: stringListingCards.includes(id.toString())
-      }
-    })
+        inListing: stringListingCards.includes(id.toString()),
+      };
+    });
 
     return res.send(
       createResObject(
@@ -1009,7 +1022,7 @@ router.post("/add-grading", [appAuth, auth], async (req, res, next) => {
     card = await card.save();
     card = card.getCardDetailsWithGrading();
 
-    const { id = '' } = card;
+    const { id = "" } = card;
 
     let cenGrading = await centerGrading(id, filePath);
     let corGrading = await cornerGrading(id, filePath);
@@ -1018,16 +1031,38 @@ router.post("/add-grading", [appAuth, auth], async (req, res, next) => {
 
     const grading = cenGrading + corGrading;
     return res.send(
-      createResObject(true, { ...card, grading }, stringConstants.GRADING_COMPLETED)
+      createResObject(
+        true,
+        { ...card, grading },
+        stringConstants.GRADING_COMPLETED
+      )
     );
   });
 });
 
-router.get('/card-details/:cardId', [appAuth, auth, valCard], async (req, res, next) => {
-  const { cardId = '' } = req.params;
-  try {
-    let card = await Card.findById(cardId);
-    if (!card)
+router.get(
+  "/card-details/:cardId",
+  [appAuth, auth, valCard],
+  async (req, res, next) => {
+    const { cardId = "" } = req.params;
+    try {
+      let card = await Card.findById(cardId);
+      if (!card)
+        return res.send(
+          createResObject(
+            false,
+            {},
+            stringConstants.CARD_ID_NOT_FOUND,
+            errorObjects.CARD_ID_NOT_FOUND
+          )
+        );
+
+      card = card.getCardDetailsWithGrading();
+
+      return res.send(
+        createResObject(true, { ...card }, stringConstants.CARD_DETAILS)
+      );
+    } catch (e) {
       return res.send(
         createResObject(
           false,
@@ -1036,26 +1071,12 @@ router.get('/card-details/:cardId', [appAuth, auth, valCard], async (req, res, n
           errorObjects.CARD_ID_NOT_FOUND
         )
       );
-
-    card = card.getCardDetailsWithGrading();
-
-    return res.send(
-        createResObject(true, { ...card }, stringConstants.CARD_DETAILS)
-    );
-  } catch(e) {
-    return res.send(
-      createResObject(
-        false,
-        {},
-        stringConstants.CARD_ID_NOT_FOUND,
-        errorObjects.CARD_ID_NOT_FOUND
-      )
-    );
+    }
   }
-});
+);
 
-router.get('/card-fac/:cardId', [valCard], async (req, res, next) => {
-  const { cardId = '' } = req.params;
+router.get("/card-fac/:cardId", [valCard], async (req, res, next) => {
+  const { cardId = "" } = req.params;
   try {
     // card details fetching
     let card = await Card.findById(cardId);
@@ -1070,15 +1091,25 @@ router.get('/card-fac/:cardId', [valCard], async (req, res, next) => {
       );
 
     // user details fetching
-    const userId = card.user
+    const userId = card.user;
+    const listing = await Listing.findById(cardId);
     const user = await User.findById(userId);
 
     card = card.getCardDetailsWithGrading();
 
     return res.send(
-        createResObject(true, { card, user: user ? user.getUserBasicInfo() : {} }, stringConstants.CARD_FAC)
+      createResObject(
+        true,
+        {
+          card,
+          user: user ? user.getUserBasicInfo() : {},
+          price: listing ? listing.price : null,
+          quantity: listing ? listing.availableQuantity : null,
+        },
+        stringConstants.CARD_FAC
+      )
     );
-  } catch(e) {
+  } catch (e) {
     return res.send(
       createResObject(
         false,
@@ -1090,5 +1121,51 @@ router.get('/card-fac/:cardId', [valCard], async (req, res, next) => {
   }
 });
 
+/**
+ * Private card route accesible to authenticated users
+ */
+router.get(
+  "/card-fac-report/:cardId",
+  [appAuth, auth, valCard],
+  async (req, res, next) => {
+    const { cardId = "" } = req.params;
+    try {
+      // card details fetching
+      let card = await Card.findById(cardId);
+      if (!card)
+        return res.send(
+          createResObject(
+            false,
+            {},
+            stringConstants.CARD_ID_NOT_FOUND,
+            errorObjects.CARD_ID_NOT_FOUND
+          )
+        );
+
+      // user details fetching
+      const userId = card.user;
+      const user = await User.findById(userId);
+
+      card = card.getCardDetailsWithGrading();
+
+      return res.send(
+        createResObject(
+          true,
+          { card, user: user ? user.getUserBasicInfo() : {} },
+          stringConstants.CARD_FAC
+        )
+      );
+    } catch (e) {
+      return res.send(
+        createResObject(
+          false,
+          {},
+          stringConstants.CARD_ID_NOT_FOUND,
+          errorObjects.CARD_ID_NOT_FOUND
+        )
+      );
+    }
+  }
+);
 
 module.exports = router;

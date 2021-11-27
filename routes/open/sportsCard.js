@@ -1,18 +1,18 @@
 /**
  * Public card route accesible to general public
  */
-const express = require("express");
+const express = require('express');
 const router = express.Router();
-const { Card } = require("../../models/card");
-const { stringConstants } = require("../../utils/constants");
-const { createResObject } = require("../../utils/utilFunctions");
-const { errorObjects } = require("../../utils/errorObjects");
+const { Card } = require('../../models/card');
+const { stringConstants } = require('../../utils/constants');
+const { createResObject } = require('../../utils/utilFunctions');
+const { errorObjects } = require('../../utils/errorObjects');
 const {
   valObjectIdInUrl,
   valPageSizeNumber,
-} = require("../../middlewares/validation");
+} = require('../../middlewares/validation');
 
-router.get("/card-details/:id", valObjectIdInUrl, async (req, res) => {
+router.get('/card-details/:id', valObjectIdInUrl, async (req, res) => {
   const cardId = req.params.id;
 
   let card = await Card.findById(cardId);
@@ -40,7 +40,7 @@ router.get("/card-details/:id", valObjectIdInUrl, async (req, res) => {
  * Route to get all graded cards
  */
 router.get(
-  "/graded-cards/:pageSize/:pageNumber",
+  '/graded-cards/:pageSize/:pageNumber',
   valPageSizeNumber,
   async (req, res) => {
     const pageSize = parseInt(req.params.pageSize);

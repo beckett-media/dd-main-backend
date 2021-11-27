@@ -1,4 +1,4 @@
-const _ = require("lodash");
+const _ = require('lodash');
 
 module.exports.createResObject = (success, object = {}, message, error) => {
   if (error) {
@@ -35,12 +35,13 @@ module.exports.isNumber = (value) => {
 };
 
 module.exports.generate = (n) => {
-  var add = 1, max = 12 - add;  
-  if ( n > max ) {
-          return generate(max) + generate(n - max);
+  var add = 1,
+    max = 12 - add;
+  if (n > max) {
+    return generate(max) + generate(n - max);
   }
-  max = Math.pow(10, n+add);
-  var min = max/10; // Math.pow(10, n) basically
-  var number = Math.floor( Math.random() * (max - min + 1) ) + min;
-  return ("" + number).substring(add); 
-}
+  max = Math.pow(10, n + add);
+  var min = max / 10; // Math.pow(10, n) basically
+  var number = Math.floor(Math.random() * (max - min + 1)) + min;
+  return ('' + number).substring(add);
+};
