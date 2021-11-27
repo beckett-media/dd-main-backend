@@ -75,7 +75,6 @@ router.get(
   async (req, res) => {
     const pageSize = parseInt(req.params.pageSize);
     const pageNumber = parseInt(req.params.pageNumber);
-    const userId = req.user._id;
 
     const totalStores = await Store.find({ user: null })
       .sort({ createdAt: 1 })
@@ -103,6 +102,19 @@ router.get(
 router.get("/publicunclaimed/:store", async (req, res) => {
   const storeId = req.params.store;
   const store = await Store.findById(storeId);
+
+  // if (store.user) {
+  //   return res
+  //     .status(400)
+  //     .send(
+  //       createResObject(
+  //         false,
+  //         {store: "Already claimed"},
+  //         stringConstants.STORE_ALREADY_CLAIMED,
+  //         errorObjects.STORE_ALREADY_CLAIMED
+  //       )
+  //     );
+  // }
 
   return res.send(
     createResObject(true, { store }, stringConstants.FETCH_SUCESSFUL)

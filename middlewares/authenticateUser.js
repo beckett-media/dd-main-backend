@@ -1,10 +1,10 @@
-const jwt = require("jsonwebtoken");
-const config = require("config");
-const SimpleLogger = require("../utils/simpleLogger");
-const { User } = require("../models/user");
-const { createResObject } = require("../utils/utilFunctions");
-const { stringConstants } = require("../utils/constants");
-const { errorObjects } = require("../utils/errorObjects");
+const jwt = require('jsonwebtoken');
+const config = require('config');
+const SimpleLogger = require('../utils/simpleLogger');
+const { User } = require('../models/user');
+const { createResObject } = require('../utils/utilFunctions');
+const { stringConstants } = require('../utils/constants');
+const { errorObjects } = require('../utils/errorObjects');
 
 module.exports = async (req, res, next) => {
   const token = req.header(stringConstants.AUTH_TOKEN_STRING);
