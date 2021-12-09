@@ -1,5 +1,5 @@
 const sgMail = require("@sendgrid/mail");
-const SENDGRID_API_KEY = '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';
+const SENDGRID_API_KEY = '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';
 
 sgMail.setApiKey(SENDGRID_API_KEY);
 
@@ -8,7 +8,7 @@ const getMessage = ({
 }) => {
       return {
         to: email,
-        from: 'support@duedilly.co',
+        from: 'a@duedilly.co',
         subject,
         text
       };
