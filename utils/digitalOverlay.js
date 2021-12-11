@@ -4,6 +4,7 @@ const fs = require("fs");
 const QRCode = require("qrcode");
 const config = require("config");
 const { stringConstants } = require("../utils/constants");
+const upload = require('./../s3/upload');
 
 async function createGradedImage(card) {
   try {
@@ -180,16 +181,14 @@ async function createGradedImage(card) {
       "Assessment"
     );
 
-    const destinationPath = path.join(
-      __dirname,
-      `../public/${card.user}/cards/${card._id}/graded_card.png`
-    );
+    const destinationPath = `${card.user}/cards/${card._id}/graded_card.png`;
     // Delete the QR image
     fs.unlinkSync(qrCodeImagePath);
-    // Write the image to user card folder
-    await blackBg.write(destinationPath);
+    // Upload the image to s3
+    const buffer = await blackBg.getBufferAsync(Jimp.AUTO);
+    const response = await upload(destinationPath, 'cardOverlay', buffer, 'png');
+    const { Location: gradedCardPath = '' } = response;
     // Return the relative path
-    const gradedCardPath = `${card.user}/cards/${card._id}/graded_card.png`;
     return gradedCardPath;
   } catch (error) {
     throw error;
