@@ -2,13 +2,17 @@ const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcrypt");
 const appAuth = require("../../middlewares/authenticateApp");
+const authAdmin = require("../../middlewares/authenticateAdmin");
 const { stringConstants } = require("../../utils/constants");
 const { errorObjects } = require("../../utils/errorObjects");
 const { User } = require("../../models/user");
 const { createResObject } = require("../../utils/utilFunctions");
-const { valAdminSignIn } = require("../../middlewares/validation");
+const {
+  valAdminSignIn,
+  valSignOutReq,
+} = require("../../middlewares/validation");
 
-router.post("/sign-in", [appAuth, valAdminSignIn], async (req, res) => {
+router.post("/sign-in-admin", [appAuth, valAdminSignIn], async (req, res) => {
   const email = req.body.email.toLowerCase();
   const password = req.body.password;
 
@@ -93,5 +97,26 @@ router.post("/sign-in", [appAuth, valAdminSignIn], async (req, res) => {
     )
   );
 });
+
+router.post(
+  "/sign-out",
+  [appAuth, authAdmin, valSignOutReq],
+  async (req, res) => {
+    const deviceToken = req.body.deviceToken;
+    const userId = req.user._id;
+
+    let user = await User.findById(userId);
+    // User exists or not will be checked in auth middleware
+    user.removeToken(deviceToken);
+
+    user = await user.save();
+
+    user = user.getUserBasicInfo();
+
+    return res.send(
+      createResObject(true, { user }, stringConstants.SIGNED_OUT_SUCCESSFULLY)
+    );
+  }
+);
 
 module.exports = router;

@@ -22,38 +22,42 @@ const address = require("../routes/marketPlace/address");
 // Admin routes
 const adminAuth = require("../routes/admin/authenticate");
 const adminSportsCard = require("../routes/admin/sportsCard");
+const adminStore = require("../routes/admin/store");
 const adminQuestions = require("../routes/admin/questions");
+const adminRoutes = require("../routes/admin/admin");
 // Public routes that don't even require app token
 const publicSportsCard = require("../routes/open/sportsCard");
 
 module.exports = (app) => {
-	// Import route and use app.use();
-	app.use("/user", user);
-	app.use("/subscription", subscription);
-	app.use("/card-grading", cardGrading);
-	app.use("/collection", collection);
-	app.use("/authenticate", authenticate);
-	app.use("/payment", payment);
-	app.use("/auth-token", authToken);
-	app.use("/sports-card", sportsCard);
-	app.use("/ebay", ebay);
-	app.use("/pay", pay);
-	app.use("/marketplace", marketplace);
-	app.use("/listing", listing);
-	app.use("/store-listing", storeListing);
-	app.use("/store", marketStore);
-	app.use("/cart", cart);
-	app.use("/order", order);
-	app.use("/address", address);
-	// Test notificaiton route
-	app.use("/notification", notificaiton);
-	// Admin routes
-	app.use("/admin-auth", adminAuth);
-	app.use("/admin-sports-card", adminSportsCard);
-	app.use("/admin-questions", adminQuestions);
-	// Public routes
-	app.use("/public-cards", publicSportsCard);
-	app.use("/public-products", product);
-	app.use("/public-stores", store);
-	app.use("/public-grade", grade);
+  // Import route and use app.use();
+  app.use("/user", user);
+  app.use("/subscription", subscription);
+  app.use("/card-grading", cardGrading);
+  app.use("/collection", collection);
+  app.use("/authenticate", authenticate);
+  app.use("/payment", payment);
+  app.use("/auth-token", authToken);
+  app.use("/sports-card", sportsCard);
+  app.use("/ebay", ebay);
+  app.use("/pay", pay);
+  app.use("/marketplace", marketplace);
+  app.use("/listing", listing);
+  app.use("/store-listing", storeListing);
+  app.use("/store", marketStore);
+  app.use("/cart", cart);
+  app.use("/order", order);
+  app.use("/address", address);
+  // Test notificaiton route
+  app.use("/notification", notificaiton);
+  // Admin routes
+  app.use("/admin", adminRoutes);
+  app.use("/admin-auth", adminAuth);
+  app.use("/admin-sports-card", adminSportsCard);
+  app.use("/admin-questions", adminQuestions);
+  app.use("/admin-store", adminStore);
+  // Public routes
+  app.use("/public-cards", publicSportsCard);
+  app.use("/public-products", product);
+  app.use("/public-stores", store);
+  app.use("/public-grade", grade);
 };
