@@ -142,6 +142,123 @@ router.post(
   }
 )
 
+router.post(
+  "/v1/for-pending-cards",
+  [appAuth, auth],
+  async (req, res) => {
+    console.log('*******************cards new grading has been called********************');
+    const userId = req.user._id;
+    const user = await User.findById(userId);
+    const skipPayment = config.get('skipPayment');
+    const { subscription = {} } = user;
+    let { cardsLeft = 0, subId = '' } = subscription;
+
+    // if no card left in current plan
+    if (!skipPayment && cardsLeft !== 'Unlimited' && cardsLeft == 0)
+    return res
+        .status(400)
+        .send(
+          createResObject(
+            false,
+            {},
+            stringConstants.NO_CARDS_LEFT_IN_PLAN,
+            errorObjects.NO_CARDS_LEFT_IN_PLAN
+          )
+        );
+    const cardId = req.body.cardId;
+    const card = await Card.findById(cardId);
+
+    // if no card found
+    if (!card)
+    return res
+        .status(400)
+        .send(
+          createResObject(
+            false,
+            {},
+            stringConstants.NO_CARD,
+            errorObjects.NO_CARD
+          )
+        );
+
+        // grading of card
+        const { front: filePath = '' } = card;
+
+        const grading = await combinedGrading(cardId, filePath, userId, true);
+        if (grading === 0) {
+          return res
+          .status(500)
+          .send(
+            createResObject(
+              false,
+              {},
+              stringConstants.API_ERROR,
+              errorObjects.API_ERROR
+            )
+          );
+        }
+
+        if (!grading.success) {
+          return res
+          .status(500)
+          .send(
+            createResObject(
+              false,
+              {},
+              grading.error,
+              {
+                errorCode: 444,
+                errorSubCode: 'API_ERROR',
+                errorMessage: grading.error
+              }
+            )
+          );
+        }
+
+        const { surface = {} } = grading || {};
+        const { success: surfaceSuccess = false } = surface;
+
+        if (!surfaceSuccess) {
+          return res.send(
+            createResObject(
+              true,
+              { clientSecret: null, cardsUpdated: 0, grading },
+              'Surface Assessment Issue'
+            )
+          );
+        }
+
+        // create card grading image
+        const gradedImage = await createGradedImage(card, true);
+
+        // check for value returned
+        await Card.findByIdAndUpdate(
+          cardId,
+          { $set: { status: stringConstants.cardState.GRADED, grading, gradedImage } }
+        );
+
+        // reducing cards left in subscription by 1
+        await User.findByIdAndUpdate(
+          userId,
+          { $set: {
+            subscription: {
+              cardsLeft: cardsLeft === 'Unlimited' || skipPayment ? 'Unlimited' : typeof cardsLeft === 'string' ? (parseInt(cardsLeft, 10) - 1).toString() : (cardsLeft - 1).toString(),
+              subId
+            }
+          } },
+          { new: true }
+        );
+
+        return res.send(
+          createResObject(
+            true,
+            { clientSecret: null, cardsUpdated: 1, grading },
+            'Card Graded Successfully'
+          )
+        );
+  }
+)
+
 /**
  * Stripe webhook to listen for async payment processing
  */

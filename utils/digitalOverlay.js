@@ -6,12 +6,12 @@ const config = require("config");
 const { stringConstants } = require("../utils/constants");
 const upload = require('./../s3/upload');
 
-async function createGradedImage(card) {
+async function createGradedImage(card, newApp = false) {
   try {
     const cardId = card._id;
     const userId = card.user;
     // Create the overlay image
-    const cardImagePath = path.join(__dirname, "../public", card.front);
+    const cardImagePath = newApp ? card.front : path.join(__dirname, "../public", card.front);
     let cardImage = await Jimp.read(cardImagePath);
 
     cardImage.cover(500, 700);
@@ -84,7 +84,7 @@ async function createGradedImage(card) {
     qrCodeMask.resize(logoQrWidth, logoQrHeight);
     qrCodeImage.mask(qrCodeMask, 0, 0);
 
-    const qrPositionX = 75;
+    const qrPositionX = 90;
     const qrPositionY = bgHeight - 250 + 10;
 
     blackBg.composite(qrCodeImage, cardWidth - qrPositionX - 80, qrPositionY - 20);

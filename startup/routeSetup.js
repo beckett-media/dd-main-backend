@@ -1,4 +1,5 @@
 const user = require("../routes/user/user");
+const userV1 = require("../routes/user/userV1");
 const subscription = require("../routes/user/subscription");
 const cardGrading = require("../routes/user/cardGrading");
 const collection = require("../routes/myCollection/collection");
@@ -6,6 +7,7 @@ const authenticate = require("../routes/user/authenticate");
 const payment = require("../routes/user/payment");
 const authToken = require("../routes/common/authToken");
 const sportsCard = require("../routes/user/sportsCard");
+const sportsCardV1 = require("../routes/user/sportsCardV1");
 const ebay = require("../routes/user/ebay");
 const pay = require("../routes/user/pay");
 const notificaiton = require("../routes/user/testNotifications");
@@ -29,6 +31,7 @@ const publicSportsCard = require("../routes/open/sportsCard");
 module.exports = (app) => {
 	// Import route and use app.use();
 	app.use("/user", user);
+	app.use("/user/v1", userV1);  // v1 versioning of user APIs
 	app.use("/subscription", subscription);
 	app.use("/card-grading", cardGrading);
 	app.use("/collection", collection);
@@ -36,6 +39,7 @@ module.exports = (app) => {
 	app.use("/payment", payment);
 	app.use("/auth-token", authToken);
 	app.use("/sports-card", sportsCard);
+	app.use("/sports-card/v1", sportsCardV1); // v1 versioning of sports card APIs
 	app.use("/ebay", ebay);
 	app.use("/pay", pay);
 	app.use("/marketplace", marketplace);
