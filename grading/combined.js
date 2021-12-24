@@ -4,7 +4,7 @@ const path = require('path');
 const config = require('config');
 const { gradePhase } = require('./helper');
 
-const combinedGrading = (cardId, imagePath, userId) => {
+const combinedGrading = (cardId, imagePath, userId, newApp = false) => {
     const options = {
         method: 'POST',
         url: config.get('gradeAPI'),
@@ -14,7 +14,7 @@ const combinedGrading = (cardId, imagePath, userId) => {
         formData: {
             user_id: userId,
             report_id: cardId,
-            image: fs.createReadStream(path.join(__dirname, './../public/', imagePath)),
+            image: newApp ? imagePath : fs.createReadStream(path.join(__dirname, './../public/', imagePath)),
             device: 'node',
             phrase: gradePhase()
         }

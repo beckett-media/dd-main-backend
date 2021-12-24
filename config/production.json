@@ -2,7 +2,7 @@
   "ebayoAuthUrl": "https://api.ebay.com/identity/v1/oauth2/token",
   "ebayGetUserUrl": "https://apiz.ebay.com/commerce/identity/v1/user/",
   "ebayGetRefreshToken": "https://api.ebay.com/identity/v1/oauth2/token",
-  "qrBaseUrl": "https://api.duedilly.co/",
+  "qrBaseUrl": "https://card-overlay.s3.ap-south-1.amazonaws.com/",
   "dbConnectionString": "mongodb+srv://admin:iib878pOwPwFc832@due-dilly-production.wytqf.mongodb.net/snap_grade_prod",
   "snapGradeJwtPrivateKey": "SNAP_GRADE_JWT_PRIVATE_KEY",
   "snapGradeJwtRefreshKey": "SNAP_GRADE_JWT_REFRESH_KEY",
