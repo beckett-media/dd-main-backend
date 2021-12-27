@@ -10,6 +10,7 @@ var crypto = require("crypto");
  */
 router.get("/", async (req, res) => {
   console.log("EBAY DELETION NOTIFICATION RECEIVED");
+  console.log(req.query);
   const hash = crypto.createHash("sha256");
   hash.update(req.query.challenge_code);
   hash.update(
