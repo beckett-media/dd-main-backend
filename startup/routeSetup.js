@@ -15,7 +15,6 @@ const storeListing = require("../routes/marketStore/store-listing");
 const marketStore = require("../routes/marketStore/store");
 const product = require("../routes/open/product");
 const store = require("../routes/open/store");
-const ebayNotification = require("../routes/open/ebay");
 const grade = require("../routes/open/grade");
 const cart = require("../routes/cart/cart");
 const order = require("../routes/order/index");
@@ -28,6 +27,9 @@ const adminQuestions = require("../routes/admin/questions");
 const adminRoutes = require("../routes/admin/admin");
 // Public routes that don't even require app token
 const publicSportsCard = require("../routes/open/sportsCard");
+
+// Public routes for AWS services
+const awsS3Routes = require("../routes/awsS3/api");
 
 module.exports = (app) => {
   // Import route and use app.use();
@@ -50,6 +52,8 @@ module.exports = (app) => {
   app.use("/address", address);
   // Test notificaiton route
   app.use("/notification", notificaiton);
+  // AWS s3 route
+  app.use("/aws-s3", awsS3Routes);
   // Admin routes
   app.use("/admin", adminRoutes);
   app.use("/admin-auth", adminAuth);
@@ -61,5 +65,4 @@ module.exports = (app) => {
   app.use("/public-products", product);
   app.use("/public-stores", store);
   app.use("/public-grade", grade);
-  app.use("/public-ebay-notification", ebayNotification);
 };

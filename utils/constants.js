@@ -50,6 +50,8 @@ module.exports.stringConstants = {
 	OTP_NOT_VERIFIED: "Please verify the OTP first and try again",
 
 	USER_ID_DOEST_NOT_EXISTS: "User with the given ID does not exists",
+	AWS_S3_PRE_SIGNED_URL_CREATED: "Pre signed URL created successfully",
+	AWS_S3_PRE_SIGNED_NOT_CREATED: "Pre signed URL not created successfully",
 	STORE_ID_DOEST_NOT_EXISTS: "Store with the given ID does not exists",
 	CARD_ALREADY_EXIST: "Card already exist in collection",
 	NO_OTP: "No OTP found in the system. Please re-generate the OTP",
