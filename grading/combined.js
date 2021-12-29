@@ -7,14 +7,20 @@ const { gradePhase } = require('./helper');
 const combinedGrading = (cardId, imagePath, userId, newApp = false) => {
     const options = {
         method: 'POST',
-        url: config.get('gradeAPI'),
+        url: newApp ? config.get('gradeAPIV1') : config.get('gradeAPI'),
         headers: {
             "Content-Type": "multipart/form-data"
         },
-        formData: {
+        formData: newApp ? {
             user_id: userId,
             report_id: cardId,
-            image: newApp ? imagePath : fs.createReadStream(path.join(__dirname, './../public/', imagePath)),
+            image_url: imagePath,
+            device: 'node',
+            phrase: gradePhase()
+        } : {
+            user_id: userId,
+            report_id: cardId,
+            image: fs.createReadStream(path.join(__dirname, './../public/', imagePath)),
             device: 'node',
             phrase: gradePhase()
         }
