@@ -230,6 +230,7 @@ module.exports.stringConstants = {
 		ORDER_COLLECTION: "Order",
 		CART_COLLECTION: "Cart",
 		ADDRESS_COLLECTION: "Address",
+		BLOG_PRESS_COLLECTION: "BlogPress",
 		STRIPE_CONNECT_COLLECTION: "StripeConnect",
 		ORDER_LOG_COLLECTION: "OrderLog",
 		ORDER_ITEM_COLLECTION: "OrderItem",
