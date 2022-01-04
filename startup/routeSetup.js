@@ -17,6 +17,7 @@ const product = require("../routes/open/product");
 const store = require("../routes/open/store");
 const grade = require("../routes/open/grade");
 const cart = require("../routes/cart/cart");
+const blogPress = require("../routes/blogPress/blogPress");
 const order = require("../routes/order/index");
 const address = require("../routes/marketPlace/address");
 // Admin routes
@@ -48,6 +49,7 @@ module.exports = (app) => {
   app.use("/store-listing", storeListing);
   app.use("/store", marketStore);
   app.use("/cart", cart);
+  app.use("/blog-press", blogPress);
   app.use("/order", order);
   app.use("/address", address);
   // Test notificaiton route
