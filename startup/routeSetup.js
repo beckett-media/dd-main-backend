@@ -29,9 +29,6 @@ const adminRoutes = require("../routes/admin/admin");
 // Public routes that don't even require app token
 const publicSportsCard = require("../routes/open/sportsCard");
 
-// Public routes for AWS services
-const awsS3Routes = require("../routes/awsS3/api");
-
 module.exports = (app) => {
   // Import route and use app.use();
   app.use("/user", user);
@@ -54,8 +51,6 @@ module.exports = (app) => {
   app.use("/address", address);
   // Test notificaiton route
   app.use("/notification", notificaiton);
-  // AWS s3 route
-  app.use("/aws-s3", awsS3Routes);
   // Admin routes
   app.use("/admin", adminRoutes);
   app.use("/admin-auth", adminAuth);
