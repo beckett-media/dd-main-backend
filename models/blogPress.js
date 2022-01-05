@@ -15,6 +15,11 @@ const blogPressSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    type: {
+      type: String,
+      enum: ["blog", "press"],
+      required: true,
+    },
   },
   { timestamps: true, toJSON: { getters: true } }
 );

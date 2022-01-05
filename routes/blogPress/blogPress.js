@@ -11,6 +11,7 @@ const {
   valBlogPress,
   valObjectIdInUrl,
   valBlogPressUpdate,
+  valPostTypeInUrl,
 } = require("../../middlewares/validation");
 const { valPageSizeNumber } = require("../../middlewares/validation");
 
@@ -60,11 +61,21 @@ router.delete("/:id", [authAdmin, valObjectIdInUrl], async (req, res) => {
   );
 });
 
-router.get("/:id", [authAdmin, valObjectIdInUrl], async (req, res) => {
+router.get("/:id", [valObjectIdInUrl], async (req, res) => {
   let blogPress = await BLOG_PRESS.findOne({ _id: req.params.id });
 
   return res.send(
     createResObject(true, { blogPress }, stringConstants.FETCH_SUCESSFUL)
+  );
+});
+
+router.get("/collection/:type", [valPostTypeInUrl], async (req, res) => {
+  let blogs = await BLOG_PRESS.find({ type: req.params.type }).select(
+    "title bannerImage type"
+  );
+
+  return res.send(
+    createResObject(true, { blogs }, stringConstants.FETCH_SUCESSFUL)
   );
 });
 
