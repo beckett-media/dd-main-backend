@@ -741,7 +741,7 @@ module.exports = {
   },
   valBlogPress: (req, res, next) => {
     const schema = Joi.object({
-      title: Joi.string().required().min(5).max(30),
+      title: Joi.string().required().min(5).max(60),
       data: Joi.string().allow(null).allow(""),
       bannerImage: Joi.binary().optional().allow(null),
       type: Joi.string().valid("blog", "press").required(),
@@ -764,7 +764,7 @@ module.exports = {
   },
   valBlogPressUpdate: (req, res, next) => {
     const schema = Joi.object({
-      title: Joi.string().required().min(5).max(40),
+      title: Joi.string().required().min(5).max(60),
       data: Joi.string().allow(null).allow(""),
       bannerImage: Joi.optional(),
       type: Joi.string().valid("blog", "press").required(),
