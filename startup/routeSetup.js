@@ -15,9 +15,9 @@ const storeListing = require("../routes/marketStore/store-listing");
 const marketStore = require("../routes/marketStore/store");
 const product = require("../routes/open/product");
 const store = require("../routes/open/store");
-const ebayNotification = require("../routes/open/ebay");
 const grade = require("../routes/open/grade");
 const cart = require("../routes/cart/cart");
+const blogPress = require("../routes/blogPress/blogPress");
 const order = require("../routes/order/index");
 const address = require("../routes/marketPlace/address");
 // Admin routes
@@ -46,6 +46,7 @@ module.exports = (app) => {
   app.use("/store-listing", storeListing);
   app.use("/store", marketStore);
   app.use("/cart", cart);
+  app.use("/blog-press", blogPress);
   app.use("/order", order);
   app.use("/address", address);
   // Test notificaiton route
@@ -61,5 +62,4 @@ module.exports = (app) => {
   app.use("/public-products", product);
   app.use("/public-stores", store);
   app.use("/public-grade", grade);
-  app.use("/public-ebay-notification", ebayNotification);
 };
