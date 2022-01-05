@@ -80,14 +80,14 @@ router.get("/collection/:type", [valPostTypeInUrl], async (req, res) => {
 });
 
 router.get(
-  "/:pageSize/:pageNumber",
-  [authAdmin, valPageSizeNumber],
+  "/:pageSize/:pageNumber/:type",
+  [authAdmin, valPageSizeNumber, valPostTypeInUrl],
   async (req, res) => {
     const pageSize = parseInt(req.params.pageSize);
     const pageNumber = parseInt(req.params.pageNumber);
 
-    const totalDocs = await BLOG_PRESS.count({});
-    const totalDocuments = await BLOG_PRESS.find()
+    const totalDocs = await BLOG_PRESS.count({ type: req.params.type });
+    const totalDocuments = await BLOG_PRESS.find({ type: req.params.type })
       .sort({ createdAt: 1 })
       .select("title")
       .skip((pageNumber - 1) * pageSize)
