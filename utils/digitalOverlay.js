@@ -10,8 +10,9 @@ async function createGradedImage(card, newApp = false) {
   try {
     const cardId = card._id;
     const userId = card.user;
+    const clientS3Path = config.get('clientS3Path');
     // Create the overlay image
-    const cardImagePath = newApp ? card.front : path.join(__dirname, "../public", card.front);
+    const cardImagePath = newApp ? `${clientS3Path}${card.front}` : path.join(__dirname, "../public", card.front);
     let cardImage = await Jimp.read(cardImagePath);
 
     cardImage.cover(500, 700);
