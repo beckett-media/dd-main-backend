@@ -5,6 +5,7 @@ const config = require('config');
 const { gradePhase } = require('./helper');
 
 const combinedGrading = (cardId, imagePath, userId, newApp = false) => {
+    const clientS3Path = config.get('clientS3Path');
     const options = {
         method: 'POST',
         url: newApp ? config.get('gradeAPIV1') : config.get('gradeAPI'),
@@ -14,7 +15,7 @@ const combinedGrading = (cardId, imagePath, userId, newApp = false) => {
         formData: newApp ? {
             user_id: userId,
             report_id: cardId,
-            image_url: imagePath,
+            image_url: `${clientS3Path}${imagePath}`,
             device: 'node',
             phrase: gradePhase()
         } : {
