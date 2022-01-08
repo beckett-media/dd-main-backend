@@ -1,18 +1,19 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
-const authAdminOrUser = require("../../middlewares/authenticateAdminOrUser");
-const appAuth = require("../../middlewares/authenticateApp");
-const { User } = require("../../models/user");
-const { createResObject } = require("../../utils/utilFunctions");
-const { stringConstants } = require("../../utils/constants");
-const { errorObjects } = require("../../utils/errorObjects");
+const authAdminOrUser = require('../../middlewares/authenticateAdminOrUser');
+const appAuth = require('../../middlewares/authenticateApp');
+const { User } = require('../../models/user');
+const { createResObject } = require('../../utils/utilFunctions');
+const { stringConstants } = require('../../utils/constants');
+const { errorObjects } = require('../../utils/errorObjects');
+const config = require('config');
 
 /**
  * Post or update the already existing profile picture
 */
 
 router.post(
-    "/add-update-profile-picture",
+    '/add-update-profile-picture',
     [appAuth, authAdminOrUser],
     async (req, res, next) => {
         const userId = req.user._id;
@@ -44,9 +45,10 @@ router.post(
                     )
             );
         }
+        const clientS3Path = config.get('clientS3Path');
         user = await User.findByIdAndUpdate(
             userId,
-            { $set: { profilePicture: imageUrl } },
+            { $set: { profilePicture: `${clientS3Path}${imageUrl}` } },
             { new: true }
           );
           user = user.getUserBasicInfo();

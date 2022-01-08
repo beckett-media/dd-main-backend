@@ -1,21 +1,22 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
-const auth = require("../../middlewares/authenticateUser");
-const appAuth = require("../../middlewares/authenticateApp");
-const { User } = require("../../models/user");
-const { Card } = require("../../models/card");
-const { stringConstants } = require("../../utils/constants");
-const { errorObjects } = require("../../utils/errorObjects");
-const { createResObject } = require("../../utils/utilFunctions");
+const auth = require('../../middlewares/authenticateUser');
+const appAuth = require('../../middlewares/authenticateApp');
+const { User } = require('../../models/user');
+const { Card } = require('../../models/card');
+const { stringConstants } = require('../../utils/constants');
+const { errorObjects } = require('../../utils/errorObjects');
+const { createResObject } = require('../../utils/utilFunctions');
 const {
   valObjectIdInUrl
-} = require("../../middlewares/validation");
+} = require('../../middlewares/validation');
+const config = require('config');
 
 
 /**
  * Step 1: Create a new card and upload card front
  */
-router.post("/add-front", [appAuth, auth], async (req, res, next) => {
+router.post('/add-front', [appAuth, auth], async (req, res, next) => {
   const userId = req.user._id;
   const cardFront = req.body.cardFront;
   const user = await User.findById(userId);
@@ -52,7 +53,8 @@ router.post("/add-front", [appAuth, auth], async (req, res, next) => {
   // Send card ID to multer
   req.cardId = cardId;
 
-  card.front = cardFront;
+  const clientS3Path = config.get('clientS3Path');
+  card.front = `${clientS3Path}${cardFront}`;
   card = await card.save();
   card = card.getCardDetailsWithGrading();
 
@@ -68,7 +70,7 @@ router.post("/add-front", [appAuth, auth], async (req, res, next) => {
  * separte route is used for updating front
  */
 router.post(
-  "/update-front/:cardId",
+  '/update-front/:cardId',
   [appAuth, auth, valObjectIdInUrl],
   async (req, res, next) => {
     const userId = req.user._id;
@@ -113,7 +115,8 @@ router.post(
     }
 
     req.cardId = cardId;
-    card.front = cardFront;
+    const clientS3Path = config.get('clientS3Path');
+    card.front = `${clientS3Path}${cardFront}`;
     card = await card.save();
     card = card.getCardDetailsWithGrading();
 
@@ -128,11 +131,10 @@ router.post(
  * requires the card id in request
  */
 router.post(
-  "/add-update-back/:cardId",
+  '/add-update-back/:cardId',
   [appAuth, auth, valObjectIdInUrl],
   async (req, res) => {
     const cardId = req.params.cardId;
-    const userId = req.user._id;
     const cardBack = req.body.cardBack;
     let card = await Card.findById(cardId);
     if (!card) {
@@ -176,7 +178,8 @@ router.post(
 
     // Upload the back of the card
     req.cardId = cardId;
-    card.back = cardBack;
+    const clientS3Path = config.get('clientS3Path');
+    card.back = `${clientS3Path}${cardBack}`;
       card = await card.save();
 
       card = card.getCardDetailsWithGrading();

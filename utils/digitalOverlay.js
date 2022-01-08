@@ -181,7 +181,8 @@ async function createGradedImage(card, newApp = false) {
       "Assessment"
     );
 
-    const destinationPath = `${card.user}/cards/${card._id}/graded_card.png`;
+    const secondsSinceEpoch = Date.now();
+    const destinationPath = `${card.user}/cards/${card._id}/graded_card_${secondsSinceEpoch}.png`;
     // Delete the QR image
     fs.unlinkSync(qrCodeImagePath);
     // Upload the image to s3
