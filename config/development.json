@@ -15,5 +15,6 @@
   "eBayRuname": "Andrew_Medal-AndrewMe-DCGS-S-ajrxfauw",
   "gradeAPI": "https://grading.duedilly.co:5000/get_score",
   "gradeAPIV1": "https://grading.duedilly.co:5000/v1/get_score",
+  "clientS3Path": "https://duedillyandroidf8feeb799bf34558bb93b496b7958ee6115036-prod.s3.amazonaws.com/public/",
   "skipPayment": true
 }
