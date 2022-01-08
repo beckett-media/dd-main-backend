@@ -6,7 +6,6 @@ const { User } = require('../../models/user');
 const { createResObject } = require('../../utils/utilFunctions');
 const { stringConstants } = require('../../utils/constants');
 const { errorObjects } = require('../../utils/errorObjects');
-const config = require('config');
 
 /**
  * Post or update the already existing profile picture
@@ -45,10 +44,9 @@ router.post(
                     )
             );
         }
-        const clientS3Path = config.get('clientS3Path');
         user = await User.findByIdAndUpdate(
             userId,
-            { $set: { profilePicture: `${clientS3Path}${imageUrl}` } },
+            { $set: { profilePicture: imageUrl } },
             { new: true }
           );
           user = user.getUserBasicInfo();

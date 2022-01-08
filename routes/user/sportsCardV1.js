@@ -10,7 +10,6 @@ const { createResObject } = require('../../utils/utilFunctions');
 const {
   valObjectIdInUrl
 } = require('../../middlewares/validation');
-const config = require('config');
 
 
 /**
@@ -53,8 +52,7 @@ router.post('/add-front', [appAuth, auth], async (req, res, next) => {
   // Send card ID to multer
   req.cardId = cardId;
 
-  const clientS3Path = config.get('clientS3Path');
-  card.front = `${clientS3Path}${cardFront}`;
+  card.front = cardFront;
   card = await card.save();
   card = card.getCardDetailsWithGrading();
 
@@ -115,8 +113,7 @@ router.post(
     }
 
     req.cardId = cardId;
-    const clientS3Path = config.get('clientS3Path');
-    card.front = `${clientS3Path}${cardFront}`;
+    card.front = cardFront;
     card = await card.save();
     card = card.getCardDetailsWithGrading();
 
@@ -178,8 +175,7 @@ router.post(
 
     // Upload the back of the card
     req.cardId = cardId;
-    const clientS3Path = config.get('clientS3Path');
-    card.back = `${clientS3Path}${cardBack}`;
+    card.back = cardBack;
       card = await card.save();
 
       card = card.getCardDetailsWithGrading();
