@@ -81,7 +81,7 @@ router.get("/collection/:type", [valPostTypeInUrl], async (req, res) => {
 
 router.get(
   "/:pageSize/:pageNumber/:type",
-  [authAdmin, valPageSizeNumber, valPostTypeInUrl],
+  [valPageSizeNumber, valPostTypeInUrl],
   async (req, res) => {
     const pageSize = parseInt(req.params.pageSize);
     const pageNumber = parseInt(req.params.pageNumber);
