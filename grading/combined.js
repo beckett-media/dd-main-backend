@@ -4,14 +4,21 @@ const path = require('path');
 const config = require('config');
 const { gradePhase } = require('./helper');
 
-const combinedGrading = (cardId, imagePath, userId) => {
+const combinedGrading = (cardId, imagePath, userId, newApp = false) => {
+    const clientS3Path = config.get('clientS3Path');
     const options = {
         method: 'POST',
-        url: config.get('gradeAPI'),
+        url: newApp ? config.get('gradeAPIV1') : config.get('gradeAPI'),
         headers: {
             "Content-Type": "multipart/form-data"
         },
-        formData: {
+        formData: newApp ? {
+            user_id: userId,
+            report_id: cardId,
+            image_url: `${clientS3Path}${imagePath}`,
+            device: 'node',
+            phrase: gradePhase()
+        } : {
             user_id: userId,
             report_id: cardId,
             image: fs.createReadStream(path.join(__dirname, './../public/', imagePath)),
@@ -28,7 +35,6 @@ const combinedGrading = (cardId, imagePath, userId) => {
             } else {
                 try {
                     const data = typeof body === 'string' && !body.includes('error') ? JSON.parse(body) : body;
-                    console.log('********** Data from python API **********', data);
                     resolve(data);
                 }catch (error) {
                     console.log(error);

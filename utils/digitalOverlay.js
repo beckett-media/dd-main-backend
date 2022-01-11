@@ -4,13 +4,15 @@ const fs = require("fs");
 const QRCode = require("qrcode");
 const config = require("config");
 const { stringConstants } = require("../utils/constants");
+const upload = require('./../s3/upload');
 
-async function createGradedImage(card) {
+async function createGradedImage(card, newApp = false) {
   try {
     const cardId = card._id;
     const userId = card.user;
+    const clientS3Path = config.get('clientS3Path');
     // Create the overlay image
-    const cardImagePath = path.join(__dirname, "../public", card.front);
+    const cardImagePath = newApp ? `${clientS3Path}${card.front}` : path.join(__dirname, "../public", card.front);
     let cardImage = await Jimp.read(cardImagePath);
 
     cardImage.cover(500, 700);
@@ -83,7 +85,7 @@ async function createGradedImage(card) {
     qrCodeMask.resize(logoQrWidth, logoQrHeight);
     qrCodeImage.mask(qrCodeMask, 0, 0);
 
-    const qrPositionX = 75;
+    const qrPositionX = 90;
     const qrPositionY = bgHeight - 250 + 10;
 
     blackBg.composite(qrCodeImage, cardWidth - qrPositionX - 80, qrPositionY - 20);
@@ -180,16 +182,15 @@ async function createGradedImage(card) {
       "Assessment"
     );
 
-    const destinationPath = path.join(
-      __dirname,
-      `../public/${card.user}/cards/${card._id}/graded_card.png`
-    );
+    const secondsSinceEpoch = Date.now();
+    const destinationPath = `${card.user}/cards/${card._id}/graded_card_${secondsSinceEpoch}.png`;
     // Delete the QR image
     fs.unlinkSync(qrCodeImagePath);
-    // Write the image to user card folder
-    await blackBg.write(destinationPath);
+    // Upload the image to s3
+    const buffer = await blackBg.getBufferAsync(Jimp.AUTO);
+    const response = await upload(destinationPath, 'cardOverlay', buffer, 'png');
+    const { Location: gradedCardPath = '' } = response;
     // Return the relative path
-    const gradedCardPath = `${card.user}/cards/${card._id}/graded_card.png`;
     return gradedCardPath;
   } catch (error) {
     throw error;
