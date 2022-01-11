@@ -2,7 +2,7 @@
   "ebayoAuthUrl": "https://api.sandbox.ebay.com/identity/v1/oauth2/token",
   "ebayGetUserUrl": "https://apiz.sandbox.ebay.com/commerce/identity/v1/user/",
   "ebayGetRefreshToken": "https://api.sandbox.ebay.com/identity/v1/oauth2/token",
-  "qrBaseUrl": "http://3.139.34.166/",
+  "qrBaseUrl": "https://card-overlay.s3.ap-south-1.amazonaws.com/",
   "dbConnectionString": "mongodb+srv://admin:iib878pOwPwFc832@due-dilly.wytqf.mongodb.net/snap_grade",
   "snapGradeJwtPrivateKey": "SNAP_GRADE_JWT_PRIVATE_KEY",
   "snapGradeJwtRefreshKey": "SNAP_GRADE_JWT_REFRESH_KEY",
@@ -13,6 +13,8 @@
   "eBayClientId": "AndrewMe-DCGS-SBX-1c8e8a00c-bffefd29",
   "eBayClientSecret": "SBX-c8e8a00c3e51-4a4e-45db-b348-e85f",
   "eBayRuname": "Andrew_Medal-AndrewMe-DCGS-S-ajrxfauw",
-  "gradeAPI": "http://65.2.7.211:5000/get_score",
+  "gradeAPI": "https://grading.duedilly.co:5000/get_score",
+  "gradeAPIV1": "https://grading.duedilly.co:5000/v1/get_score",
+  "clientS3Path": "https://duedillyandroidf8feeb799bf34558bb93b496b7958ee6115036-prod.s3.amazonaws.com/public/",
   "skipPayment": true
 }
