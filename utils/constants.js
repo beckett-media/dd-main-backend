@@ -433,4 +433,5 @@ module.exports.stringConstants = {
 		CANCELED: "canceled",
 		COMPLETED: "completed",
 	},
+	GO_HIGH_API_KEY: "goHighApiKey"
 };

@@ -31,6 +31,9 @@ const adminRoutes = require("../routes/admin/admin");
 // Public routes that don't even require app token
 const publicSportsCard = require("../routes/open/sportsCard");
 
+// Marketing subscription Routes 
+const goHighSubscription = require("../routes/marketing/gohigh")
+
 module.exports = (app) => {
 	// Import route and use app.use();
 	app.use("/user", user);
@@ -56,14 +59,15 @@ module.exports = (app) => {
 	// Test notificaiton route
 	app.use("/notification", notificaiton);
 	// Admin routes
-  app.use("/admin", adminRoutes);
+  	app.use("/admin", adminRoutes);
 	app.use("/admin-auth", adminAuth);
 	app.use("/admin-sports-card", adminSportsCard);
 	app.use("/admin-questions", adminQuestions);
-  app.use("/admin-store", adminStore);
+  	app.use("/admin-store", adminStore);
 	// Public routes
 	app.use("/public-cards", publicSportsCard);
 	app.use("/public-products", product);
 	app.use("/public-stores", store);
 	app.use("/public-grade", grade);
+	app.use("/marketing", goHighSubscription)
 };
