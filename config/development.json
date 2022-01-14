@@ -15,7 +15,7 @@
   "eBayRuname": "Andrew_Medal-AndrewMe-DCGS-S-ajrxfauw",
   "gradeAPI": "https://grading.duedilly.co:5000/get_score",
   "gradeAPIV1": "https://grading.duedilly.co:5000/v1/get_score",
-  "clientS3Path": "https://duedillyandroidf8feeb799bf34558bb93b496b7958ee6115036-prod.s3.amazonaws.com/public/",
+  "clientS3Path": "https://duedillymobile4ddd12da3ecd4a37ab585dd4904acd7e125824-prod.s3.amazonaws.com/public/",
   "skipPayment": true,
   "goHighApiKey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJsb2NhdGlvbl9pZCI6InJxUUVBTWFRVFNsaTUzVExyTmdhIiwiY29tcGFueV9pZCI6IkNWdWhMd0pEOXF0Q1NUT0pCSzVvIiwidmVyc2lvbiI6MSwiaWF0IjoxNjQyMDIxOTQ2MTM4LCJzdWIiOiJtb0tqMThoSHdGOXB6bHBNTFNLVSJ9.0tBCW9Dg5aRUQN0X-W9V--v6F7ujwpFHKKgQSrdAP7I"
 }
