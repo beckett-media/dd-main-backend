@@ -89,7 +89,7 @@ router.get(
     const totalDocs = await BLOG_PRESS.count({ type: req.params.type });
     const totalDocuments = await BLOG_PRESS.find({ type: req.params.type })
       .sort({ createdAt: 1 })
-      .select("title bannerImage type")
+      .select("title bannerImage type createdAt")
       .skip((pageNumber - 1) * pageSize)
       .limit(pageSize);
 
