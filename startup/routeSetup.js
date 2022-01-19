@@ -30,6 +30,8 @@ const adminQuestions = require("../routes/admin/questions");
 const adminRoutes = require("../routes/admin/admin");
 // Public routes that don't even require app token
 const publicSportsCard = require("../routes/open/sportsCard");
+// Public routes for AWS services
+const awsS3Routes = require("../routes/awsS3/api");
 
 // Marketing subscription Routes 
 const goHighSubscription = require("../routes/marketing/gohigh")
@@ -54,11 +56,13 @@ module.exports = (app) => {
 	app.use("/store-listing", storeListing);
 	app.use("/store", marketStore);
 	app.use("/cart", cart);
-  app.use("/blog-press", blogPress);
+  	app.use("/blog-press", blogPress);
 	app.use("/order", order);
 	app.use("/address", address);
 	// Test notificaiton route
 	app.use("/notification", notificaiton);
+	// AWS s3 route
+	app.use("/aws-s3", awsS3Routes);
 	// Admin routes
   	app.use("/admin", adminRoutes);
 	app.use("/admin-auth", adminAuth);
