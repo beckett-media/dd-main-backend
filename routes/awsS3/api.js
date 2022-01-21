@@ -1,13 +1,13 @@
 const express = require("express");
 const router = express.Router();
+const config = require("config");
 const S3 = require("aws-sdk/clients/s3");
 const auth = require("../../middlewares/authenticateUser");
 const appAuth = require("../../middlewares/authenticateApp");
 const { createResObject } = require("../../utils/utilFunctions");
 const { stringConstants } = require("../../utils/constants");
 const { errorObjects } = require("../../utils/errorObjects");
-const config = require("config");
-
+const { awsS3Service } = require("../../services/");
 const s3 = new S3({
   region: config.get(stringConstants.awsS3.S3_BUCKET_REGION),
   accessKeyId: config.get(stringConstants.awsS3.S3_WEB_ACCESS_KEY_ID),
@@ -16,17 +16,11 @@ const s3 = new S3({
 });
 
 router.all("/profile-picture", [appAuth, auth], (req, res) => {
-  const post = s3.createPresignedPost({
-    Bucket: "dilly-uploads",
-    Fields: {
-      key: `${stringConstants.awsS3.S3_PROFILE_PIC_UPLOAD}/${req.user._id}`,
-      ContentType: req.body.fileType,
-    },
-    Expires: 60, // seconds
-    Conditions: [
-      ["content-length-range", 0, 2048576], // up to 2 MB
-    ],
-  });
+  const post = awsS3Service.createS3PostUrl(
+    req.body.fileType,
+    req.body.fileExtension,
+    req.user._id
+  );
   if (post)
     return res
       .status(200)
