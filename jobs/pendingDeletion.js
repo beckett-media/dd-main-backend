@@ -7,6 +7,8 @@ const SimpleLogger = require("../utils/simpleLogger");
 const fs = require("fs");
 const fsPromises = fs.promises;
 const rimraf = require("rimraf");
+const S3 = require("aws-sdk/clients/s3");
+const { awsS3Service } = require("../services/");
 
 module.exports = async () => {
   SimpleLogger.info(
@@ -19,6 +21,9 @@ module.exports = async () => {
       switch (pendingDeletion.deletionType) {
         case stringConstants.deletionType.FILE:
           await fsPromises.unlink(pendingDeletion.data);
+          break;
+        case stringConstants.deletionType.S3_WEB:
+          awsS3Service.deleteFileFromS3Bucket(pendingDeletion);
           break;
         case stringConstants.deletionType.DIR:
           rimraf.sync(pendingDeletion.data);

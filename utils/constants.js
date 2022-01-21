@@ -241,6 +241,7 @@ module.exports.stringConstants = {
 		FILE: "File",
 		CARD: "Card",
 		DIR: "Directory",
+		S3_WEB: "s3Web",
 	},
 
 	role: {

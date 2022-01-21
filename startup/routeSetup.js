@@ -34,8 +34,8 @@ const publicSportsCard = require("../routes/open/sportsCard");
 const awsS3Routes = require("../routes/awsS3/api");
 
 // Marketing subscription Routes 
-const goHighSubscription = require("../routes/marketing/gohigh")
-const contactUs = require("../routes/marketing/contact-us")
+const goHighSubscription = require("../routes/marketing/gohigh");
+const contactUs = require("../routes/marketing/contact-us");
 
 module.exports = (app) => {
 	// Import route and use app.use();
