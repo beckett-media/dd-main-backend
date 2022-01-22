@@ -241,6 +241,7 @@ module.exports.stringConstants = {
 		FILE: "File",
 		CARD: "Card",
 		DIR: "Directory",
+		S3_WEB: "s3Web",
 	},
 
 	role: {
@@ -433,5 +434,15 @@ module.exports.stringConstants = {
 		CANCELED: "canceled",
 		COMPLETED: "completed",
 	},
-	GO_HIGH_API_KEY: "goHighApiKey"
+	GO_HIGH_API_KEY: "goHighApiKey",
+  	awsS3: {
+		S3_BUCKET_NAME: "s3BucketName",
+		S3_BUCKET_BASE_URL: "s3BucketBaseUrl",
+		S3_BUCKET_REGION: "s3BucketRegion",
+		S3_WEB_ACCESS_KEY_ID: "s3WebAccessKeyId",
+		S3_WEB_SECRET_ASCCESS_KEY: "s3WebSecretAccessKey",
+		S3_WEB_SIGNATURE_VERSION: "s3WebSignatureVersion",
+		S3_PROFILE_PIC_UPLOAD: "public/profilePic",
+		S3_CARD_PICS_UPLOAD: "public/marketplace",
+  },
 };

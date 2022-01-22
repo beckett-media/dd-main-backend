@@ -11,6 +11,7 @@ const pendingDeletionSchema = new mongoose.Schema(
         stringConstants.deletionType.FILE,
         stringConstants.deletionType.CARD,
         stringConstants.deletionType.DIR,
+        stringConstants.deletionType.S3_WEB,
       ],
     },
     data: {
