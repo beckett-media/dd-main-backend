@@ -54,11 +54,15 @@ router.post(
     user = user.getUserBasicInfo();
 
     try {
-      await PendingDeletion.create({
-        deletionType: stringConstants.deletionType.S3_WEB,
-        data: `${req.user.profilePicture}`,
-      });
-      SimpleLogger.info("Created job for old profile pic deletion");
+      if (req.user.profilePicture) {
+        await PendingDeletion.create({
+          deletionType: stringConstants.deletionType.S3_WEB,
+          data: `${req.user.profilePicture}`,
+        });
+        SimpleLogger.info("Created job for old profile pic deletion");
+      } else {
+        SimpleLogger.info("No previous image found to create job for removing");
+      }
     } catch (error) {
       SimpleLogger.error(
         "Not able to create job for old profile pic deletion" + error
