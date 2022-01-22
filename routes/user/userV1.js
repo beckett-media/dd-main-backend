@@ -29,8 +29,8 @@ router.post(
             false,
             {},
             stringConstants.USER_ID_DOEST_NOT_EXISTS,
-            errorObjects.USER_ID_DOEST_NOT_EXISTS,
-          ),
+            errorObjects.USER_ID_DOEST_NOT_EXISTS
+          )
         );
     }
 
@@ -42,14 +42,14 @@ router.post(
             false,
             {},
             stringConstants.NO_FILE_FOUND,
-            errorObjects.NO_FILE_FOUND,
-          ),
+            errorObjects.NO_FILE_FOUND
+          )
         );
     }
     user = await User.findByIdAndUpdate(
       userId,
       { $set: { profilePicture: imageUrl } },
-      { new: true },
+      { new: true }
     );
     user = user.getUserBasicInfo();
 
@@ -65,14 +65,14 @@ router.post(
       }
     } catch (error) {
       SimpleLogger.error(
-        "Not able to create job for old profile pic deletion" + error,
+        "Not able to create job for old profile pic deletion" + error
       );
     }
 
     return res.send(
-      createResObject(true, { user }, stringConstants.UPDATE_SUCCESSFUL),
+      createResObject(true, { user }, stringConstants.UPDATE_SUCCESSFUL)
     );
-  },
+  }
 );
 
 module.exports = router;
