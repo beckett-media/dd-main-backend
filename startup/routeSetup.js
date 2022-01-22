@@ -33,6 +33,7 @@ const publicSportsCard = require("../routes/open/sportsCard");
 
 // Marketing subscription Routes 
 const goHighSubscription = require("../routes/marketing/gohigh")
+const contactUs = require("../routes/marketing/contact-us")
 
 module.exports = (app) => {
 	// Import route and use app.use();
@@ -69,5 +70,6 @@ module.exports = (app) => {
 	app.use("/public-products", product);
 	app.use("/public-stores", store);
 	app.use("/public-grade", grade);
-	app.use("/marketing", goHighSubscription)
+	app.use("/marketing", goHighSubscription);
+	app.use("/contact-us", contactUs);
 };

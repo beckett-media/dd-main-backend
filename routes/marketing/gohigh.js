@@ -13,8 +13,7 @@ router.post(
   [marketingGoHighVal.valHeroBannerContactInfo],
   async (req, res) => {
     try {
-      const resp = await axios(getAxiosConfig(req.body, "main-hero-banner"));
-      console.log(resp);
+      await axios(getAxiosConfig(req.body, "main-hero-banner"));
       return res.send(
         createResObject(true, {
           //   ...resp.data,
@@ -32,7 +31,7 @@ router.post(
   [marketingGoHighVal.valFooterContactInfo],
   async (req, res) => {
     try {
-      const resp = await axios(getAxiosConfig(req.body, "main-footer"));
+      await axios(getAxiosConfig(req.body, "main-footer"));
       return res.send(
         createResObject(true, {
           //   ...resp.data,
@@ -50,7 +49,7 @@ router.post(
   [marketingGoHighVal.valGameOverContactInfo],
   async (req, res) => {
     try {
-      const resp = await axios(getAxiosConfig(req.body, "game-over"));
+      await axios(getAxiosConfig(req.body, "game-over"));
       return res.send(
         createResObject(true, {
           //   ...resp.data,
