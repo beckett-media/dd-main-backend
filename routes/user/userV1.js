@@ -29,8 +29,8 @@ router.post(
             false,
             {},
             stringConstants.USER_ID_DOEST_NOT_EXISTS,
-            errorObjects.USER_ID_DOEST_NOT_EXISTS
-          )
+            errorObjects.USER_ID_DOEST_NOT_EXISTS,
+          ),
         );
     }
 
@@ -42,33 +42,37 @@ router.post(
             false,
             {},
             stringConstants.NO_FILE_FOUND,
-            errorObjects.NO_FILE_FOUND
-          )
+            errorObjects.NO_FILE_FOUND,
+          ),
         );
     }
     user = await User.findByIdAndUpdate(
       userId,
       { $set: { profilePicture: imageUrl } },
-      { new: true }
+      { new: true },
     );
     user = user.getUserBasicInfo();
 
     try {
-      await PendingDeletion.create({
-        deletionType: stringConstants.deletionType.S3_WEB,
-        data: `${req.user.profilePicture}`,
-      });
-      SimpleLogger.info("Created job for old profile pic deletion");
+      if (req.user.profilePicture) {
+        await PendingDeletion.create({
+          deletionType: stringConstants.deletionType.S3_WEB,
+          data: `${req.user.profilePicture}`,
+        });
+        SimpleLogger.info("Created job for old profile pic deletion");
+      } else {
+        SimpleLogger.info("No previous image found to create job for removing");
+      }
     } catch (error) {
       SimpleLogger.error(
-        "Not able to create job for old profile pic deletion" + error
+        "Not able to create job for old profile pic deletion" + error,
       );
     }
 
     return res.send(
-      createResObject(true, { user }, stringConstants.UPDATE_SUCCESSFUL)
+      createResObject(true, { user }, stringConstants.UPDATE_SUCCESSFUL),
     );
-  }
+  },
 );
 
 module.exports = router;
