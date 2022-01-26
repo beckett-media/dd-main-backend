@@ -1092,7 +1092,7 @@ router.get("/card-fac/:cardId", [valCard], async (req, res, next) => {
 
     // user details fetching
     const userId = card.user;
-    const listing = await Listing.findById(cardId);
+    const listing = await Listing.findOne({ card: cardId });
     const user = await User.findById(userId);
 
     card = card.getCardDetailsWithGrading();
