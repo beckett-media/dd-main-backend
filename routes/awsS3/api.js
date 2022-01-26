@@ -8,12 +8,6 @@ const { createResObject } = require("../../utils/utilFunctions");
 const { stringConstants } = require("../../utils/constants");
 const { errorObjects } = require("../../utils/errorObjects");
 const { awsS3Service } = require("../../services/");
-const s3 = new S3({
-  region: config.get(stringConstants.awsS3.S3_BUCKET_REGION),
-  accessKeyId: config.get(stringConstants.awsS3.S3_WEB_ACCESS_KEY_ID),
-  secretAccessKey: config.get(stringConstants.awsS3.S3_WEB_SECRET_ASCCESS_KEY),
-  signatureVersion: config.get(stringConstants.awsS3.S3_WEB_SIGNATURE_VERSION),
-});
 
 router.all("/profile-picture", [appAuth, auth], (req, res) => {
   const post = awsS3Service.createS3PostUrl(

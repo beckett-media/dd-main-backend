@@ -437,6 +437,7 @@ module.exports.stringConstants = {
 	GO_HIGH_API_KEY: "goHighApiKey",
   	awsS3: {
 		S3_BUCKET_NAME: "s3BucketName",
+		S3_BUCKET_NAME_PUBLIC: "s3BucketNamePublic",
 		S3_BUCKET_BASE_URL: "s3BucketBaseUrl",
 		S3_BUCKET_REGION: "s3BucketRegion",
 		S3_WEB_ACCESS_KEY_ID: "s3WebAccessKeyId",

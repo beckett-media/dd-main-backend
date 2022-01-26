@@ -19,6 +19,7 @@
   "skipPayment": true,
   "goHighApiKey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJsb2NhdGlvbl9pZCI6InJxUUVBTWFRVFNsaTUzVExyTmdhIiwiY29tcGFueV9pZCI6IkNWdWhMd0pEOXF0Q1NUT0pCSzVvIiwidmVyc2lvbiI6MSwiaWF0IjoxNjQyMDIxOTQ2MTM4LCJzdWIiOiJtb0tqMThoSHdGOXB6bHBNTFNLVSJ9.0tBCW9Dg5aRUQN0X-W9V--v6F7ujwpFHKKgQSrdAP7I",
   "s3BucketName": "duedillymobile4ddd12da3ecd4a37ab585dd4904acd7e125824-prod",
+  "s3BucketNamePublic": "duedillymobile4ddd12da3ecd4a37ab585dd4904acd7e125824-prod/public",
   "s3BucketBaseUrl": "https://s3.amazonaws.com/duedillymobile4ddd12da3ecd4a37ab585dd4904acd7e125824-prod/",
   "s3BucketRegion": "us-east-1",
   "s3WebAccessKeyId": "AKIA2UG7D5EPCSPKMPMB",
