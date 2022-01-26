@@ -13,7 +13,7 @@ const s3 = new S3({
 const deleteFileFromS3Bucket = (docToRemove) => {
   s3.deleteObject(
     {
-      Bucket: config.get(stringConstants.awsS3.S3_BUCKET_NAME),
+      Bucket: config.get(stringConstants.awsS3.S3_BUCKET_NAME_PUBLIC),
       Key: docToRemove.data,
     },
     async function (err, _data) {
