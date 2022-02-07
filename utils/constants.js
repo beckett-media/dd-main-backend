@@ -243,6 +243,7 @@ module.exports.stringConstants = {
 		STRIPE_CONNECT_COLLECTION: "StripeConnect",
 		ORDER_LOG_COLLECTION: "OrderLog",
 		ORDER_ITEM_COLLECTION: "OrderItem",
+		AUCTION_COLLECTION: "Auction"
 	},
 
 	deletionType: {
@@ -458,4 +459,5 @@ module.exports.stringConstants = {
 		S3_PROFILE_PIC_UPLOAD: "public/profilePic",
 		S3_CARD_PICS_UPLOAD: "public/marketplace",
   },
+  AUCTION_ID_NOT_FOUND: "No auction forund for respective auction ID"
 };
