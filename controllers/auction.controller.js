@@ -223,7 +223,8 @@ const listOpen = async (req, res) => {
     let auctions = await Auction.find({ bidEnd: { $gt: new Date() } })
       .sort("bidStart")
       .populate("seller", "_id fullName")
-      .populate("bids.bidder", "_id fullName");
+      .populate("listing")
+      .populate("bids.bidderreq", "_id fullName");
     res.send(
       createResObject(true, { auctions }, "Fetched open auctions successfully")
     );
