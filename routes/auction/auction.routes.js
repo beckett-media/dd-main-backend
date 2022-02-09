@@ -12,7 +12,7 @@ router
   )
   .get([appAuth, auth], auctionController.listBySeller);
 
-router.route("/open").get(auctionController.listOpen);
+router.route("/open/:productId/:pageSize/:pageNumber").get(auctionController.listOpen);
 
 router.route("/list-by-bidder").get(auctionController.listByBidder);
 
