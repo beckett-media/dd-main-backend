@@ -1,8 +1,5 @@
 const { Listing } = require("../models/listing");
 const { Auction } = require("../models/auction.model");
-const extend = require("lodash/extend");
-// const errorHandler = require("../helpers/dbErrorHandler");
-const fs = require("fs");
 const { createResObject } = require("../utils/utilFunctions");
 const { stringConstants } = require("../utils/constants");
 const { errorObjects } = require("../utils/errorObjects");
@@ -109,8 +106,9 @@ const createAuction = async (req, res) => {
 const auctionByID = async (req, res) => {
   try {
     let auction = await Auction.findById(req.params.auctionId)
-      .populate("seller", "_id name")
+      .populate("seller", "_id fullName")
       .populate("bids.bidder", "_id name")
+      .populate("listing")
       .exec();
     if (!auction)
       return res
@@ -222,9 +220,11 @@ const listOpen = async (req, res) => {
   try {
     let auctions = await Auction.find({ bidEnd: { $gt: new Date() } })
       .sort("bidStart")
-      .populate("seller", "_id fullName")
-      .populate("listing")
-      .populate("bids.bidderreq", "_id fullName");
+      .select("bids bidEnd bidStart startingBid")
+      .populate(
+        "listing",
+        "images playerNames title is_sale sale_price price _id"
+      );
     res.send(
       createResObject(true, { auctions }, "Fetched open auctions successfully")
     );

@@ -18,7 +18,7 @@ const AuctionSchema = new mongoose.Schema(
       required: true,
     },
     seller: {
-      type: mongoose.Schema.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: stringConstants.collectionNames.USER_COLLECTION,
       required: true,
     },
@@ -26,7 +26,7 @@ const AuctionSchema = new mongoose.Schema(
     bids: [
       {
         bidder: {
-          type: mongoose.Schema.ObjectId,
+          type: Schema.Types.ObjectId,
           ref: stringConstants.collectionNames.USER_COLLECTION,
           required: true,
         },
