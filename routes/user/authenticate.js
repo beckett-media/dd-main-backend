@@ -10,6 +10,8 @@ const SimpleLogger = require("../../utils/simpleLogger");
 const appAuth = require("../../middlewares/authenticateApp");
 const auth = require("../../middlewares/authenticateUser");
 const authAppleTokenMiddleware = require("../../middlewares/authenticateAppleToken");
+const authGoogleToken = require("../../middlewares/authGoogleToken");
+const authFacebookToken = require("../../middlewares/authFacebookToken");
 const { User } = require("../../models/user");
 const { stringConstants } = require("../../utils/constants");
 const { errorObjects } = require("../../utils/errorObjects");
@@ -95,6 +97,342 @@ router.post(
     user.metadata.osType = osType;
     user.addDeviceToken(deviceToken);
     user = await user.save();
+
+    const returnObject = {
+      ...user.getUserBasicInfo(),
+      authTokenExpiry: authToken.expiry,
+      refreshTokenExpiry: refreshToken.expiry,
+      firstSignin,
+    };
+
+    return res.send(
+      createResObject(
+        true,
+        { user: returnObject },
+        stringConstants.SIGN_IN_SUCCESSFUL
+      )
+    );
+  }
+);
+
+/**
+ * Route to sign in user using Facebook
+ */
+ router.post(
+  "/sign-in-with-facebook",
+  [wrongSigninLimiter, appAuth],
+  async (req, res, next) => {
+    const { token, osType, deviceToken, email } = req.body;
+
+    if (!token) {
+      return res
+        .status(400)
+        .send(
+          createResObject(
+            false,
+            {},
+            stringConstants.FACEBOOK_NO_TOKEN,
+            errorObjects.FACEBOOK_NO_TOKEN
+          )
+        );
+    }
+
+    const userData = await authFacebookToken(token);
+    const { first_name, last_name, id: facebookId } = userData;
+    const fullName = `${first_name} ${last_name}`;
+
+    let user,
+      schema,
+      firstSignin = false;
+
+    if (!email) {
+      return next(new Error("Facebook sign in email not found in payload"));
+    }
+
+    user = await User.findOne({ email });
+    if (user && user.metadata.signupType !== stringConstants.signupType.FACEBOOK) {
+      return res
+        .status(400)
+        .send(
+          createResObject(
+            false,
+            {},
+            stringConstants.USER_ALREADY_SIGNED_UP_WITH_DIFFERENT_METHOD,
+            errorObjects.USER_ALREADY_SIGNED_UP_WITH_DIFFERENT_METHOD(
+              user.metadata.signupType
+            )
+          )
+        );
+    }
+
+    if (!user) {
+      firstSignin = true;
+      // Create a new user
+      schema = Joi.object({
+        token: Joi.string().required(),
+        osType: Joi.string()
+          .valid(
+            stringConstants.osType.ANDROID,
+            stringConstants.osType.iOS,
+            stringConstants.osType.LINUX,
+            stringConstants.osType.MAC_OS,
+            stringConstants.osType.WINDOWS
+          )
+          .required(),
+        deviceToken: Joi.string().required(),
+        email: Joi.string().required(),
+      });
+
+      const { error } = schema.validate(req.body);
+      if (error)
+        return res
+          .status(400)
+          .send(
+            createResObject(
+              false,
+              {},
+              stringConstants.REQUEST_VALIDATION_FAILED,
+              errorObjects.REQUEST_VALIDATION_ERROR(error.details[0].message)
+            )
+          );
+
+      user = new User({
+        fullName,
+        email,
+        facebookId,
+        "metadata.signupType": stringConstants.signupType.FACEBOOK,
+      });
+    } else {
+      const role = user.role;
+      // Cannot use this route for admin login
+      if (role !== stringConstants.role.USER || role !== user.role) {
+        //   Forbidden resource
+        return res
+          .status(403)
+          .send(
+            createResObject(
+              false,
+              {},
+              stringConstants.FORBIDDEN_RESOURCE,
+              errorObjects.FORBIDDEN_RESOURCE
+            )
+          );
+      }
+      schema = Joi.object({
+        token: Joi.string().required(),
+        osType: Joi.string()
+          .valid(
+            stringConstants.osType.ANDROID,
+            stringConstants.osType.iOS,
+            stringConstants.osType.LINUX,
+            stringConstants.osType.MAC_OS,
+            stringConstants.osType.WINDOWS
+          )
+          .required(),
+        deviceToken: Joi.string().required(),
+        email: Joi.string().required(),
+      });
+
+      const { error } = schema.validate(req.body);
+      if (error) {
+        return res
+          .status(400)
+          .send(
+            createResObject(
+              false,
+              {},
+              stringConstants.REQUEST_VALIDATION_FAILED,
+              errorObjects.REQUEST_VALIDATION_ERROR(error.details[0].message)
+            )
+          );
+      }
+
+    }
+
+    const authToken = user.generateAuthToken();
+    const refreshToken = user.generateRefreshToken();
+
+    res.header(stringConstants.AUTH_TOKEN_STRING, authToken.token);
+    res.header(stringConstants.REFRESH_TOKEN_STRING, refreshToken.token);
+
+    user.refreshToken = refreshToken.token;
+    user.metadata.osType = osType;
+    user.addDeviceToken(deviceToken);
+    user = await user.save();
+
+    if(req.body.claimStore){
+      let store = await Store.findById(req.body.claimStore);
+      store.user = user;
+      await store.save();
+    }
+
+    const returnObject = {
+      ...user.getUserBasicInfo(),
+      authTokenExpiry: authToken.expiry,
+      refreshTokenExpiry: refreshToken.expiry,
+      firstSignin,
+    };
+
+    return res.send(
+      createResObject(
+        true,
+        { user: returnObject },
+        stringConstants.SIGN_IN_SUCCESSFUL
+      )
+    );
+  }
+);
+
+/**
+ * Route to sign in user using Google ID
+ */
+ router.post(
+  "/sign-in-with-google",
+  [wrongSigninLimiter, appAuth],
+  async (req, res, next) => {
+    const token = req.body.token;
+    const osType = req.body.osType;
+    const deviceToken = req.body.deviceToken;
+
+    if (!token) {
+      return res
+        .status(400)
+        .send(
+          createResObject(
+            false,
+            {},
+            stringConstants.GOOGLE_NO_TOKEN,
+            errorObjects.GOOGLE_NO_TOKEN
+          )
+        );
+    }
+
+    const userData = await authGoogleToken(token);
+    console.log('############', userData);
+    const { fullName, email, googleId } = userData;
+
+    let user,
+      schema,
+      firstSignin = false;
+
+    if (!email) {
+      return next(new Error("Google sign in email not found in payload"));
+    }
+
+    user = await User.findOne({ email });
+    if (user && user.metadata.signupType !== stringConstants.signupType.GOOGLE) {
+      return res
+        .status(400)
+        .send(
+          createResObject(
+            false,
+            {},
+            stringConstants.USER_ALREADY_SIGNED_UP_WITH_DIFFERENT_METHOD,
+            errorObjects.USER_ALREADY_SIGNED_UP_WITH_DIFFERENT_METHOD(
+              user.metadata.signupType
+            )
+          )
+        );
+    }
+
+    if (!user) {
+      firstSignin = true;
+      // Create a new user
+      schema = Joi.object({
+        token: Joi.string().required(),
+        osType: Joi.string()
+          .valid(
+            stringConstants.osType.ANDROID,
+            stringConstants.osType.iOS,
+            stringConstants.osType.LINUX,
+            stringConstants.osType.MAC_OS,
+            stringConstants.osType.WINDOWS
+          )
+          .required(),
+        deviceToken: Joi.string().required(),
+      });
+
+      const { error } = schema.validate(req.body);
+      if (error)
+        return res
+          .status(400)
+          .send(
+            createResObject(
+              false,
+              {},
+              stringConstants.REQUEST_VALIDATION_FAILED,
+              errorObjects.REQUEST_VALIDATION_ERROR(error.details[0].message)
+            )
+          );
+
+      user = new User({
+        fullName,
+        email,
+        googleId,
+        "metadata.signupType": stringConstants.signupType.GOOGLE,
+      });
+    } else {
+      const role = user.role;
+      // Cannot use this route for admin login
+      if (role !== stringConstants.role.USER || role !== user.role) {
+        //   Forbidden resource
+        return res
+          .status(403)
+          .send(
+            createResObject(
+              false,
+              {},
+              stringConstants.FORBIDDEN_RESOURCE,
+              errorObjects.FORBIDDEN_RESOURCE
+            )
+          );
+      }
+      schema = Joi.object({
+        token: Joi.string().required(),
+        osType: Joi.string()
+          .valid(
+            stringConstants.osType.ANDROID,
+            stringConstants.osType.iOS,
+            stringConstants.osType.LINUX,
+            stringConstants.osType.MAC_OS,
+            stringConstants.osType.WINDOWS
+          )
+          .required(),
+        deviceToken: Joi.string().required(),
+      });
+
+      const { error } = schema.validate(req.body);
+      if (error) {
+        return res
+          .status(400)
+          .send(
+            createResObject(
+              false,
+              {},
+              stringConstants.REQUEST_VALIDATION_FAILED,
+              errorObjects.REQUEST_VALIDATION_ERROR(error.details[0].message)
+            )
+          );
+      }
+
+    }
+
+    const authToken = user.generateAuthToken();
+    const refreshToken = user.generateRefreshToken();
+
+    res.header(stringConstants.AUTH_TOKEN_STRING, authToken.token);
+    res.header(stringConstants.REFRESH_TOKEN_STRING, refreshToken.token);
+
+    user.refreshToken = refreshToken.token;
+    user.metadata.osType = osType;
+    user.addDeviceToken(deviceToken);
+    user = await user.save();
+
+    if(req.body.claimStore){
+      let store = await Store.findById(req.body.claimStore);
+      store.user = user;
+      await store.save();
+    }
 
     const returnObject = {
       ...user.getUserBasicInfo(),
