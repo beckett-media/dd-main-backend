@@ -61,6 +61,12 @@ const userSchema = new mongoose.Schema(
 		appleId: {
 			type: String,
 		},
+		googleId: {
+			type: String,
+		},
+		facebookId: {
+			type: String,
+		},
 		isComplete: {
 			type: Boolean,
 			default: false,
@@ -87,6 +93,8 @@ const userSchema = new mongoose.Schema(
 				enum: [
 					stringConstants.signupType.EBAY,
 					stringConstants.signupType.APPLE,
+					stringConstants.signupType.GOOGLE,
+					stringConstants.signupType.FACEBOOK,
 					stringConstants.signupType.IN_APP,
 				],
 				default: stringConstants.signupType.IN_APP,

@@ -115,6 +115,12 @@ module.exports.stringConstants = {
 	NO_KID_FOUND_IN_APPLE_PUBLIC_KEYS:
 		"No KID found in Apple provided public keys",
 
+	GOOGLE_NO_TOKEN:
+		"Token Not found",
+
+	FACEBOOK_NO_TOKEN:
+		"Token Not found",
+
 	APPLE_ID_DOES_NOT_MATCH_EMAIL:
 		"User Identifier does not match the given email",
 
@@ -260,6 +266,8 @@ module.exports.stringConstants = {
 		EBAY: "ebay",
 		APPLE: "apple",
 		IN_APP: "in_app",
+		GOOGLE: "google",
+		FACEBOOK: "facebook"
 	},
 	// OS information
 	osType: {

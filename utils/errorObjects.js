@@ -196,6 +196,24 @@ module.exports.errorObjects = {
 		errorMessage: stringConstants.APPLE_ID_DOES_NOT_MATCH_EMAIL,
 	},
 
+	GOOGLE_NO_TOKEN: {
+		errorCode: 119,
+		errorSubCode: getKey(
+			stringConstants,
+			stringConstants.GOOGLE_NO_TOKEN
+		),
+		errorMessage: stringConstants.GOOGLE_NO_TOKEN,
+	},
+
+	FACEBOOK_NO_TOKEN: {
+		errorCode: 119,
+		errorSubCode: getKey(
+			stringConstants,
+			stringConstants.FACEBOOK_NO_TOKEN
+		),
+		errorMessage: stringConstants.FACEBOOK_NO_TOKEN,
+	},
+
 	NOT_AUTHORIZED_TO_PERFORM_THE_ACTION: {
 		errorCode: 120,
 		errorSubCode: getKey(
