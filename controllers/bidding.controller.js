@@ -43,8 +43,11 @@ const bidding = (server) => {
           },
           { new: true }
         )
-          .populate("bids.bidder", "_id fullName")
           .populate("seller", "_id fullName")
+          .populate(
+            "listing",
+            "images playerNames title is_sale sale_price price _id "
+          )
           .exec();
 
         if (result) {
