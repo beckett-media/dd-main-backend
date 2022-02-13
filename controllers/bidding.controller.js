@@ -53,20 +53,20 @@ const bidding = (server) => {
         if (result) {
           io.to(auction).emit("new bid", {
             success: true,
-            data: { ...result },
+            data: { ...result, bidder: auth.user._id },
             message: "Bid placed successfully",
           });
         } else {
           io.to(auction).emit("new bid", {
             success: false,
-            data: {},
+            data: { bidder: auth.user._id },
             message: "Not able to place your bid",
           });
         }
       } else {
         io.to(auction).emit("new bid", {
           success: false,
-          data: {},
+          data: { bidder: auth.user._id },
           message: auth.message,
         });
       }
