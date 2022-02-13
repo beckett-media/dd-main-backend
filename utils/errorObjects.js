@@ -214,6 +214,15 @@ module.exports.errorObjects = {
 		errorMessage: stringConstants.FACEBOOK_NO_TOKEN,
 	},
 
+	TWITTER_NO_TOKEN: {
+		errorCode: 119,
+		errorSubCode: getKey(
+			stringConstants,
+			stringConstants.TWITTER_NO_TOKEN
+		),
+		errorMessage: stringConstants.TWITTER_NO_TOKEN,
+	},
+
 	NOT_AUTHORIZED_TO_PERFORM_THE_ACTION: {
 		errorCode: 120,
 		errorSubCode: getKey(

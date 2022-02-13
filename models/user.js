@@ -67,6 +67,9 @@ const userSchema = new mongoose.Schema(
 		facebookId: {
 			type: String,
 		},
+		twitterId: {
+			type: String,
+		},
 		isComplete: {
 			type: Boolean,
 			default: false,
@@ -95,6 +98,7 @@ const userSchema = new mongoose.Schema(
 					stringConstants.signupType.APPLE,
 					stringConstants.signupType.GOOGLE,
 					stringConstants.signupType.FACEBOOK,
+					stringConstants.signupType.TWITTER,
 					stringConstants.signupType.IN_APP,
 				],
 				default: stringConstants.signupType.IN_APP,

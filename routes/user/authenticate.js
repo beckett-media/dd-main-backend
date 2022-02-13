@@ -12,6 +12,7 @@ const auth = require("../../middlewares/authenticateUser");
 const authAppleTokenMiddleware = require("../../middlewares/authenticateAppleToken");
 const authGoogleToken = require("../../middlewares/authGoogleToken");
 const authFacebookToken = require("../../middlewares/authFacebookToken");
+const authTwitterToken = require("../../middlewares/authTwitterToken");
 const { User } = require("../../models/user");
 const { stringConstants } = require("../../utils/constants");
 const { errorObjects } = require("../../utils/errorObjects");
@@ -97,6 +98,177 @@ router.post(
     user.metadata.osType = osType;
     user.addDeviceToken(deviceToken);
     user = await user.save();
+
+    const returnObject = {
+      ...user.getUserBasicInfo(),
+      authTokenExpiry: authToken.expiry,
+      refreshTokenExpiry: refreshToken.expiry,
+      firstSignin,
+    };
+
+    return res.send(
+      createResObject(
+        true,
+        { user: returnObject },
+        stringConstants.SIGN_IN_SUCCESSFUL
+      )
+    );
+  }
+);
+
+/**
+ * Route to sign in user using Twitter
+ */
+ router.post(
+  "/sign-in-with-twitter",
+  [wrongSigninLimiter, appAuth],
+  async (req, res, next) => {
+    const { token, osType, deviceToken, name, email, twitterId } = req.body;
+
+    if (!token) {
+      return res
+        .status(400)
+        .send(
+          createResObject(
+            false,
+            {},
+            stringConstants.TWITTER_NO_TOKEN,
+            errorObjects.TWITTER_NO_TOKEN
+          )
+        );
+    }
+
+    const userData = await authTwitterToken(token);
+    const fullName = `${name}`;
+
+    let user,
+      schema,
+      firstSignin = false;
+
+    if (!email) {
+      return next(new Error("Twitter sign in email not found in payload"));
+    }
+
+    user = await User.findOne({ email });
+    if (user && user.metadata.signupType !== stringConstants.signupType.TWITTER) {
+      return res
+        .status(400)
+        .send(
+          createResObject(
+            false,
+            {},
+            stringConstants.USER_ALREADY_SIGNED_UP_WITH_DIFFERENT_METHOD,
+            errorObjects.USER_ALREADY_SIGNED_UP_WITH_DIFFERENT_METHOD(
+              user.metadata.signupType
+            )
+          )
+        );
+    }
+
+    if (!user) {
+      firstSignin = true;
+      // Create a new user
+      schema = Joi.object({
+        token: Joi.string().required(),
+        osType: Joi.string()
+          .valid(
+            stringConstants.osType.ANDROID,
+            stringConstants.osType.iOS,
+            stringConstants.osType.LINUX,
+            stringConstants.osType.MAC_OS,
+            stringConstants.osType.WINDOWS
+          )
+          .required(),
+        deviceToken: Joi.string().required(),
+        name: Joi.string().required(),
+        email: Joi.string().required(),
+        twitterId: Joi.string().required()
+      });
+
+      const { error } = schema.validate(req.body);
+      if (error)
+        return res
+          .status(400)
+          .send(
+            createResObject(
+              false,
+              {},
+              stringConstants.REQUEST_VALIDATION_FAILED,
+              errorObjects.REQUEST_VALIDATION_ERROR(error.details[0].message)
+            )
+          );
+
+      user = new User({
+        fullName,
+        email,
+        twitterId,
+        "metadata.signupType": stringConstants.signupType.TWITTER,
+      });
+    } else {
+      const role = user.role;
+      // Cannot use this route for admin login
+      if (role !== stringConstants.role.USER || role !== user.role) {
+        //   Forbidden resource
+        return res
+          .status(403)
+          .send(
+            createResObject(
+              false,
+              {},
+              stringConstants.FORBIDDEN_RESOURCE,
+              errorObjects.FORBIDDEN_RESOURCE
+            )
+          );
+      }
+      schema = Joi.object({
+        token: Joi.string().required(),
+        osType: Joi.string()
+          .valid(
+            stringConstants.osType.ANDROID,
+            stringConstants.osType.iOS,
+            stringConstants.osType.LINUX,
+            stringConstants.osType.MAC_OS,
+            stringConstants.osType.WINDOWS
+          )
+          .required(),
+        deviceToken: Joi.string().required(),
+        name: Joi.string().required(),
+        email: Joi.string().required(),
+        twitterId: Joi.string().required()
+      });
+
+      const { error } = schema.validate(req.body);
+      if (error) {
+        return res
+          .status(400)
+          .send(
+            createResObject(
+              false,
+              {},
+              stringConstants.REQUEST_VALIDATION_FAILED,
+              errorObjects.REQUEST_VALIDATION_ERROR(error.details[0].message)
+            )
+          );
+      }
+
+    }
+
+    const authToken = user.generateAuthToken();
+    const refreshToken = user.generateRefreshToken();
+
+    res.header(stringConstants.AUTH_TOKEN_STRING, authToken.token);
+    res.header(stringConstants.REFRESH_TOKEN_STRING, refreshToken.token);
+
+    user.refreshToken = refreshToken.token;
+    user.metadata.osType = osType;
+    user.addDeviceToken(deviceToken);
+    user = await user.save();
+
+    if(req.body.claimStore){
+      let store = await Store.findById(req.body.claimStore);
+      store.user = user;
+      await store.save();
+    }
 
     const returnObject = {
       ...user.getUserBasicInfo(),
