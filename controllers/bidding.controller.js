@@ -1,7 +1,12 @@
 const { Auction } = require("../models/auction.model");
 const authUser = require("../middlewares/socketAuthenticateUser");
 const bidding = (server) => {
-  const io = require("socket.io").listen(server);
+  const io = require("socket.io")(server, {
+    cors: {
+      origin: "*",
+      methods: ["GET", "POST"],
+    },
+  });
 
   io.on("connection", function (socket) {
     socket.on("join auction room", (data) => {
