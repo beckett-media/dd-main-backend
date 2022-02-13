@@ -121,6 +121,9 @@ module.exports.stringConstants = {
 	FACEBOOK_NO_TOKEN:
 		"Token Not found",
 
+	TWITTER_NO_TOKEN:
+		"Token Not found",
+
 	APPLE_ID_DOES_NOT_MATCH_EMAIL:
 		"User Identifier does not match the given email",
 
@@ -267,7 +270,8 @@ module.exports.stringConstants = {
 		APPLE: "apple",
 		IN_APP: "in_app",
 		GOOGLE: "google",
-		FACEBOOK: "facebook"
+		FACEBOOK: "facebook",
+		TWITTER: "twitter"
 	},
 	// OS information
 	osType: {
