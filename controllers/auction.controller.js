@@ -242,11 +242,11 @@ const listOpen = async (req, res) => {
 };
 
 const listBySeller = async (req, res) => {
-  console.log(req.user._id);
   try {
-    let auctions = await Auction.find({ seller: req.user._id })
-      .populate("listing")
-      .populate("bids.bidder", "_id fullName username");
+    let auctions = await Auction.find({ seller: req.user._id }).populate(
+      "listing",
+      "images playerNames title is_sale sale_price price _id"
+    );
     res.send(
       createResObject(true, { auctions }, "Fetched auctions successfully")
     );

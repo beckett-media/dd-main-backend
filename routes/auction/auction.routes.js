@@ -9,10 +9,14 @@ router
   .post(
     [appAuth, auth, auctionValidation.valCreateAuction],
     auctionController.createAuction
-  )
+  );
+router
+  .route("/:pageSize/:pageNumber")
   .get([appAuth, auth], auctionController.listBySeller);
 
-router.route("/open/:productId/:pageSize/:pageNumber").get(auctionController.listOpen);
+router
+  .route("/open/:productId/:pageSize/:pageNumber")
+  .get(auctionController.listOpen);
 
 router.route("/list-by-bidder").get(auctionController.listByBidder);
 
