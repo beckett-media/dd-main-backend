@@ -6,6 +6,8 @@ const blogPressSchema = new mongoose.Schema(
     title: {
       type: String,
       required: true,
+      unique: true,
+      trim: true,
     },
     bannerImage: {
       type: Buffer,
