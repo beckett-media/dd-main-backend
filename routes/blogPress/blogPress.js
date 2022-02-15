@@ -61,6 +61,17 @@ router.delete("/:id", [authAdmin, valObjectIdInUrl], async (req, res) => {
   );
 });
 
+router.get("/title/:title", [valObjectIdInUrl], async (req, res) => {
+  let title = req.url.replace("/title/", "").replace(/-/g, " ");
+  let blogPress = await BLOG_PRESS.findOne({
+    title,
+  });
+
+  return res.send(
+    createResObject(true, { blogPress }, stringConstants.FETCH_SUCESSFUL)
+  );
+});
+
 router.get("/:id", [valObjectIdInUrl], async (req, res) => {
   let blogPress = await BLOG_PRESS.findOne({ _id: req.params.id });
 
