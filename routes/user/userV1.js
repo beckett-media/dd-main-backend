@@ -8,6 +8,7 @@ const { createResObject } = require("../../utils/utilFunctions");
 const { stringConstants } = require("../../utils/constants");
 const { errorObjects } = require("../../utils/errorObjects");
 const SimpleLogger = require("../../utils/simpleLogger");
+const breakingLiveWebhook = require('../../services/breakingLiveWebhook');
 
 /**
  * Post or update the already existing profile picture
@@ -52,6 +53,9 @@ router.post(
       { new: true }
     );
     user = user.getUserBasicInfo();
+
+    const headers = req.headers;
+    breakingLiveWebhook(user, headers);
 
     try {
       if (req.user.profilePicture) {
