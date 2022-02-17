@@ -27,6 +27,7 @@ const sendNotifications = require("../../utils/sendNotifications");
 const sendMail = require("./../../handler/sendMail");
 const config = require("config");
 const stripe = require("stripe")(config.get(stringConstants.STRIPE_TEST_KEY));
+const breakingLiveWebhook = require('../../services/breakingLiveWebhook');
 
 // Dev remove in production
 const Joi = require("@hapi/joi");
@@ -233,6 +234,8 @@ router.post(
     user = await user.save();
 
     user = user.getUserBasicInfo();
+    const headers = req.headers;
+    breakingLiveWebhook(user, headers);
     return res.send(
       createResObject(true, { user }, stringConstants.UPDATE_SUCCESSFUL)
     );
