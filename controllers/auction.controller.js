@@ -3,6 +3,7 @@ const { Auction } = require("../models/auction.model");
 const { createResObject } = require("../utils/utilFunctions");
 const { stringConstants } = require("../utils/constants");
 const { errorObjects } = require("../utils/errorObjects");
+const SimpleLogger = require("../utils/simpleLogger");
 
 const createAuction = async (req, res) => {
   let listing = await Listing.findById(req.body.listingId);
@@ -106,6 +107,8 @@ const createAuction = async (req, res) => {
         )
       );
   } catch (err) {
+    SimpleLogger.error(err);
+
     return res
       .status(400)
       .send(
@@ -135,6 +138,8 @@ const auctionByID = async (req, res) => {
         createResObject(false, { auction }, stringConstants.FETCH_SUCESSFUL)
       );
   } catch (err) {
+    SimpleLogger.error(err);
+
     return res
       .status(400)
       .send(
@@ -203,6 +208,8 @@ const update = async (req, res) => {
       )
     );
   } catch (err) {
+    SimpleLogger.error(err);
+
     return res.status(400).send(
       createResObject(false, {
         error: err,
@@ -232,19 +239,22 @@ const remove = async (req, res) => {
         );
     }
 
-    await Listing.findByIdAndUpdate(auction.listing, {
-      auctionId: null,
-    });
-
     if (!auction)
       return res
         .status("400")
         .send(createResObject(false, {}, stringConstants.AUCTION_ID_NOT_FOUND));
 
+    await auction.remove();
+    await Listing.findByIdAndUpdate(auction.listing, {
+      auctionId: null,
+    });
+
     res.send(
       createResObject(true, { auction }, stringConstants.DELETED_SUCCESSFULLY)
     );
   } catch (err) {
+    SimpleLogger.error(err);
+
     return res.status(400).send(createResObject(false, {}, err.message || err));
   }
 };
@@ -262,6 +272,8 @@ const listOpen = async (req, res) => {
       createResObject(true, { auctions }, "Fetched open auctions successfully")
     );
   } catch (err) {
+    SimpleLogger.error(err);
+
     res
       .status(400)
       .send(
@@ -284,6 +296,8 @@ const listBySeller = async (req, res) => {
       createResObject(true, { auctions }, "Fetched auctions successfully")
     );
   } catch (err) {
+    SimpleLogger.error(err);
+
     return res
       .status(400)
       .send(
@@ -305,6 +319,8 @@ const listByBidder = async (req, res) => {
       createResObject(true, { auctions }, "Fetched auctions successfully")
     );
   } catch (err) {
+    SimpleLogger.error(err);
+
     res
       .status(400)
       .send(
