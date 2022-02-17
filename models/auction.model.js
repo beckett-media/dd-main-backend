@@ -22,7 +22,7 @@ const AuctionSchema = new mongoose.Schema(
       ref: stringConstants.collectionNames.USER_COLLECTION,
       required: true,
     },
-    startingBid: { type: Number, default: 0 },
+    startingBid: { type: Number, default: 0, min: 0 },
     bids: [
       {
         bidder: {

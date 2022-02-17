@@ -179,6 +179,7 @@ module.exports.stringConstants = {
 	LISTING_DELETE_SUCCESSFULLY: "listing delete successfully",
 	STORE_DELETE_SUCCESSFULLY: "store delete successfully",
 	PRODUCT_NOT_FOUND: "Products not found",
+	PRODUCT_NOT_PUBLIC: "Product is not public",
 	STORE_NOT_FOUND: "Stores not found",
 	PRODUCT_ID_NOT_FOUND: "Product with the given ID not found",
 	STORE_ID_NOT_FOUND: "Store with the given ID not found",

@@ -20,6 +20,19 @@ const createAuction = async (req, res) => {
       );
   }
 
+  if (!listing.isPublic) {
+    return res
+      .status(400)
+      .send(
+        createResObject(
+          false,
+          {},
+          stringConstants.PRODUCT_NOT_PUBLIC,
+          errorObjects.PRODUCT_NOT_FOUND
+        )
+      );
+  }
+
   if (listing.user != req.user._id) {
     return res
       .status(401)
@@ -81,6 +94,8 @@ const createAuction = async (req, res) => {
 
   try {
     let result = await auction.save();
+    listing.auctionId = result.id;
+    await listing.save();
     return res
       .status(201)
       .send(
@@ -136,21 +151,6 @@ const update = async (req, res) => {
       .status("400")
       .send(createResObject(false, {}, stringConstants.AUCTION_ID_NOT_FOUND));
 
-  let responseOfDates = verifyAuctionDates(req.body);
-
-  if (responseOfDates && !responseOfDates.status) {
-    return res
-      .status(400)
-      .send(
-        createResObject(
-          false,
-          {},
-          responseOfDates.message,
-          errorObjects.NOT_AUTHORIZED_TO_PERFORM_THE_ACTION
-        )
-      );
-  }
-
   if (auction.bidEnd <= currentDate) {
     return res
       .status("400")
@@ -169,13 +169,28 @@ const update = async (req, res) => {
         createResObject(
           false,
           {},
-          "Can't update auction start time after it is already live"
+          "Can't update auction after it is already live"
+        )
+      );
+  }
+
+  let responseOfDates = verifyAuctionDates(req.body, auction, true);
+
+  if (responseOfDates && !responseOfDates.status) {
+    return res
+      .status(400)
+      .send(
+        createResObject(
+          false,
+          {},
+          responseOfDates.message,
+          errorObjects.NOT_AUTHORIZED_TO_PERFORM_THE_ACTION
         )
       );
   }
 
   auction.bidEnd = req.body.bidEnd;
-  auction.bidStart = req.body.bidEnd;
+  auction.bidStart = req.body.bidStart;
   auction.startingBid = req.body.startingBid;
 
   try {
@@ -197,8 +212,30 @@ const update = async (req, res) => {
 };
 
 const remove = async (req, res) => {
+  let currentDate = new Date();
+
   try {
-    let auction = await Auction.findByIdAndDelete(req.params.auctionId);
+    let auction = await Auction.findById(req.params.auctionId);
+
+    if (
+      (auction.bidStart <= currentDate && currentDate <= auction.bidEnd) ||
+      auction.bids.length > 0
+    ) {
+      return res
+        .status("400")
+        .send(
+          createResObject(
+            false,
+            {},
+            "Can't remove an auction after it is gone live or if someone placed a bid."
+          )
+        );
+    }
+
+    await Listing.findByIdAndUpdate(auction.listing, {
+      auctionId: null,
+    });
+
     if (!auction)
       return res
         .status("400")
@@ -208,11 +245,7 @@ const remove = async (req, res) => {
       createResObject(true, { auction }, stringConstants.DELETED_SUCCESSFULLY)
     );
   } catch (err) {
-    return res.status(400).send(
-      createResObject(false, {
-        error: err,
-      })
-    );
+    return res.status(400).send(createResObject(false, {}, err.message || err));
   }
 };
 

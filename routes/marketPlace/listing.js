@@ -41,12 +41,10 @@ router.get(
     const pageNumber = parseInt(req.params.pageNumber);
     const userId = req.user._id;
 
-    const auctionCondition =
-      req.query.onlyAuction == "true" ? { $ne: null } : { $eq: null };
-
     const totalListing = await Listing.find({
       user: userId,
-      auctionId: auctionCondition,
+      auctionId: { $eq: null },
+      isPublic: req.query.isPublic == "true" ? true : { $in: [true, false] },
     })
       .sort({ createdAt: 1 })
       .skip((pageNumber - 1) * pageSize)
