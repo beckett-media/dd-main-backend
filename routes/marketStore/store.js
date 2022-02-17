@@ -657,7 +657,7 @@ router.delete(
             )
           );
     } else {
-      if (store.user.toString() !== userId)
+      if (store.user.toString() != userId)
         return res
           .status(400)
           .send(
