@@ -10,6 +10,11 @@ router
     [appAuth, auth, auctionValidation.valCreateAuction],
     auctionController.createAuction
   );
+  
+router
+  .route("/detailed/:auctionId")
+  .get([appAuth, auth], auctionController.auctionByIdDetailed);
+
 router
   .route("/:pageSize/:pageNumber")
   .get([appAuth, auth], auctionController.listBySeller);

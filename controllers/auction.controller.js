@@ -125,19 +125,68 @@ const auctionByID = async (req, res) => {
   try {
     let auction = await Auction.findById(req.params.auctionId)
       .populate("seller", "_id fullName")
-      .populate("bids.bidder", "_id name")
+      .populate("bids.bidder", "_id")
       .populate("listing")
       .exec();
+
     if (!auction)
       return res
         .status("400")
         .send(createResObject(false, {}, stringConstants.AUCTION_ID_NOT_FOUND));
+
     return res
       .status(200)
       .send(
-        createResObject(false, { auction }, stringConstants.FETCH_SUCESSFUL)
+        createResObject(true, { auction }, stringConstants.FETCH_SUCESSFUL)
       );
   } catch (err) {
+    console.log(err);
+    SimpleLogger.error(err);
+
+    return res
+      .status(400)
+      .send(
+        createResObject(false, { error: err }, "Could not retrieve auction")
+      );
+  }
+};
+
+const auctionByIdDetailed = async (req, res) => {
+  try {
+    let auction = await Auction.findById(req.params.auctionId)
+      .populate("seller", "_id fullName")
+      .populate("bids.bidder", "_id fullName email")
+      .populate("listing")
+      .exec();
+
+    if (!auction)
+      return res
+        .status("400")
+        .send(createResObject(false, {}, stringConstants.AUCTION_ID_NOT_FOUND));
+
+    if (auction.seller._id != req.user._id)
+      return res
+        .status("401")
+        .send(
+          createResObject(
+            false,
+            {},
+            stringConstants.NOT_AUTHORIZED_TO_PERFORM_THE_ACTION,
+            errorObjects.NOT_AUTHORIZED_TO_PERFORM_THE_ACTION
+          )
+        );
+
+    return res
+      .status(200)
+      .send(
+        createResObject(
+          true,
+          { auction: auction },
+          stringConstants.FETCH_SUCESSFUL
+        )
+      );
+  } catch (err) {
+    console.log(err);
     SimpleLogger.error(err);
 
     return res
@@ -183,7 +232,7 @@ const update = async (req, res) => {
 
   if (responseOfDates && !responseOfDates.status) {
     return res
-      .status(400)
+      .status(401)
       .send(
         createResObject(
           false,
@@ -368,4 +417,5 @@ module.exports = {
   listByBidder,
   update,
   remove,
+  auctionByIdDetailed,
 };
