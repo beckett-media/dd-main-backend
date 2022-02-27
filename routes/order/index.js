@@ -86,6 +86,21 @@ router.post("/checkout", [appAuth, auth], async (req, res) => {
     }
     const listings = await Listing.find({ _id: { $in: listingsIds } });
     if (listings.length > 0) {
+      for (const listing of listings) {
+        if (listing.auctionId) {
+          return res
+            .status(401)
+            .send(
+              createResObject(
+                false,
+                {},
+                stringConstants.ITEM_LISTED_IN_AUCTION_PURCHASE,
+                errorObjects.ITEM_LISTED_IN_AUCTION_PURCHASE
+              )
+            );
+        }
+      }
+
       const charge = await stripe.charges.create({
         amount: amount[0].totalAmount * 100,
         currency: "usd",
