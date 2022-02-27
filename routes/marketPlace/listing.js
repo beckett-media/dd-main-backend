@@ -72,7 +72,7 @@ router.get(
 router.get("/:cardId", [appAuth], async (req, res) => {
   const cardId = req.params.cardId;
   const cardDetail = await Listing.aggregate([
-    { $match: { _id: mongoose.Types.ObjectId(cardId) } },
+    { $match: { _id: mongoose.Types.ObjectId(cardId), auctionId: null } },
     {
       $lookup: {
         from: "users",
