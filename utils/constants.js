@@ -206,6 +206,7 @@ module.exports.stringConstants = {
 	ADDRESS_TYPE_CONFLICT: "Please make another default address first",
 	REMVOE_DEFAULT_ADDRESS: "You cannot delete the default address.",
 	CARD_OWN_ERROR: "You are not able to purchase your own card.",
+	ITEM_LISTED_IN_AUCTION: "Auction item can not be added to cart for purchase.",
 	CARD_ALREADY_CART: "This card is already into your cart.",
 	STRIPE_ACCOUNT_CONNECT_SUCCESSFULLY: "Stripe account connect successfully.",
 	SAVE_CARD_REMOVE: "Save card remove successfully.",
