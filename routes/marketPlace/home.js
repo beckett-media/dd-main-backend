@@ -40,6 +40,7 @@ router.get("/", [appAuth, publicRouteAuth], async (req, res) => {
     $match: {
       $and: [
         { isPublic: true },
+        { auctionId: null },
         { status: stringConstants.listingState.LISTING_SALE },
       ],
     },
@@ -186,7 +187,7 @@ router.get("/", [appAuth, publicRouteAuth], async (req, res) => {
                   : 10000,
             },
           },
-
+          { auctionId: null },
           { isPublic: true },
           { status: stringConstants.listingState.LISTING_SALE },
         ],
@@ -209,7 +210,7 @@ router.get("/", [appAuth, publicRouteAuth], async (req, res) => {
                   : 10000,
             },
           },
-
+          { auctionId: null },
           { isPublic: true },
           { status: stringConstants.listingState.LISTING_SALE },
         ],
@@ -534,6 +535,7 @@ router.get(
         $and: [
           { product: filter },
           { isPublic: true },
+          { auctionId: null },
           { status: stringConstants.listingState.LISTING_SALE },
         ],
       },
