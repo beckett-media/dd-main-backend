@@ -10,7 +10,7 @@ router
     [appAuth, auth, auctionValidation.valCreateAuction],
     auctionController.createAuction
   );
-  
+
 router
   .route("/detailed/:auctionId")
   .get([appAuth, auth], auctionController.auctionByIdDetailed);
@@ -23,7 +23,9 @@ router
   .route("/open/:productId/:pageSize/:pageNumber")
   .get(auctionController.listOpen);
 
-router.route("/list-by-bidder").get(auctionController.listByBidder);
+router
+  .route("/list-by-bidder")
+  .get([appAuth, auth], auctionController.listByBidder);
 
 router
   .route("/:auctionId")
