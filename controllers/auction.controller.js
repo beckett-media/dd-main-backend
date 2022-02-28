@@ -308,7 +308,7 @@ const remove = async (req, res) => {
   }
 };
 
-const listOpen = async (req, res) => {
+const listOpen = async (_req, res) => {
   try {
     let auctions = await Auction.find({ bidEnd: { $gt: new Date() } })
       .sort("bidStart")
@@ -361,9 +361,9 @@ const listBySeller = async (req, res) => {
 
 const listByBidder = async (req, res) => {
   try {
-    let auctions = await Auction.find({ "bids.bidder": req.user._id })
-      .populate("seller", "_id fullName profilePicture")
-      .populate("bids.bidder", "_id fullName");
+    let auctions = await Auction.find({
+      "bids.bidder": req.user._id,
+    }).populate("listing", "images playerNames title _id");
     res.send(
       createResObject(true, { auctions }, "Fetched auctions successfully")
     );
