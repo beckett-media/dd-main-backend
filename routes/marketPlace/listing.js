@@ -5,7 +5,6 @@ const auth = require("../../middlewares/authenticateUser");
 const appAuth = require("../../middlewares/authenticateApp");
 const fs = require("fs");
 const {
-  valCardPost,
   valLisitngCardData,
   valObjectIdInUrl,
 } = require("../../middlewares/validation");
@@ -13,7 +12,6 @@ const SimpleLogger = require("../../utils/simpleLogger");
 const path = require("path");
 const fsPromises = require("fs").promises;
 const _ = require("lodash");
-const Jimp = require("jimp");
 
 const { valPageSizeNumber } = require("../../middlewares/validation");
 const { Listing } = require("../../models/listing");
@@ -850,7 +848,6 @@ router.get(
     const pageSize = parseInt(req.params.pageSize);
     const pageNumber = parseInt(req.params.pageNumber);
     const userId = req.user._id;
-    // const userId = "60c1e943ac722e253061a51f";
     const user = await User.findById(userId);
     if (!user)
       return res
@@ -863,9 +860,9 @@ router.get(
             errorObjects.USER_ID_DOEST_NOT_EXISTS
           )
         );
-    const orderIds = await OrderItem.find({ seller: userId }).distinct(
-      "parent"
-    );
+    const orderIds = await OrderItem.find({
+      seller: userId,
+    }).distinct("parent");
     let ids = [];
     if (orderIds.length > 0) {
       ids = orderIds.map((id, i) => {
@@ -874,7 +871,17 @@ router.get(
     }
     const sellerListing = await Order.aggregate([
       {
-        $match: { _id: { $in: ids } },
+        $match: {
+          $and: [
+            { _id: { $in: ids } },
+            {
+              auctionId:
+                req.query.auctionOrder == "true"
+                  ? { $ne: null }
+                  : { $eq: null },
+            },
+          ],
+        },
       },
       {
         $lookup: {
