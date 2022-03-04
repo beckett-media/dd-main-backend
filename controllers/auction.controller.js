@@ -126,7 +126,10 @@ const auctionByID = async (req, res) => {
     let auction = await Auction.findById(req.params.auctionId)
       .populate("seller", "_id fullName")
       .populate("bids.bidder", "_id")
-      .populate("listing")
+      .populate(
+        "listing",
+        "auctionId availableQuantity brand card cardNumber cardType condition createdAt description grade _id id  images isPublic modelNo playerNames product quantity serialNumber sport status tags title updatedAt user year"
+      )
       .exec();
 
     if (!auction)
@@ -313,10 +316,7 @@ const listOpen = async (_req, res) => {
     let auctions = await Auction.find({})
       .sort("bidStart")
       .select("bids bidEnd bidStart startingBid")
-      .populate(
-        "listing",
-        "images playerNames title is_sale sale_price price _id"
-      );
+      .populate("listing", "images playerNames title is_sale _id");
     res.send(
       createResObject(true, { auctions }, "Fetched open auctions successfully")
     );
