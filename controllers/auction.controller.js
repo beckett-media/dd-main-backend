@@ -316,7 +316,11 @@ const listOpen = async (_req, res) => {
     let auctions = await Auction.find({})
       .sort("bidStart")
       .select("bids bidEnd bidStart startingBid")
-      .populate("listing", "images playerNames title is_sale _id");
+      .populate(
+        "listing",
+        "images product playerNames title is_sale _id brand grade packaging cardType"
+      );
+
     res.send(
       createResObject(true, { auctions }, "Fetched open auctions successfully")
     );
