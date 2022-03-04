@@ -34,6 +34,10 @@ const AuctionSchema = new mongoose.Schema(
         time: Date,
       },
     ],
+    orderId: {
+      type: Schema.Types.ObjectId,
+      ref: stringConstants.collectionNames.ORDER_COLLECTION,
+    },
   },
   { timestamps: true, toJSON: { getters: true } }
 );
