@@ -310,7 +310,7 @@ const remove = async (req, res) => {
 
 const listOpen = async (_req, res) => {
   try {
-    let auctions = await Auction.find({ bidEnd: { $gt: new Date() } })
+    let auctions = await Auction.find({})
       .sort("bidStart")
       .select("bids bidEnd bidStart startingBid")
       .populate(

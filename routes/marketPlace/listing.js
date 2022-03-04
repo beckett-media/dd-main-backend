@@ -942,6 +942,7 @@ router.get(
           updatedAt: { $first: "$updatedAt" },
           buyer: { $first: "$buyer" },
           items: { $push: "$items" },
+          auctionId: { $first: "$auctionId" },
         },
       },
       { $skip: (pageNumber - 1) * pageSize },
