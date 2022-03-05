@@ -28,6 +28,7 @@ const { uploadMultiImage } = require("../../middlewares/multerSingle");
 const { Listing } = require("../../models/listing");
 const { Order } = require("../../models/order");
 const { Store } = require("../../models/store");
+const { Auction } = require("../../models/auction.model");
 
 /**
  * Route to get all marketplace data
@@ -50,6 +51,7 @@ router.get("/", [appAuth, publicRouteAuth], async (req, res) => {
   const grade = await Grade.find();
   const newArrivals = await filterData(arivalCondition, pageSize, pageNumber);
   const newStores = await filterStoreData(4, pageNumber);
+  const newAuctions = await filterAuctionData();
 
   const trendingLisitnProduct = await Order.aggregate([
     {
@@ -234,6 +236,7 @@ router.get("/", [appAuth, publicRouteAuth], async (req, res) => {
         trendingPlayers: trendingPlayers,
         recommendation: recommendation,
         newStores,
+        newAuctions,
       },
       stringConstants.FETCH_SUCESSFUL
     )
@@ -642,6 +645,19 @@ let filterStoreData = async (pageSize, pageNumber) => {
   ]);
 
   return stores;
+};
+
+let filterAuctionData = async () => {
+  const auctions = await Auction.find({})
+    .sort("bidStart")
+    .limit(4)
+    .select("bids bidEnd bidStart startingBid")
+    .populate(
+      "listing",
+      "images product playerNames title is_sale _id brand grade packaging cardType"
+    );
+
+  return auctions;
 };
 
 module.exports = router;
