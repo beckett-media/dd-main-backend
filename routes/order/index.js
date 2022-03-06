@@ -443,7 +443,7 @@ router.post(
           auctionId: auction._id,
         });
         let fee =
-          (auction.bids[0].bidAmount *
+          (amount *
             stringConstants.APPLICATION_FEE_PERCENTAGE) /
           100;
 
@@ -451,7 +451,7 @@ router.post(
           user: auction.seller,
         });
         await stripe.transfers.create({
-          amount: (auction.bids[0].bidAmount - fee) * 100,
+          amount: (amount - fee) * 100,
           currency: "usd",
           source_transaction: charge.id,
           destination: stripeObj.stripeUserId,
