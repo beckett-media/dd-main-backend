@@ -1,5 +1,6 @@
 const { Auction } = require("../models/auction.model");
 const authUser = require("../middlewares/socketAuthenticateUser");
+
 const bidding = (server) => {
   const io = require("socket.io")(server, {
     cors: {
@@ -22,7 +23,7 @@ const bidding = (server) => {
   const bid = async (bid, auction) => {
     try {
       let auth = await authUser(bid.jwt);
-      if (auth.status) {
+      if (auth.status && auth?.user?.stripeId) {
         let result = await Auction.findOneAndUpdate(
           {
             _id: auction,

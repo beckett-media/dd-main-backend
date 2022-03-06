@@ -402,7 +402,7 @@ router.post(
           description: "Purchasing sports card in auction",
           metadata: {
             userId: user._id.toString(),
-            auctionId: auction._id,
+            auctionId: auction._id.toString(),
           },
         });
         cusId = createCustomer.id;

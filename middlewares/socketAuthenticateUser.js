@@ -25,7 +25,7 @@ module.exports = async (token) => {
     if (role !== stringConstants.role.USER || role !== user.role)
       return { status: false, user: null, message: "Forbidden Resource" };
 
-    return { status: true, user: decoded, message: "Auth Successfull" };
+    return { status: true, user, message: "Auth Successfull" };
   } catch (ex) {
     SimpleLogger.error(ex);
     return { status: false, user: null, message: "Invalid or Expired Token" };
