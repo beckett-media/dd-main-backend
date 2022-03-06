@@ -18,7 +18,6 @@ const corsOptions = {
     "Accept",
     "Content-Type",
   ],
-  methods: ["POST", "GET", "PATCH", "DELETE", "OPTIONS"],
 };
 
 module.exports = (app) => {
