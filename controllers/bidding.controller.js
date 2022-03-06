@@ -23,7 +23,7 @@ const bidding = (server) => {
   const bid = async (bid, auction) => {
     try {
       let auth = await authUser(bid.jwt);
-      if (auth.status && auth.user.stripeId) {
+      if (auth.status && auth.user && auth.user.stripeId) {
         let result = await Auction.findOneAndUpdate(
           {
             _id: auction,
