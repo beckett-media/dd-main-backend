@@ -482,8 +482,7 @@ router.post(
     }
 
     const userData = await authGoogleToken(token);
-    console.log('############', userData);
-    const { fullName, email, googleId } = userData;
+    const { given_name: fullName, email, kid: googleId } = userData;
 
     let user,
       schema,
