@@ -267,6 +267,7 @@ userSchema.methods.getUserBasicInfo = function () {
 		email: email,
 		profilePicture: profilePicture,
 		username: username,
+		signupType: signupType,
 		stripeId,
 	};
 };
