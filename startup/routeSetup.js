@@ -37,6 +37,8 @@ const awsS3Routes = require("../routes/awsS3/api");
 const goHighSubscription = require("../routes/marketing/gohigh");
 const contactUs = require("../routes/marketing/contact-us");
 
+const auctionRoutes = require("../routes/auction/auction.routes")
+
 module.exports = (app) => {
 	// Import route and use app.use();
 	app.use("/user", user);
@@ -76,4 +78,5 @@ module.exports = (app) => {
 	app.use("/public-grade", grade);
 	app.use("/marketing", goHighSubscription);
 	app.use("/contact-us", contactUs);
+	app.use("/auction", auctionRoutes)
 };

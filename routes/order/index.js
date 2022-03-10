@@ -11,11 +11,13 @@ const { errorObjects } = require("../../utils/errorObjects");
 const { Listing } = require("../../models/listing");
 const { User } = require("../../models/user");
 const { Cart } = require("../../models/cart");
+const { Auction } = require("../../models/auction.model");
 const config = require("config");
 const { StripeConnect } = require("../../models/stripeConnect");
 const { OrderLog } = require("../../models/orderLog");
 const { OrderItem } = require("../../models/orderItem");
 const { valPageSizeNumber } = require("../../middlewares/validation");
+const { orderValidation } = require("../../middlewares/validators/");
 const stripe = require("stripe")(config.get(stringConstants.STRIPE_TEST_KEY));
 
 /**
@@ -85,14 +87,30 @@ router.post("/checkout", [appAuth, auth], async (req, res) => {
       }
     }
     const listings = await Listing.find({ _id: { $in: listingsIds } });
+    let createOrder;
     if (listings.length > 0) {
+      for (const listing of listings) {
+        if (listing.auctionId) {
+          return res
+            .status(401)
+            .send(
+              createResObject(
+                false,
+                {},
+                stringConstants.ITEM_LISTED_IN_AUCTION_PURCHASE,
+                errorObjects.ITEM_LISTED_IN_AUCTION_PURCHASE
+              )
+            );
+        }
+      }
+
       const charge = await stripe.charges.create({
         amount: amount[0].totalAmount * 100,
         currency: "usd",
         customer: cusId,
         // card: cardId,
       });
-      const createOrder = await Order.create({
+      createOrder = await Order.create({
         buyer: userId,
         address: addressId,
         price: amount[0].totalAmount,
@@ -211,6 +229,20 @@ router.post("/guest-checkout", [appAuth], async (req, res) => {
     cusId = createCustomer.id;
 
     const listings = await Listing.find({ _id: { $in: [listingsId] } });
+    for (const listing of listings) {
+      if (listing.auctionId) {
+        return res
+          .status(401)
+          .send(
+            createResObject(
+              false,
+              {},
+              stringConstants.ITEM_LISTED_IN_AUCTION_PURCHASE,
+              errorObjects.ITEM_LISTED_IN_AUCTION_PURCHASE
+            )
+          );
+      }
+    }
     if (listings.length > 0) {
       const charge = await stripe.charges.create({
         amount: amount[0].totalAmount * 100,
@@ -301,6 +333,186 @@ router.post("/guest-checkout", [appAuth], async (req, res) => {
     return res.status(502).send(createResObject(false, {}, e.message, e));
   }
 });
+
+// Route for auction checkout
+
+router.post(
+  "/auction-checkout",
+  [appAuth, auth, orderValidation.valAuctionCheckout],
+  async (req, res) => {
+    const currentDate = new Date();
+    const userId = req.user._id;
+    const cardToken = req.body.cardToken;
+    const addressId = req.body.addressId;
+    const auctionId = req.body.auctionId;
+    const isCardSave = req.body.isCardSave;
+    const user = req.user;
+
+    try {
+      const auction = await Auction.findById(auctionId).populate("listing");
+
+      if (auction) {
+        const previousOrder = await Order.findOne({
+          status: "completed",
+          auctionId: auction._id,
+        });
+
+        if (previousOrder) {
+          return res
+            .status("400")
+            .send(
+              createResObject(
+                false,
+                {},
+                "This auction is already paid. Please contact support."
+              )
+            );
+        }
+
+        if (auction.bidEnd >= currentDate) {
+          return res
+            .status("400")
+            .send(createResObject(false, {}, "Auction is not ended yet"));
+        }
+
+        if (auction.bids[0].bidder != userId) {
+          return res
+            .status("400")
+            .send(createResObject(false, {}, "You are not the winner"));
+        }
+      } else {
+        return res
+          .status(404)
+          .send(
+            createResObject(
+              false,
+              {},
+              stringConstants.AUCTION_ID_NOT_FOUND,
+              errorObjects.AUCTION_ID_NOT_FOUND
+            )
+          );
+      }
+
+      const amount = auction.bids[0].bidAmount;
+      let cusId = "";
+      if (cardToken !== "") {
+        const createCustomer = await stripe.customers.create({
+          email: user.email,
+          source: cardToken,
+          description: "Purchasing sports card in auction",
+          metadata: {
+            userId: user._id.toString(),
+            auctionId: auction._id.toString(),
+          },
+        });
+        cusId = createCustomer.id;
+        if (isCardSave) {
+          await User.findByIdAndUpdate(userId, {
+            $set: {
+              stripeId: cusId,
+            },
+          });
+        }
+      } else {
+        cusId = user.stripeId;
+        if (cusId === "") {
+          return res
+            .status(404)
+            .send(
+              createResObject(
+                false,
+                {},
+                stringConstants.STRIPE_CLIENTID_NOT_FOUND,
+                errorObjects.STRIPE_CLIENTID_NOT_FOUND
+              )
+            );
+        }
+      }
+      let createOrder;
+      if (auction.listing) {
+        const charge = await stripe.charges.create({
+          amount: amount * 100,
+          currency: "usd",
+          customer: cusId,
+          // card: cardId,
+        });
+        createOrder = await Order.create({
+          buyer: userId,
+          address: addressId,
+          price: amount,
+          auctionId: auction._id,
+        });
+        let fee =
+          (amount *
+            stringConstants.APPLICATION_FEE_PERCENTAGE) /
+          100;
+
+        const stripeObj = await StripeConnect.findOne({
+          user: auction.seller,
+        });
+        await stripe.transfers.create({
+          amount: (amount - fee) * 100,
+          currency: "usd",
+          source_transaction: charge.id,
+          destination: stripeObj.stripeUserId,
+        });
+
+        // need to optimize this, no need to find listing
+        if (auction.listing.availableQuantity === 1) {
+          await Listing.findByIdAndUpdate(
+            auction.listing._id,
+            { $set: { status: "sold", availableQuantity: 0 } },
+            { new: true }
+          );
+        } else if (auction.listing.availableQuantity > 1) {
+          let quantityLeft = auction.listing.availableQuantity - 1;
+          await Listing.findByIdAndUpdate(
+            auction.listing._id,
+            { $set: { availableQuantity: quantityLeft } },
+            { new: true }
+          );
+        }
+
+        const createOrderItem = await OrderItem.create({
+          buyer: userId,
+          seller: auction.seller,
+          listing: auction.listing._id,
+          address: addressId,
+          price: auction.bids[0].bidAmount,
+          title: auction.listing.title,
+          status: "pending",
+          parent: createOrder._id,
+          quantity: 1,
+          auctionId: auction,
+        });
+        const orderLog = await OrderLog.create({
+          response: charge,
+          order: createOrder.id,
+          buyer: userId,
+          listing: auction.listing._id,
+          auctionId: auction,
+        });
+        await Order.findByIdAndUpdate(createOrder._id, {
+          $set: { status: "completed" },
+        });
+        auction.orderId = createOrder._id;
+        await auction.save();
+        return res.send(
+          createResObject(true, {}, stringConstants.AUCTION_ORDER_SUCCESSFULLY)
+        );
+      } else {
+        await Order.findByIdAndUpdate(createOrder._id, {
+          $set: { status: "incomplete" },
+        });
+        return res.send(
+          createResObject(true, {}, stringConstants.LISTING_NOT_FOUND)
+        );
+      }
+    } catch (e) {
+      return res.status(502).send(createResObject(false, {}, e.message, e));
+    }
+  }
+);
 
 /**
  * Route to filter(status) the orders for seller

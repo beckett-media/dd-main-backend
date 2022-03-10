@@ -4,6 +4,8 @@ require("./startup/corsSetup")(app);
 const path = require("path");
 const errorMid = require("./middlewares/errorHandler");
 require("./startup/directoryCreator")();
+const { bidding } = require("./controllers/bidding.controller");
+
 /**
  * Async error handler, so you don't have to use try
  * and catch all the time
@@ -48,5 +50,5 @@ require("./startup/jobsSetups")();
 app.use(errorMid);
 
 const server = require("./startup/startServer")(app);
-
+bidding(server);
 module.exports = server;
