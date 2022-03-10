@@ -23,6 +23,11 @@ const orderLogSchema = new mongoose.Schema(
 			ref: stringConstants.collectionNames.Listing_COLLECTION,
 			required: true,
 		},
+		auctionId: {
+			type: Schema.Types.ObjectId,
+			ref: stringConstants.collectionNames.AUCTION_COLLECTION,
+			required: false,
+		}
 	},
 	{ timestamps: true, toJSON: { getters: true } }
 );

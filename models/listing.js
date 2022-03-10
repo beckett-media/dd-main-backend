@@ -125,6 +125,11 @@ const listingSchema = new mongoose.Schema(
 			type: Schema.Types.ObjectId,
 			ref: stringConstants.collectionNames.STORES_COLLECTION,
 			required: false,
+		},
+		auctionId: {
+			type: Schema.Types.ObjectId,
+			ref: stringConstants.collectionNames.AUCTION_COLLECTION,
+			required: false,
 		}
 	},
 	{ timestamps: true, toJSON: { getters: true } }
