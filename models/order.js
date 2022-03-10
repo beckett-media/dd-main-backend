@@ -31,6 +31,11 @@ const orderSchema = new mongoose.Schema(
 			type: String,
 			default: shortid.generate,
 		},
+		auctionId: {
+			type: Schema.Types.ObjectId,
+			ref: stringConstants.collectionNames.AUCTION_COLLECTION,
+			required: false,
+		}
 	},
 	{ timestamps: true, toJSON: { getters: true } }
 );

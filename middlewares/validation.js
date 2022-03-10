@@ -641,6 +641,7 @@ module.exports = {
       brand: Joi.string().required(),
       modelNo: Joi.allow(""),
       images: Joi.allow(""),
+      auctionId: Joi.string().allow(""),
     });
 
     const { error } = schema.validate(req.body);

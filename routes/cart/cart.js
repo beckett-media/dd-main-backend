@@ -79,6 +79,17 @@ router.post("/add/:listingId", [appAuth, auth], async (req, res) => {
 					errorObjects.CARD_OWN_ERROR
 				)
 			);
+	if (card.auctionId)
+	return res
+		.status(401)
+		.send(
+			createResObject(
+				false,
+				{},
+				stringConstants.ITEM_LISTED_IN_AUCTION,
+				errorObjects.ITEM_LISTED_IN_AUCTION
+			)
+		);
 	if (
 		quantity < 1 ||
 		quantity === "" ||
