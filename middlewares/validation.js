@@ -637,6 +637,7 @@ module.exports = {
       cardType: Joi.string().required(),
       sport: Joi.string().required(),
       cardNumber: Joi.allow(""),
+      printRun: Joi.allow(""),
       year: Joi.number().min(1000).max(9999).required(),
       brand: Joi.string().required(),
       modelNo: Joi.allow(""),

@@ -128,6 +128,7 @@ router.get("/:cardId", [appAuth], async (req, res) => {
         sport: "$sport",
         store: "$store",
         cardNumber: "$cardNumber",
+        printRun: "$printRun",
         year: "$year",
         brand: "$brand",
         modelNo: "$modelNo",
@@ -173,6 +174,7 @@ router.post(
     const cardType = req.body.cardType;
     const sport = req.body.sport;
     const cardNumber = req.body.cardNumber;
+    const printRun = req.body.printRun;
     const year = req.body.year;
     const brand = req.body.brand;
     const modelNo = req.body.modelNo;
@@ -275,6 +277,7 @@ router.post(
       cardType: cardType,
       sport: sport,
       cardNumber: cardNumber,
+      printRun: printRun,
       year: year,
       brand: brand,
       modelNo: modelNo,
@@ -328,6 +331,7 @@ router.put(
     const cardType = req.body.cardType;
     const sport = req.body.sport;
     const cardNumber = req.body.cardNumber;
+    const printRun = req.body.printRun;
     const year = req.body.year;
     const brand = req.body.brand;
     const modelNo = req.body.modelNo;
@@ -427,6 +431,7 @@ router.put(
           cardType: cardType,
           sport: sport,
           cardNumber: cardNumber,
+          printRun: printRun,
           year: year,
           brand: brand,
           modelNo: modelNo,
