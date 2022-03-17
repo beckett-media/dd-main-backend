@@ -6,10 +6,8 @@ const authTwitterToken = async (accesstoken) => {
       url: `https://api.twitter.com/oauth/authorize?oauth_token=${accesstoken}`,
       method: 'get'
     });
-    console.log('#############', data);
     return data;
   } catch (e) {
-    console.log('#####err########', e);
     return {};
   }
 };
