@@ -11,6 +11,7 @@ const promoSchema = new mongoose.Schema(
     },
     promoCode: {
       type: String,
+      uppercase: true,
       unique: true,
       required: true,
       trim: true,
@@ -18,6 +19,8 @@ const promoSchema = new mongoose.Schema(
     percentage: {
       type: Number,
       required: true,
+      min: 0,
+      max: 90,
     },
     listing: {
       type: Array,

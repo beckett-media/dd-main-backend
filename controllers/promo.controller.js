@@ -67,7 +67,7 @@ const getPromos = async (req, res) => {
 
 const getPromo = async (req, res) => {
   try {
-    const promo = await promoService.getPromoById(req.params.id);
+    const promo = await promoService.getPromoById(req.params.promoId);
     return res
       .status(200)
       .send(createResObject(true, { promo }, stringConstants.FETCH_SUCESSFUL));
@@ -86,7 +86,10 @@ const getPromo = async (req, res) => {
 };
 const updatePromo = async (req, res) => {
   try {
-    const promo = await promoService.updatePromoById(req.params.id, req.body);
+    const promo = await promoService.updatePromoById(
+      req.params.promoId,
+      req.body
+    );
     return res
       .status(200)
       .send(createResObject(true, { promo }, stringConstants.FETCH_SUCESSFUL));
@@ -106,7 +109,7 @@ const updatePromo = async (req, res) => {
 
 const deletePromo = async (req, res) => {
   try {
-    const promo = await promoService.softDeletepromoById(req.params.id);
+    const promo = await promoService.softDeletepromoById(req.params.promoId);
     res.send(
       createResObject(true, { promo }, stringConstants.DELETED_SUCCESSFULLY)
     );

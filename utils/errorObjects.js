@@ -18,19 +18,6 @@ module.exports.errorObjects = {
     ),
     errorMessage: stringConstants.USER_EMAIL_ALREADY_EXISTS,
   },
-  PROMO_CODE_ALREADY_EXISTS: {
-    errorCode: 102,
-    errorSubCode: getKey(
-      stringConstants,
-      stringConstants.PROMO_CODE_ALREADY_EXISTS
-    ),
-    errorMessage: stringConstants.PROMO_CODE_ALREADY_EXISTS,
-  },
-  PROMO_NOT_FOUND: {
-    errorCode: 105,
-    errorSubCode: getKey(stringConstants, stringConstants.PROMO_NOT_FOUND),
-    errorMessage: stringConstants.PROMO_NOT_FOUND,
-  },
   NO_AUTH_TOKEN_FOUND: {
     errorCode: 103,
     errorSubCode: getKey(stringConstants, stringConstants.NO_AUTH_TOKEN_FOUND),
@@ -407,5 +394,18 @@ module.exports.errorObjects = {
     errorCode: 139,
     errorSubCode: getKey(stringConstants, stringConstants.STORE_ID_NOT_FOUND),
     errorMessage: stringConstants.STORE_ID_NOT_FOUND,
+  },
+  PROMO_CODE_ALREADY_EXISTS: {
+    errorCode: 135,
+    errorSubCode: getKey(
+      stringConstants,
+      stringConstants.PROMO_CODE_ALREADY_EXISTS
+    ),
+    errorMessage: stringConstants.PROMO_CODE_ALREADY_EXISTS,
+  },
+  PROMO_NOT_FOUND: {
+    errorCode: 136,
+    errorSubCode: getKey(stringConstants, stringConstants.PROMO_NOT_FOUND),
+    errorMessage: stringConstants.PROMO_NOT_FOUND,
   },
 };
