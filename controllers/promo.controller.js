@@ -6,7 +6,7 @@ const createPromo = async (req, res) => {
   try {
     const promo = await promoService.createPromo(req.body);
     if (promo)
-      return res.status(201).send(
+      res.status(201).send(
         createResObject(
           true,
           {
@@ -21,7 +21,7 @@ const createPromo = async (req, res) => {
         )
       );
     else
-      return res
+      res
         .status(400)
         .send(
           createResObject(
@@ -32,7 +32,7 @@ const createPromo = async (req, res) => {
           )
         );
   } catch (err) {
-    return res
+    res
       .status(400)
       .send(
         createResObject(
@@ -48,11 +48,11 @@ const createPromo = async (req, res) => {
 const getPromos = async (req, res) => {
   try {
     const promos = await promoService.getPromos();
-    return res
+    res
       .status(200)
       .send(createResObject(true, { promos }, stringConstants.FETCH_SUCESSFUL));
   } catch (err) {
-    return res
+    res
       .status(400)
       .send(
         createResObject(
@@ -68,11 +68,11 @@ const getPromos = async (req, res) => {
 const getPromo = async (req, res) => {
   try {
     const promo = await promoService.getPromoById(req.params.promoId);
-    return res
+    res
       .status(200)
       .send(createResObject(true, { promo }, stringConstants.FETCH_SUCESSFUL));
   } catch (err) {
-    return res
+    res
       .status(400)
       .send(
         createResObject(
@@ -90,11 +90,11 @@ const updatePromo = async (req, res) => {
       req.params.promoId,
       req.body
     );
-    return res
+    res
       .status(200)
       .send(createResObject(true, { promo }, stringConstants.FETCH_SUCESSFUL));
   } catch (err) {
-    return res
+    res
       .status(400)
       .send(
         createResObject(
@@ -114,7 +114,7 @@ const deletePromo = async (req, res) => {
       createResObject(true, { promo }, stringConstants.DELETED_SUCCESSFULLY)
     );
   } catch (err) {
-    return res
+    res
       .status(400)
       .send(
         createResObject(
