@@ -19,9 +19,9 @@ const getPromos = async () => {
  * @param {ObjectId} id
  * @returns {Promise<promo>}
  */
-const getPromoById = async (id) => {
-  const promo = await Promo.findById(id);
-  if (promo?.isDeleted === true) return null;
+const getPromoById = async (promoId) => {
+  const promo = await Promo.findById(promoId);
+  if (promo?.isDeleted === true) throw new Error("Promo not found");
   return promo;
 };
 

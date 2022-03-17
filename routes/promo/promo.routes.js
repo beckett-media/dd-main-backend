@@ -7,18 +7,15 @@ const { promoValidation } = require("../../middlewares/validators/");
 
 const router = express.Router();
 
-router.post(
-  "/",
-  [appAuth, authAdminOrUser, promoValidation.createPromo],
-  promoController.createPromo
-);
-router.get("/", [appAuth, authAdminOrUser], promoController.getPromos);
-router.post(
-  "/:id",
-  [appAuth, authAdminOrUser, promoValidation.updatePromo],
-  promoController.updatePromo
-);
-router.get("/:id", [appAuth, authAdminOrUser], promoController.getPromo);
-router.delete("/:id", [appAuth, authAdmin], promoController.deletePromo);
+router
+  .route("/")
+  .post([promoValidation.createPromo], promoController.createPromo)
+  .get(promoController.getPromos);
+
+router
+  .route("/:promoId")
+  .post([promoValidation.updatePromo], promoController.updatePromo)
+  .get([promoValidation.getPromo], promoController.getPromo)
+  .delete([promoValidation.deletePromo], promoController.deletePromo);
 
 module.exports = router;
