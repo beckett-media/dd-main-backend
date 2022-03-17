@@ -139,7 +139,7 @@ router.post(
     }
 
     const userData = await authTwitterToken(token);
-    const fullName = `${name}`;
+    const fullName = name || 'name';
 
     let user,
       schema,
@@ -312,7 +312,7 @@ router.post(
 
     const userData = await authFacebookToken(token);
     const { first_name, last_name, id: facebookId } = userData;
-    const fullName = `${first_name} ${last_name}`;
+    const fullName = `${first_name} ${last_name}` || 'name';
 
     let user,
       schema,
@@ -539,11 +539,11 @@ router.post(
           );
 
       user = new User({
-        fullName,
+        fullName: fullName || 'name',
         email,
         googleId,
         "metadata.signupType": stringConstants.signupType.GOOGLE,
-        username: fullName
+        username: fullName || 'name'
       });
     } else {
       const role = user.role;
