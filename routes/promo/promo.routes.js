@@ -9,13 +9,22 @@ const router = express.Router();
 
 router
   .route("/")
-  .post([promoValidation.createPromo], promoController.createPromo)
-  .get(promoController.getPromos);
+  .post(
+    [appAuth, authAdminOrUser, promoValidation.createPromo],
+    promoController.createPromo
+  )
+  .get([appAuth, authAdminOrUser], promoController.getPromos);
 
 router
   .route("/:promoId")
-  .post([promoValidation.updatePromo], promoController.updatePromo)
-  .get([promoValidation.getPromo], promoController.getPromo)
-  .delete([promoValidation.deletePromo], promoController.deletePromo);
+  .get(
+    [appAuth, authAdminOrUser, promoValidation.getPromo],
+    promoController.getPromo
+  )
+  .patch([promoValidation.updatePromo], promoController.updatePromo)
+  .delete(
+    [appAuth, authAdmin, promoValidation.deletePromo],
+    promoController.deletePromo
+  );
 
 module.exports = router;

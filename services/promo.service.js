@@ -36,7 +36,10 @@ const updatePromoById = async (promoId, updateBody) => {
   if (!promo) {
     throw new Error("Promo not found");
   }
-  Object.assign(promo, updateBody);
+  promo.name = updateBody.name;
+  promo.percentage = updateBody.percentage;
+  promo.promoCode = updateBody.promoCode;
+  promo.listing = updateBody?.listing || [];
   await promo.save();
   return promo;
 };
@@ -52,6 +55,7 @@ const softDeletepromoById = async (promoId) => {
     throw new Error("Promo not found");
   }
   promo.isDeleted = true;
+  promo.enabled = false;
   await promo.save();
   return promo;
 };

@@ -38,9 +38,9 @@ module.exports = {
 
   updatePromo: (req, res, next) => {
     const schema = Joi.object({
-      name: Joi.string().optional(),
-      promoCode: Joi.string().optional(),
-      percentage: Joi.number().optional(),
+      name: Joi.string().required(),
+      promoCode: Joi.string().required(),
+      percentage: Joi.number().min(0).max(90).required(),
       listing: Joi.array().optional(),
     });
 
