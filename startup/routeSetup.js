@@ -33,50 +33,52 @@ const publicSportsCard = require("../routes/open/sportsCard");
 // Public routes for AWS services
 const awsS3Routes = require("../routes/awsS3/api");
 
-// Marketing subscription Routes 
+// Marketing subscription Routes
 const goHighSubscription = require("../routes/marketing/gohigh");
 const contactUs = require("../routes/marketing/contact-us");
 
-const auctionRoutes = require("../routes/auction/auction.routes")
+const auctionRoutes = require("../routes/auction/auction.routes");
+const promoRoutes = require("../routes/promo/promo.routes");
 
 module.exports = (app) => {
-	// Import route and use app.use();
-	app.use("/user", user);
-	app.use("/user/v1", userV1);  // v1 versioning of user APIs
-	app.use("/subscription", subscription);
-	app.use("/card-grading", cardGrading);
-	app.use("/collection", collection);
-	app.use("/authenticate", authenticate);
-	app.use("/payment", payment);
-	app.use("/auth-token", authToken);
-	app.use("/sports-card", sportsCard);
-	app.use("/sports-card/v1", sportsCardV1); // v1 versioning of sports card APIs
-	app.use("/ebay", ebay);
-	app.use("/pay", pay);
-	app.use("/marketplace", marketplace);
-	app.use("/listing", listing);
-	app.use("/store-listing", storeListing);
-	app.use("/store", marketStore);
-	app.use("/cart", cart);
-  	app.use("/blog-press", blogPress);
-	app.use("/order", order);
-	app.use("/address", address);
-	// Test notificaiton route
-	app.use("/notification", notificaiton);
-	// AWS s3 route
-	app.use("/aws-s3", awsS3Routes);
-	// Admin routes
-  	app.use("/admin", adminRoutes);
-	app.use("/admin-auth", adminAuth);
-	app.use("/admin-sports-card", adminSportsCard);
-	app.use("/admin-questions", adminQuestions);
-  	app.use("/admin-store", adminStore);
-	// Public routes
-	app.use("/public-cards", publicSportsCard);
-	app.use("/public-products", product);
-	app.use("/public-stores", store);
-	app.use("/public-grade", grade);
-	app.use("/marketing", goHighSubscription);
-	app.use("/contact-us", contactUs);
-	app.use("/auction", auctionRoutes)
+  // Import route and use app.use();
+  app.use("/user", user);
+  app.use("/user/v1", userV1); // v1 versioning of user APIs
+  app.use("/subscription", subscription);
+  app.use("/card-grading", cardGrading);
+  app.use("/collection", collection);
+  app.use("/authenticate", authenticate);
+  app.use("/payment", payment);
+  app.use("/auth-token", authToken);
+  app.use("/sports-card", sportsCard);
+  app.use("/sports-card/v1", sportsCardV1); // v1 versioning of sports card APIs
+  app.use("/ebay", ebay);
+  app.use("/pay", pay);
+  app.use("/marketplace", marketplace);
+  app.use("/listing", listing);
+  app.use("/store-listing", storeListing);
+  app.use("/store", marketStore);
+  app.use("/cart", cart);
+  app.use("/blog-press", blogPress);
+  app.use("/order", order);
+  app.use("/address", address);
+  // Test notificaiton route
+  app.use("/notification", notificaiton);
+  // AWS s3 route
+  app.use("/aws-s3", awsS3Routes);
+  // Admin routes
+  app.use("/admin", adminRoutes);
+  app.use("/admin-auth", adminAuth);
+  app.use("/admin-sports-card", adminSportsCard);
+  app.use("/admin-questions", adminQuestions);
+  app.use("/admin-store", adminStore);
+  // Public routes
+  app.use("/public-cards", publicSportsCard);
+  app.use("/public-products", product);
+  app.use("/public-stores", store);
+  app.use("/public-grade", grade);
+  app.use("/marketing", goHighSubscription);
+  app.use("/contact-us", contactUs);
+  app.use("/auction", auctionRoutes);
+  app.use("/promo", promoRoutes);
 };
