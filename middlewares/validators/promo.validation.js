@@ -10,7 +10,7 @@ module.exports = {
       name: Joi.string().required(),
       promoCode: Joi.string().required(),
       percentage: Joi.number().required(),
-      listing: Joi.array().optional,
+      listing: Joi.array().optional(),
     });
 
     const { error } = schema.validate(req.body);
@@ -31,10 +31,10 @@ module.exports = {
 
   updatePromo: (req, res, next) => {
     const schema = Joi.object({
-      name: Joi.string().optional,
-      promoCode: Joi.string().optional,
-      percentage: Joi.number().optional,
-      listing: Joi.array().optional,
+      name: Joi.string().optional(),
+      promoCode: Joi.string().optional(),
+      percentage: Joi.number().optional(),
+      listing: Joi.array().optional(),
     });
 
     const { error } = schema.validate(req.body);
