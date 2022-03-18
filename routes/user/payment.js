@@ -154,6 +154,12 @@ router.post(
     const expMonth = req.body.expMonth;
     const expYear = req.body.expYear;
     const fullName = req.body.fullName;
+    const address_city = req.body.address_city;
+    const address_country = req.body.address_country;
+    const address_line1 = req.body.address_line1;
+    const address_line2 = req.body.address_line2;
+    const address_state = req.body.address_state;
+    const address_zip = req.body.address_zip;
     if (!user)
       return res
         .status(404)
@@ -167,7 +173,9 @@ router.post(
         );
 
     try {
-      const card = await updateCard(cardId, expMonth, expYear, fullName);
+      const card = await updateCard(cardId, expMonth, expYear, fullName, {
+        address_city, address_country, address_line1, address_line2, address_state, address_zip
+      });
       // const card = await updateCard("pm_1H6EpqBA2vsISVcRXliuiH5o", 12, 2021);
       return res.send(
         createResObject(true, { card }, stringConstants.FETCH_SUCESSFUL)
@@ -236,7 +244,9 @@ async function getCards(stripeId) {
   });
 }
 
-async function updateCard(paymentMethodId, expMonth, expYear, fullName) {
+async function updateCard(paymentMethodId, expMonth, expYear, fullName, {
+  address_city, address_country, address_line1, address_line2, address_state, address_zip
+}) {
   // Not sure if these methods can be used with async and await
   // So converting them to async and await form
   return new Promise((resolve, reject) => {
@@ -253,6 +263,12 @@ async function updateCard(paymentMethodId, expMonth, expYear, fullName) {
         {
           billing_details: {
             name: fullName,
+            address_city,
+            address_country,
+            address_line1,
+            address_line2,
+            address_state,
+            address_zip
           },
           card: {
             exp_month: expMonth,

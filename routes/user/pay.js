@@ -14,7 +14,7 @@ const { Card } = require("../../models/card");
 const { stringConstants } = require("../../utils/constants");
 const { errorObjects } = require("../../utils/errorObjects");
 const { createResObject } = require("../../utils/utilFunctions");
-const { valPayPenReq, valPaySubReq } = require("../../middlewares/validation");
+const { valPayPenReq, valPaySubReq, valPayStripeReq } = require("../../middlewares/validation");
 const { Transaction } = require("../../models/transaction");
 const { Subscription } = require("../../models/subscription");
 const { TransactionLog } = require("../../models/transactionLog");
@@ -544,6 +544,159 @@ router.post(
             createResObject(
               true,
               { clientSecret: null, subscriptionOpted: false },
+              stringConstants.stripeMessages.PROCESSING
+            )
+          );
+
+        case stringConstants.piStatus.REQ_PM_METHOD:
+          return res.send(
+            createResObject(
+              false,
+              {},
+              stringConstants.stripeMessages.FAILED,
+              errorObjects.STRIPE_ERROR(stringConstants.stripeMessages.FAILED)
+            )
+          );
+
+        default:
+          return res.send(
+            createResObject(
+              false,
+              {},
+              stringConstants.stripeMessages.FAILED,
+              errorObjects.STRIPE_ERROR(stringConstants.stripeMessages.FAILED)
+            )
+          );
+      }
+    } catch (error) {
+      SimpleLogger.error(error);
+
+      // Try catch block maybe
+      if (paymentIntent.status === stringConstants.piStatus.SUCCEEDED) {
+        const refund = await stripe.refunds.create({
+          payment_intent: paymentIntent.id,
+        });
+      //   Refunded with ${refund.id}`
+
+        return res
+          .status(400)
+          .send(
+            createResObject(
+              false,
+              {},
+              stringConstants.stripeMessages.REFUND,
+              errorObjects.STRIPE_ERROR(stringConstants.stripeMessages.REFUND)
+            )
+          );
+      }
+    }
+  }
+);
+
+router.post(
+  "/for-stripe",
+  [appAuth, auth, valPayStripeReq],
+  async (req, res) => {
+    console.log('*******************Stripe payment has been called********************');
+    const userId = req.user._id;
+    const amount = currency(req.body.amount).intValue;
+    const paymentMethod = req.body.paymentMethod;
+
+    let user = await User.findById(userId);
+
+    // Check if stripe ID, if not then create one
+    if (!user.stripeId) {
+      let customer;
+      try {
+        customer = await stripe.customers.create({
+          email: user.email,
+          description: stringConstants.STRIPE_CUSTOMER_CREATION_DESC,
+          metadata: {
+            userId: user._id.toString(),
+          },
+        });
+      } catch (err) {
+        SimpleLogger.error(err);
+        return res
+          .status(400)
+          .send(
+            createResObject(
+              false,
+              {},
+              stringConstants.UNSUSPECTED_ERROR,
+              errorObjects.UNSUSPECTED_ERROR(err.message)
+            )
+          );
+      }
+      // Everything went well add the ID to customer object
+      user = await User.findByIdAndUpdate(
+        userId,
+        {
+          $set: { stripeId: customer.id },
+        },
+        { new: true }
+      );
+    }
+
+    const stripeId = user.stripeId;
+
+    // Every check passes then create payment intent
+    let paymentIntent;
+
+    try {
+      paymentIntent = await stripe.paymentIntents.create({
+        amount: amount,
+        currency: stringConstants.currency.USD,
+        customer: stripeId,
+        payment_method: paymentMethod,
+        confirm: true,
+        description: `Payment for stripe: ${userId} @ DCGS.AI`,
+        receipt_email: user.email,
+      });
+    } catch (error) {
+      SimpleLogger.info(error.code);
+      SimpleLogger.error(error);
+      const pm = error.raw.payment_intent;
+      if (pm) {
+        SimpleLogger.info(`Payment intent ID that errored out: ${pm.id}`);
+      }
+      return res
+        .status(400)
+        .send(
+          createResObject(
+            false,
+            {},
+            stringConstants.PAYMENT_ERRORED,
+            errorObjects.PAYMENT_ERRORED(error.message)
+          )
+        );
+    }
+
+    try {
+      switch (paymentIntent.status) {
+        case stringConstants.piStatus.SUCCEEDED:
+          return res.send(
+            createResObject(
+              true,
+              { clientSecret: null, paymentSuccess: true, paymentIntentId: paymentIntent.id },
+              stringConstants.stripeMessages.SUCCEEDED
+            )
+          );
+
+        case stringConstants.piStatus.REQ_ACTION:
+          return res.send(
+            createResObject(
+              true,
+              { clientSecret: paymentIntent.client_secret, paymentSuccess: false },
+              stringConstants.stripeMessages.REQ_ACTION
+            )
+          );
+
+        case stringConstants.piStatus.PROCESSING:
+          return res.send(
+            createResObject(
+              true,
+              { clientSecret: null, paymentSuccess: false },
               stringConstants.stripeMessages.PROCESSING
             )
           );
