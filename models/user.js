@@ -259,7 +259,6 @@ userSchema.methods.getUserBasicInfo = function () {
 	const profilePicture = this.profilePicture || null;
 	const username = this.username || null;
 	const signupType = this.metadata.signupType || null;
-	const stripeId = this.stripeId || null;
 
 	return {
 		id: id,
@@ -268,7 +267,6 @@ userSchema.methods.getUserBasicInfo = function () {
 		profilePicture: profilePicture,
 		username: username,
 		signupType: signupType,
-		stripeId,
 	};
 };
 /**
