@@ -45,6 +45,8 @@ module.exports.stringConstants = {
   USER_EMAIL_ALREADY_EXISTS: "User with the given email already exists",
   PROMO_CODE_ALREADY_EXISTS: "Promo with given promo code already exists",
   PROMO_NOT_FOUND: "Promo with given id not found",
+  PROMO_VALIDATED: "Promo validated",
+  PROMO_NOT_VALIDATED: "Promo not validated",
 
   STORE_TITLE_ALREADY_EXISTS: "Store with the given title already exists",
   STORE_ALREADY_CLAIMED: "Store with the given title already claimed",

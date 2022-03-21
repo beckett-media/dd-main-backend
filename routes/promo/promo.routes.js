@@ -10,10 +10,17 @@ const router = express.Router();
 router
   .route("/")
   .post(
-    [appAuth, authAdminOrUser, promoValidation.createPromo],
+    [appAuth, authAdmin, promoValidation.createPromo],
     promoController.createPromo
   )
   .get([appAuth, authAdminOrUser], promoController.getPromos);
+
+router
+  .route("/validate")
+  .post(
+    [appAuth, authAdminOrUser, promoValidation.validatePromo],
+    promoController.validatePromo
+  );
 
 router
   .route("/:promoId")
@@ -21,7 +28,10 @@ router
     [appAuth, authAdminOrUser, promoValidation.getPromo],
     promoController.getPromo
   )
-  .patch([promoValidation.updatePromo], promoController.updatePromo)
+  .patch(
+    [appAuth, authAdmin, promoValidation.updatePromo],
+    promoController.updatePromo
+  )
   .delete(
     [appAuth, authAdmin, promoValidation.deletePromo],
     promoController.deletePromo

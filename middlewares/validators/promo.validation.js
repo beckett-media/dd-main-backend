@@ -38,10 +38,11 @@ module.exports = {
 
   updatePromo: (req, res, next) => {
     const schema = Joi.object({
-      name: Joi.string().required(),
-      promoCode: Joi.string().required(),
-      percentage: Joi.number().min(0).max(90).required(),
+      name: Joi.string().optional(),
+      promoCode: Joi.string().optional(),
+      percentage: Joi.number().min(0).max(90).optional(),
       listing: Joi.array().optional(),
+      enabled: Joi.boolean().optional(),
     });
 
     const { error } = schema.validate(req.body);
@@ -87,6 +88,28 @@ module.exports = {
     });
 
     const { error } = schema.validate(req.params);
+
+    if (error)
+      return res
+        .status(400)
+        .send(
+          createResObject(
+            false,
+            { errorMessage: error.details[0].message },
+            stringConstants.REQUEST_VALIDATION_FAILED,
+            errorObjects.REQUEST_VALIDATION_ERROR(error.details[0].message)
+          )
+        );
+    return next();
+  },
+
+  validatePromo: (req, res, next) => {
+    console.log(req.body);
+    const schema = Joi.object({
+      promoCode: Joi.string().required(),
+    });
+
+    const { error } = schema.validate(req.body);
 
     if (error)
       return res

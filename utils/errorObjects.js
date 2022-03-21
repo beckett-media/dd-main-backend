@@ -408,4 +408,9 @@ module.exports.errorObjects = {
     errorSubCode: getKey(stringConstants, stringConstants.PROMO_NOT_FOUND),
     errorMessage: stringConstants.PROMO_NOT_FOUND,
   },
+  PROMO_NOT_VALIDATED: {
+    errorCode: 137,
+    errorSubCode: getKey(stringConstants, stringConstants.PROMO_NOT_VALIDATED),
+    errorMessage: stringConstants.PROMO_NOT_VALIDATED,
+  },
 };
