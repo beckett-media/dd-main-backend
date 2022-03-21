@@ -127,10 +127,29 @@ const deletePromo = async (req, res) => {
   }
 };
 
+const validatePromo = async (req, res) => {
+  try {
+    const promo = await promoService.validatePromo(req.body.promoCode);
+    res.send(createResObject(true, { promo }, stringConstants.PROMO_VALIDATED));
+  } catch (err) {
+    res
+      .status(400)
+      .send(
+        createResObject(
+          false,
+          {},
+          stringConstants.PROMO_NOT_VALIDATED,
+          errorObjects.PROMO_NOT_VALIDATED
+        )
+      );
+  }
+};
+
 module.exports = {
   createPromo,
   getPromos,
   updatePromo,
   deletePromo,
   getPromo,
+  validatePromo,
 };

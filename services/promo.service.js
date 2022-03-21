@@ -25,6 +25,15 @@ const getPromoById = async (promoId) => {
   return promo;
 };
 
+const getPromoByPromoCode = async (promoCode) => {
+  const promo = await Promo.findOne({ promoCode });
+  if (!promo || promo.isDeleted) {
+    throw new Error("Promo not found");
+  }
+  if (promo.enabled === true) return promo;
+  else throw new Error("Promo not validated");
+};
+
 /**
  * Update promo by id
  * @param {ObjectId} promoId
@@ -36,10 +45,7 @@ const updatePromoById = async (promoId, updateBody) => {
   if (!promo) {
     throw new Error("Promo not found");
   }
-  promo.name = updateBody.name;
-  promo.percentage = updateBody.percentage;
-  promo.promoCode = updateBody.promoCode;
-  promo.listing = updateBody?.listing || [];
+  Object.assign(promo, updateBody);
   await promo.save();
   return promo;
 };
@@ -60,10 +66,26 @@ const softDeletepromoById = async (promoId) => {
   return promo;
 };
 
+/**
+ * validate promo by id
+ * @param {ObjectId} promoCode
+ * @returns {Promise<promo>}
+ */
+const validatePromo = async (promoCode) => {
+  const promo = await Promo.findOne({ promoCode });
+  if (!promo || promo.isDeleted) {
+    throw new Error("Promo not found");
+  }
+  if (promo.enabled === true) return promo;
+  else throw new Error("Promo not validated");
+};
+
 module.exports = {
   createPromo,
   getPromos,
   updatePromoById,
   softDeletepromoById,
   getPromoById,
+  validatePromo,
+  getPromoByPromoCode,
 };
