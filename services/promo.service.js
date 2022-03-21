@@ -21,7 +21,7 @@ const getPromos = async () => {
  */
 const getPromoById = async (promoId) => {
   const promo = await Promo.findById(promoId);
-  if (promo?.isDeleted === true) throw new Error("Promo not found");
+  if (promo && promo.isDeleted === true) throw new Error("Promo not found");
   return promo;
 };
 
