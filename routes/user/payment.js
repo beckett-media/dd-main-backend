@@ -263,12 +263,14 @@ async function updateCard(paymentMethodId, expMonth, expYear, fullName, {
         {
           billing_details: {
             name: fullName,
-            address_city,
-            address_country,
-            address_line1,
-            address_line2,
-            address_state,
-            address_zip
+            address: {
+              city: address_city,
+              country: address_country,
+              line1: address_line1,
+              line2: address_line2,
+              postal_code: address_zip,
+              state: address_state
+            }
           },
           card: {
             exp_month: expMonth,
