@@ -30,7 +30,7 @@ router.post("/checkout", [appAuth, auth], async (req, res) => {
   // const customerId = req.body.customerId;
   const addressId = req.body.addressId;
   const isCardSave = req.body.isCardSave;
-  const promoCode = req.body?.promoCode || "";
+  const promoCode = req.body.promoCode || "";
   let percentage = 0;
   if (promoCode !== "") {
     const promo = await promoService.getPromoByPromoCode(promoCode);
