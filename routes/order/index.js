@@ -30,7 +30,7 @@ router.post("/checkout", [appAuth, auth], async (req, res) => {
   // const customerId = req.body.customerId;
   const addressId = req.body.addressId;
   const isCardSave = req.body.isCardSave;
-  const promoCode = req.body?.promoCode || "";
+  const promoCode = req.body.promoCode || "";
   let discount_percentage = 0;
   let promo = undefined;
   if (promoCode !== "") {
