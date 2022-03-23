@@ -18,6 +18,7 @@ const { OrderLog } = require("../../models/orderLog");
 const { OrderItem } = require("../../models/orderItem");
 const { valPageSizeNumber } = require("../../middlewares/validation");
 const { orderValidation } = require("../../middlewares/validators/");
+const { promoService } = require("../../services");
 const stripe = require("stripe")(config.get(stringConstants.STRIPE_TEST_KEY));
 
 /**
@@ -29,6 +30,13 @@ router.post("/checkout", [appAuth, auth], async (req, res) => {
   // const customerId = req.body.customerId;
   const addressId = req.body.addressId;
   const isCardSave = req.body.isCardSave;
+  const promoCode = req.body.promoCode || "";
+  let discount_percentage = 0;
+  let promo = undefined;
+  if (promoCode !== "") {
+    promo = await promoService.getPromoByPromoCode(promoCode);
+    discount_percentage = promo.percentage;
+  }
   const user = await User.findById(userId);
   if (!user)
     return res
@@ -104,8 +112,13 @@ router.post("/checkout", [appAuth, auth], async (req, res) => {
         }
       }
 
+      const amountAfterPromo = promoService.getDiscountedAmount(
+        amount[0].totalAmount,
+        discount_percentage
+      );
+
       const charge = await stripe.charges.create({
-        amount: amount[0].totalAmount * 100,
+        amount: Math.round(amountAfterPromo * 100),
         currency: "usd",
         customer: cusId,
         // card: cardId,
@@ -113,8 +126,11 @@ router.post("/checkout", [appAuth, auth], async (req, res) => {
       createOrder = await Order.create({
         buyer: userId,
         address: addressId,
-        price: amount[0].totalAmount,
+        price: amountAfterPromo,
+        originalPrice: amount[0].totalAmount,
+        promoId: promo && promo._id,
       });
+
       for (const list of listings) {
         let fee =
           (list.price * stringConstants.APPLICATION_FEE_PERCENTAGE) / 100;
@@ -124,8 +140,12 @@ router.post("/checkout", [appAuth, auth], async (req, res) => {
         const stripeObj = await StripeConnect.findOne({
           user: list.user.toString(),
         });
+        const discountedAmount = promoService.getDiscountedAmount(
+          list.price,
+          discount_percentage
+        );
         const transfer = await stripe.transfers.create({
-          amount: (list.price - fee) * 100,
+          amount: Math.round((discountedAmount - fee) * 100),
           currency: "usd",
           source_transaction: charge.id,
           destination: stripeObj.stripeUserId,
@@ -152,11 +172,13 @@ router.post("/checkout", [appAuth, auth], async (req, res) => {
           seller: list.user.toString(),
           listing: list.id,
           address: addressId,
-          price: list.price,
+          price: discountedAmount,
           title: list.title,
           status: "pending",
           parent: createOrder._id,
           quantity: cart.quantity,
+          promoId: promo && promo.id,
+          originalPrice: list.price,
         });
         const orderLog = await OrderLog.create({
           response: charge,
@@ -442,10 +464,7 @@ router.post(
           price: amount,
           auctionId: auction._id,
         });
-        let fee =
-          (amount *
-            stringConstants.APPLICATION_FEE_PERCENTAGE) /
-          100;
+        let fee = (amount * stringConstants.APPLICATION_FEE_PERCENTAGE) / 100;
 
         const stripeObj = await StripeConnect.findOne({
           user: auction.seller,

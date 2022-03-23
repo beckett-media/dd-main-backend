@@ -4,44 +4,52 @@ const Schema = mongoose.Schema;
 const { stringConstants } = require("../utils/constants");
 
 const orderSchema = new mongoose.Schema(
-	{
-		price: {
-			type: Number,
-			required: true,
-		},
-		status: {
-			type: String,
-			default: "pending",
-		},
-		address: {
-			type: Schema.Types.ObjectId,
-			ref: stringConstants.collectionNames.ADDRESS_COLLECTION,
-			required: false,
-		},
-		completeAddress: {
-			type: String,
-			required: false,
-		},
-		buyer: {
-			type: Schema.Types.ObjectId,
-			ref: stringConstants.collectionNames.USER_COLLECTION,
-			required: false,
-		},
-		orderId: {
-			type: String,
-			default: shortid.generate,
-		},
-		auctionId: {
-			type: Schema.Types.ObjectId,
-			ref: stringConstants.collectionNames.AUCTION_COLLECTION,
-			required: false,
-		}
-	},
-	{ timestamps: true, toJSON: { getters: true } }
+  {
+    price: {
+      type: Number,
+      required: true,
+    },
+    status: {
+      type: String,
+      default: "pending",
+    },
+    address: {
+      type: Schema.Types.ObjectId,
+      ref: stringConstants.collectionNames.ADDRESS_COLLECTION,
+      required: false,
+    },
+    completeAddress: {
+      type: String,
+      required: false,
+    },
+    buyer: {
+      type: Schema.Types.ObjectId,
+      ref: stringConstants.collectionNames.USER_COLLECTION,
+      required: false,
+    },
+    orderId: {
+      type: String,
+      default: shortid.generate,
+    },
+    auctionId: {
+      type: Schema.Types.ObjectId,
+      ref: stringConstants.collectionNames.AUCTION_COLLECTION,
+      required: false,
+    },
+    promoId: {
+      type: Schema.Types.ObjectId,
+      ref: stringConstants.collectionNames.PROMO_COLLECTION,
+    },
+    originalPrice: {
+      type: Number,
+      required: true,
+    },
+  },
+  { timestamps: true, toJSON: { getters: true } }
 );
 
 const Order = mongoose.model(
-	stringConstants.collectionNames.ORDER_COLLECTION,
-	orderSchema
+  stringConstants.collectionNames.ORDER_COLLECTION,
+  orderSchema
 );
 module.exports.Order = Order;
