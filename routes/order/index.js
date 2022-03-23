@@ -128,7 +128,7 @@ router.post("/checkout", [appAuth, auth], async (req, res) => {
         address: addressId,
         price: amountAfterPromo,
         originalPrice: amount[0].totalAmount,
-        promoId: promo?._id,
+        promoId: promo && promo._id,
       });
 
       for (const list of listings) {
@@ -177,7 +177,7 @@ router.post("/checkout", [appAuth, auth], async (req, res) => {
           status: "pending",
           parent: createOrder._id,
           quantity: cart.quantity,
-          promoId: promo?.id,
+          promoId: promo && promo.id,
           originalPrice: list.price,
         });
         const orderLog = await OrderLog.create({
