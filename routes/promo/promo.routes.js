@@ -2,6 +2,7 @@ const express = require("express");
 const appAuth = require("../../middlewares/authenticateApp");
 const authAdminOrUser = require("../../middlewares/authenticateAdminOrUser");
 const authAdmin = require("../../middlewares/authenticateAdmin");
+const auth = require("../../middlewares/authenticateUser");
 const { promoController } = require("../../controllers");
 const { promoValidation } = require("../../middlewares/validators/");
 
@@ -18,16 +19,13 @@ router
 router
   .route("/validate")
   .post(
-    [appAuth, authAdminOrUser, promoValidation.validatePromo],
+    [appAuth, auth, promoValidation.validatePromo],
     promoController.validatePromo
   );
 
 router
   .route("/:promoId")
-  .get(
-    [appAuth, authAdminOrUser, promoValidation.getPromo],
-    promoController.getPromo
-  )
+  .get([appAuth, authAdmin, promoValidation.getPromo], promoController.getPromo)
   .patch(
     [appAuth, authAdmin, promoValidation.updatePromo],
     promoController.updatePromo

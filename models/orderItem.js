@@ -68,9 +68,9 @@ const orderItemSchema = new mongoose.Schema(
       ref: stringConstants.collectionNames.AUCTION_COLLECTION,
       required: false,
     },
-    promoCode: {
-      type: String,
-      default: "",
+    promoId: {
+      type: Schema.Types.ObjectId,
+      ref: stringConstants.collectionNames.PROMO_COLLECTION,
     },
     originalPrice: {
       type: Number,

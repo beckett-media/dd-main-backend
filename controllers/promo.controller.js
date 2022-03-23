@@ -2,6 +2,7 @@ const { stringConstants } = require("../utils/constants");
 const { createResObject } = require("../utils/utilFunctions");
 const { promoService } = require("../services");
 const { errorObjects } = require("../utils/errorObjects");
+const SimpleLogger = require("../utils/simpleLogger");
 const createPromo = async (req, res) => {
   try {
     const promo = await promoService.createPromo(req.body);
@@ -10,17 +11,13 @@ const createPromo = async (req, res) => {
         createResObject(
           true,
           {
-            promo: {
-              name: promo.name,
-              promoCode: promo.promoCode,
-              percentage: promo.percentage,
-              listing: promo.listing,
-            },
+            promo,
           },
           "Promo created successfully"
         )
       );
-    else
+    else {
+      SimpleLogger(err);
       res
         .status(400)
         .send(
@@ -31,7 +28,9 @@ const createPromo = async (req, res) => {
             errorObjects.PROMO_CODE_ALREADY_EXISTS
           )
         );
+    }
   } catch (err) {
+    SimpleLogger(err);
     res
       .status(400)
       .send(
@@ -47,19 +46,20 @@ const createPromo = async (req, res) => {
 
 const getPromos = async (req, res) => {
   try {
-    const promos = await promoService.getPromos();
+    const { role } = req.user;
+    const promos = await promoService.getPromos(role);
     res
       .status(200)
       .send(createResObject(true, { promos }, stringConstants.FETCH_SUCESSFUL));
   } catch (err) {
+    SimpleLogger(err);
     res
       .status(400)
       .send(
         createResObject(
           false,
-          {},
-          stringConstants.PROMO_CODE_ALREADY_EXISTS,
-          errorObjects.PROMO_CODE_ALREADY_EXISTS
+          { error: err },
+          "Promos not fetched successfully"
         )
       );
   }
@@ -114,6 +114,7 @@ const deletePromo = async (req, res) => {
       createResObject(true, { promo }, stringConstants.DELETED_SUCCESSFULLY)
     );
   } catch (err) {
+    SimpleLogger(err);
     res
       .status(400)
       .send(
@@ -132,6 +133,7 @@ const validatePromo = async (req, res) => {
     const promo = await promoService.validatePromo(req.body.promoCode);
     res.send(createResObject(true, { promo }, stringConstants.PROMO_VALIDATED));
   } catch (err) {
+    SimpleLogger(err);
     res
       .status(400)
       .send(

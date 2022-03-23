@@ -42,7 +42,7 @@ module.exports = {
       promoCode: Joi.string().optional(),
       percentage: Joi.number().min(0).max(90).optional(),
       listing: Joi.array().optional(),
-      enabled: Joi.boolean().optional(),
+      isEnabled: Joi.boolean().optional(),
     });
 
     const { error } = schema.validate(req.body);
