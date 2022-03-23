@@ -43,6 +43,11 @@ module.exports.stringConstants = {
   KEYS_MISSING: "Year, Brand, and Players Name are required fields",
 
   USER_EMAIL_ALREADY_EXISTS: "User with the given email already exists",
+  PROMO_CODE_ALREADY_EXISTS: "Promo with given promo code already exists",
+  PROMO_NOT_FOUND: "Promo with given id not found",
+  PROMO_VALIDATED: "Promo validated",
+  PROMO_NOT_VALIDATED: "Promo not validated",
+
   STORE_TITLE_ALREADY_EXISTS: "Store with the given title already exists",
   STORE_ALREADY_CLAIMED: "Store with the given title already claimed",
 
@@ -211,7 +216,8 @@ module.exports.stringConstants = {
   STRIPE_ACCOUNT_CONNECT_SUCCESSFULLY: "Stripe account connect successfully.",
   SAVE_CARD_REMOVE: "Save card remove successfully.",
   ORDER_SUCCESSFULLY: "Your order has been successfully submitted.",
-  AUCTION_ORDER_SUCCESSFULLY: "Your payment for auction is successfully completed.",
+  AUCTION_ORDER_SUCCESSFULLY:
+    "Your payment for auction is successfully completed.",
   APPLICATION_FEE_PERCENTAGE: 5,
   STRIPE_CONNECT_ERROR: "Please attach stripe id.",
   LISTING_NOT_FOUND: "Listing not found with given id's",
@@ -247,6 +253,7 @@ module.exports.stringConstants = {
     ORDER_LOG_COLLECTION: "OrderLog",
     ORDER_ITEM_COLLECTION: "OrderItem",
     AUCTION_COLLECTION: "Auction",
+    PROMO_COLLECTION: "Promo",
   },
 
   deletionType: {
