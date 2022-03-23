@@ -31,10 +31,11 @@ router.post("/checkout", [appAuth, auth], async (req, res) => {
   const addressId = req.body.addressId;
   const isCardSave = req.body.isCardSave;
   const promoCode = req.body?.promoCode || "";
-  let percentage = 0;
+  let discount_percentage = 0;
+  let promo = undefined;
   if (promoCode !== "") {
-    const promo = await promoService.getPromoByPromoCode(promoCode);
-    percentage = promo.percentage;
+    promo = await promoService.getPromoByPromoCode(promoCode);
+    discount_percentage = promo.percentage;
   }
   const user = await User.findById(userId);
   if (!user)
@@ -111,12 +112,10 @@ router.post("/checkout", [appAuth, auth], async (req, res) => {
         }
       }
 
-      const getDiscountedAmount = (totalAmount) => {
-        const discountAmount = totalAmount * (percentage / 100);
-        return totalAmount - discountAmount;
-      };
-
-      const amountAfterPromo = getDiscountedAmount(amount[0].totalAmount);
+      const amountAfterPromo = promoService.getDiscountedAmount(
+        amount[0].totalAmount,
+        discount_percentage
+      );
 
       const charge = await stripe.charges.create({
         amount: Math.round(amountAfterPromo * 100),
@@ -129,8 +128,9 @@ router.post("/checkout", [appAuth, auth], async (req, res) => {
         address: addressId,
         price: amountAfterPromo,
         originalPrice: amount[0].totalAmount,
-        promoCode: promoCode,
+        promoId: promo?._id,
       });
+
       for (const list of listings) {
         let fee =
           (list.price * stringConstants.APPLICATION_FEE_PERCENTAGE) / 100;
@@ -140,7 +140,10 @@ router.post("/checkout", [appAuth, auth], async (req, res) => {
         const stripeObj = await StripeConnect.findOne({
           user: list.user.toString(),
         });
-        const discountedAmount = getDiscountedAmount(list.price);
+        const discountedAmount = promoService.getDiscountedAmount(
+          list.price,
+          discount_percentage
+        );
         const transfer = await stripe.transfers.create({
           amount: Math.round((discountedAmount - fee) * 100),
           currency: "usd",
@@ -174,7 +177,7 @@ router.post("/checkout", [appAuth, auth], async (req, res) => {
           status: "pending",
           parent: createOrder._id,
           quantity: cart.quantity,
-          promoCode: promoCode,
+          promoId: promo?.id,
           originalPrice: list.price,
         });
         const orderLog = await OrderLog.create({

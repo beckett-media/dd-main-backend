@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const Schema = mongoose.Schema;
 const { stringConstants } = require("../utils/constants");
 
 const promoSchema = new mongoose.Schema(
@@ -26,7 +25,7 @@ const promoSchema = new mongoose.Schema(
       type: Array,
       default: [],
     },
-    enabled: {
+    isEnabled: {
       type: Boolean,
       default: true,
     },
@@ -43,10 +42,7 @@ const promoSchema = new mongoose.Schema(
 promoSchema.methods.toJSON = function () {
   const promo = this;
   const promoObject = promo.toObject();
-
-  delete promoObject.enabled;
   delete promoObject.isDeleted;
-
   return promoObject;
 };
 
