@@ -17,7 +17,7 @@ const createPromo = async (req, res) => {
         )
       );
     else {
-      SimpleLogger(err);
+      SimpleLogger.error(err);
       res
         .status(400)
         .send(
@@ -30,7 +30,7 @@ const createPromo = async (req, res) => {
         );
     }
   } catch (err) {
-    SimpleLogger(err);
+    SimpleLogger.error(err);
     res
       .status(400)
       .send(
@@ -52,7 +52,7 @@ const getPromos = async (req, res) => {
       .status(200)
       .send(createResObject(true, { promos }, stringConstants.FETCH_SUCESSFUL));
   } catch (err) {
-    SimpleLogger(err);
+    SimpleLogger.error(err);
     res
       .status(400)
       .send(
@@ -114,7 +114,7 @@ const deletePromo = async (req, res) => {
       createResObject(true, { promo }, stringConstants.DELETED_SUCCESSFULLY)
     );
   } catch (err) {
-    SimpleLogger(err);
+    SimpleLogger.error(err);
     res
       .status(400)
       .send(
@@ -133,7 +133,7 @@ const validatePromo = async (req, res) => {
     const promo = await promoService.validatePromo(req.body.promoCode);
     res.send(createResObject(true, { promo }, stringConstants.PROMO_VALIDATED));
   } catch (err) {
-    SimpleLogger(err);
+    SimpleLogger.error(err);
     res
       .status(400)
       .send(
