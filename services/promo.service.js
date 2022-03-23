@@ -35,7 +35,7 @@ const getPromoByPromoCode = async (promoCode) => {
     throw new Error("Promo not found");
   }
   if (promo.isEnabled === true) return promo;
-  else throw new Error("Promo not validated");
+  else throw new Error("Promo not valid");
 };
 
 /**
@@ -81,7 +81,7 @@ const validatePromo = async (promoCode) => {
     throw new Error("Promo not found");
   }
   if (promo.isEnabled === true) return promo;
-  else throw new Error("Promo not validated");
+  else throw new Error("Promo not valid");
 };
 
 const getDiscountedAmount = (totalAmount, discount_percentage) => {
