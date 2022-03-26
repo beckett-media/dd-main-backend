@@ -99,38 +99,18 @@ const centerGradeAvg = (centering) => {
 }
 
 const cornerGradeAvg = (corners) => {
-    const { bottom_left = '', bottom_right = '', top_left = '', top_right = '' } = corners;
-    const bottomLeftScore = scoreMapper[bottom_left];
-    const bottomRightScore = scoreMapper[bottom_right];
-    const topLeftScore = scoreMapper[top_left];
-    const topRightScore = scoreMapper[top_right];
-    let count = 0;
-    if (bottomLeftScore) count++;
-    if (bottomRightScore) count++;
-    if (topLeftScore) count++;
-    if (topRightScore) count++;
-    const total = checkIfExist(bottomLeftScore) + checkIfExist(bottomRightScore) + checkIfExist(topLeftScore) + checkIfExist(topRightScore); 
+    const { corner_grade = '' } = corners;
     return {
-        compare: count > 0,
-        val: count > 0 ? (total/count) : 0
+        compare: scoreMapper[corner_grade] ? true : false,
+        val: scoreMapper[corner_grade] ? scoreMapper[corner_grade] : 0
     }
 }
 
 const edgeGradeAvg = (edges) => {
-    const { bottom = '', left = '', right = '', top = '' } = edges;
-    const bottomScore = scoreMapper[bottom];
-    const leftScore = scoreMapper[left];
-    const rightScore = scoreMapper[right];
-    const topScore = scoreMapper[top];
-    let count = 0;
-    if (bottomScore) count++;
-    if (leftScore) count++;
-    if (rightScore) count++;
-    if (topScore) count++;
-    const total = checkIfExist(bottomScore) + checkIfExist(leftScore) + checkIfExist(rightScore) + checkIfExist(topScore); 
+    const { edge_grade = '' } = edges;
     return {
-        compare: count > 0,
-        val: count > 0 ? (total/count) : 0
+        compare: scoreMapper[edge_grade] ? true : false,
+        val: scoreMapper[edge_grade] ? scoreMapper[edge_grade] : 0
     }
 }
 
@@ -155,7 +135,7 @@ const totalGradeAvg = (grading, card_grade) => {
     if (surfaceGrade.compare) count++;
     const avgVal = (centerGrade.val + cornerGrade.val + edgeGrade.val + surfaceGrade.val)/count;
     const overallGrade = getGrade(avgVal);
-    const gradingComps = compsMapper[overallGrade];
+    const gradingComps = compsMapper[card_grade];
     return {
         overallGrade: card_grade,
         gradingComps
