@@ -470,4 +470,5 @@ module.exports.stringConstants = {
     S3_CARD_PICS_UPLOAD: "public/marketplace",
   },
   AUCTION_ID_NOT_FOUND: "No auction forund for respective auction ID",
+  ROLL_BAR_ACCESS_TOKEN: "rollBarAcessToken",
 };
