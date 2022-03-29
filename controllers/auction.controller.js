@@ -90,7 +90,16 @@ const createAuction = async (req, res) => {
       );
   }
 
-  let auction = new Auction({ ...req.body, listing: req.body.listingId });
+  let auction;
+
+  if (req.body.startNow)
+    auction = new Auction({
+      ...req.body,
+      listing: req.body.listingId,
+      bidStart: new Date(),
+    });
+  else auction = new Auction({ ...req.body, listing: req.body.listingId });
+
   auction.seller = listing.user;
 
   try {
