@@ -12,6 +12,7 @@ const combinedGrading = (cardId, imagePath, userId, newApp = false) => {
         headers: {
             "Content-Type": "multipart/form-data"
         },
+        "rejectUnauthorized": false, 
         formData: newApp ? {
             user_id: userId,
             report_id: cardId,
