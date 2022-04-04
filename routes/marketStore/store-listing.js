@@ -131,7 +131,7 @@ router.post(
       cardNumber,
       year,
       brand,
-      modelNo
+      modelNo,
     } = req.body;
 
     const availableQuantity = quantity;
@@ -287,7 +287,6 @@ router.put(
     const listingId = req.params.listingId;
     const storeId = req.params.storeId;
     const userId = req.user._id;
-    
 
     const {
       cardId,
@@ -307,7 +306,7 @@ router.put(
       cardNumber,
       year,
       brand,
-      modelNo
+      modelNo,
     } = req.body;
 
     const availableQuantity = quantity;
@@ -485,13 +484,24 @@ router.delete(
             errorObjects.UNAUTHENTICATE_USER
           )
         );
-    await Listing.deleteOne({
-      _id: mongoose.Types.ObjectId(listingId),
-    });
-
-    return res.send(
-      createResObject(true, {}, stringConstants.LISTING_DELETE_SUCCESSFULLY)
-    );
+    try {
+      listing.remove(function (err) {
+        if (err) throw err;
+        /* Document unindexing in the background */
+        listing.on("es-removed", function (err, _res) {
+          res.send(
+            createResObject(
+              true,
+              { listing },
+              stringConstants.LISTING_DELETE_SUCCESSFULLY
+            )
+          );
+          if (err) throw err;
+        });
+      });
+    } catch (error) {
+      res.send(createResObject(false, {}, error.message));
+    }
   }
 );
 

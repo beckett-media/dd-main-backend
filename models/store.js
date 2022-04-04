@@ -1,4 +1,6 @@
 const mongoose = require("mongoose");
+const mongoosastic = require("mongoosastic");
+
 const Schema = mongoose.Schema;
 const { stringConstants } = require("../utils/constants");
 
@@ -13,6 +15,7 @@ const storeSchema = new mongoose.Schema(
       lowercase: true,
       trim: true,
       unique: true,
+      es_indexed: true,
     },
     email: {
       type: String,
@@ -21,6 +24,7 @@ const storeSchema = new mongoose.Schema(
       maxlength: 70,
       trim: true,
       lowercase: true,
+      es_indexed: true,
     },
     phoneNumber: {
       type: String,
@@ -29,6 +33,7 @@ const storeSchema = new mongoose.Schema(
       maxlength: 15,
       trim: true,
       lowercase: true,
+      es_indexed: true,
     },
     address: {
       type: String,
@@ -37,6 +42,7 @@ const storeSchema = new mongoose.Schema(
       maxlength: 500,
       trim: true,
       lowercase: true,
+      es_indexed: true,
     },
     images: { type: [String], default: [], required: false },
     desc: {
@@ -55,6 +61,8 @@ const storeSchema = new mongoose.Schema(
   },
   { timestamps: true, toJSON: { getters: true } }
 );
+
+storeSchema.plugin(mongoosastic, { hosts: ["localhost:9200"] });
 
 const Store = mongoose.model(
   stringConstants.collectionNames.STORES_COLLECTION,
