@@ -162,7 +162,7 @@ const Listing = mongoose.model(
 );
 
 const stream = Listing.synchronize();
-const count = 0;
+let count = 0;
 
 stream.on("data", function (err, doc) {
   count++;

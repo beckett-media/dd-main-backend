@@ -70,7 +70,7 @@ const Store = mongoose.model(
 );
 
 const stream = Store.synchronize();
-const count = 0;
+let count = 0;
 
 stream.on("data", function (err, doc) {
   count++;
