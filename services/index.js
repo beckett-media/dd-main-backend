@@ -1,2 +1,4 @@
 module.exports.awsS3Service = require("./awsS3.service");
 module.exports.promoService = require("./promo.service");
+module.exports.listingService = require("./listing.service");
+module.exports.storeService = require("./store.service");

@@ -28,6 +28,13 @@ const { Order } = require("../../models/order");
 const { StripeConnect } = require("../../models/stripeConnect");
 const { OrderItem } = require("../../models/orderItem");
 const { listingValidation } = require("../../middlewares/validators");
+const { listingController } = require("../../controllers");
+
+router.get(
+  "/search/elastic",
+  [appAuth],
+  listingController.performMongoDBSearch
+);
 
 /**
  * Route to get listing by user
@@ -291,7 +298,6 @@ router.post(
     listing = await listing.save();
     if (isPublic) {
       let marketplace = await Marketplace.findOne({ listing: listing._id });
-      console.log("marketplace", marketplace);
       if (!marketplace) {
         let addListingMarket = await Marketplace.create({
           listing: listing._id,
@@ -467,7 +473,6 @@ router.delete(
 
     const userId = req.user._id;
     const user = await User.findById(userId);
-
     const listing = await Listing.findById(listingId);
     if (!user)
       return res
@@ -503,13 +508,21 @@ router.delete(
             errorObjects.UNAUTHENTICATE_USER
           )
         );
-    await Listing.deleteOne({
-      _id: mongoose.Types.ObjectId(listingId),
-    });
 
-    return res.send(
-      createResObject(true, {}, stringConstants.LISTING_DELETE_SUCCESSFULLY)
-    );
+    try {
+      listing.remove(function (err) {
+        if (err) throw err;
+        res.send(
+          createResObject(
+            true,
+            { listing },
+            stringConstants.LISTING_DELETE_SUCCESSFULLY
+          )
+        );
+      });
+    } catch (error) {
+      res.send(createResObject(false, {}, error.message));
+    }
   }
 );
 

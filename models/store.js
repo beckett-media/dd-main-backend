@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
-const Schema = mongoose.Schema;
 const { stringConstants } = require("../utils/constants");
+
+const Schema = mongoose.Schema;
 
 const storeSchema = new mongoose.Schema(
   {

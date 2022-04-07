@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
-const Schema = mongoose.Schema;
 const { stringConstants } = require("../utils/constants");
+
+const Schema = mongoose.Schema;
 
 const listingSchema = new mongoose.Schema(
   {
@@ -28,7 +29,11 @@ const listingSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    playerNames: { type: [String], default: [], required: false },
+    playerNames: {
+      type: [String],
+      default: [],
+      required: false,
+    },
     cardType: {
       type: String,
       required: true,
@@ -135,11 +140,15 @@ const listingSchema = new mongoose.Schema(
       required: false,
     },
   },
-  { timestamps: true, toJSON: { getters: true } }
+  {
+    timestamps: true,
+    toJSON: { getters: true },
+  }
 );
 
 const Listing = mongoose.model(
   stringConstants.collectionNames.Listing_COLLECTION,
   listingSchema
 );
+
 module.exports.Listing = Listing;
