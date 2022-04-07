@@ -25,7 +25,7 @@ const { uploadMultiImageStore } = require("../../middlewares/multerSingle");
 const { StripeConnect } = require("../../models/stripeConnect");
 const { storeController } = require("../../controllers");
 
-router.get("/search/elastic", [appAuth], storeController.performElasticSearch);
+router.get("/search/elastic", [appAuth], storeController.performMongoDBSearch);
 
 /**
  * Route to get store products by user of seller side
@@ -674,21 +674,13 @@ router.delete(
               .status(400)
               .send(createResObject(false, {}, error.message));
           }
-          /* Document unindexing in the background */
-          store.on("es-removed", function (err, _res) {
-            if (err) {
-              SimpleLogger.error(
-                `Unable to unidex store with title = ${store.title}`
-              );
-            }
-            return res.send(
-              createResObject(
-                true,
-                { store },
-                stringConstants.STORE_DELETE_SUCCESSFULLY
-              )
-            );
-          });
+          return res.send(
+            createResObject(
+              true,
+              { store },
+              stringConstants.STORE_DELETE_SUCCESSFULLY
+            )
+          );
         });
       } catch (error) {
         res.status(400).send(createResObject(false, {}, error.message));

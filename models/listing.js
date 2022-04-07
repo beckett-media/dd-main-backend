@@ -1,14 +1,13 @@
 const mongoose = require("mongoose");
-const mongoosastic = require("mongoosastic");
-const Schema = mongoose.Schema;
 const { stringConstants } = require("../utils/constants");
+
+const Schema = mongoose.Schema;
 
 const listingSchema = new mongoose.Schema(
   {
     title: {
       type: String,
       required: true,
-      es_indexed: true,
     },
     description: {
       type: String,
@@ -34,17 +33,14 @@ const listingSchema = new mongoose.Schema(
       type: [String],
       default: [],
       required: false,
-      es_indexed: true,
     },
     cardType: {
       type: String,
       required: true,
-      es_indexed: true,
     },
     sport: {
       type: String,
       required: true,
-      es_indexed: true,
     },
     cardNumber: {
       type: String,
@@ -55,16 +51,13 @@ const listingSchema = new mongoose.Schema(
     year: {
       type: Number,
       required: true,
-      es_indexed: true,
     },
     brand: {
       type: String,
       required: true,
-      es_indexed: true,
     },
     modelNo: {
       type: String,
-      es_indexed: true,
     },
     serialNumber: {
       type: String,
@@ -116,7 +109,6 @@ const listingSchema = new mongoose.Schema(
         stringConstants.gradeState.GRADE_RAW,
       ],
       required: true,
-      es_indexed: true,
     },
     status: {
       type: String,
@@ -154,26 +146,9 @@ const listingSchema = new mongoose.Schema(
   }
 );
 
-listingSchema.plugin(mongoosastic, { hosts: ["localhost:9200"] });
-
 const Listing = mongoose.model(
   stringConstants.collectionNames.Listing_COLLECTION,
   listingSchema
 );
-
-const stream = Listing.synchronize();
-let count = 0;
-
-stream.on("data", function (err, doc) {
-  count++;
-});
-
-stream.on("close", function () {
-  console.log("indexed " + count + " documents!");
-});
-
-stream.on("error", function (err) {
-  console.log(err);
-});
 
 module.exports.Listing = Listing;

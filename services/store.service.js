@@ -1,21 +1,33 @@
 const { Store } = require("../models/store");
 const SimpleLogger = require("../utils/simpleLogger");
 
-/**
- * Async and await conversion of function
- */
-function searchAsAyncAwait(query) {
-  return new Promise((resolve, reject) => {
-    Store.search({ query_string: { query } }, function (err, confirmation) {
-      if (err) return reject(err);
-      return resolve(confirmation);
-    });
-  });
-}
-
-const performElasticSearch = async (query) => {
+const performMongoDBSearch = async (query) => {
   try {
-    return await searchAsAyncAwait(query);
+    agg = [
+      {
+        $search: {
+          wildcard: {
+            query: `*${query}*`,
+            path: {
+              wildcard: "*",
+            },
+            allowAnalyzedField: true,
+          },
+        },
+      },
+      { $limit: limit },
+      {
+        $project: {
+          _id: 1,
+          title: 1,
+          email: 1,
+          phoneNumber: 1,
+          address: 1,
+          images: 1,
+        },
+      },
+    ];
+    return await Store.aggregate(agg);
   } catch (error) {
     SimpleLogger.error(error);
     throw new Error(error.message);
@@ -23,5 +35,5 @@ const performElasticSearch = async (query) => {
 };
 
 module.exports = {
-  performElasticSearch,
+  performMongoDBSearch,
 };

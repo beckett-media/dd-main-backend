@@ -33,7 +33,7 @@ const { listingController } = require("../../controllers");
 router.get(
   "/search/elastic",
   [appAuth],
-  listingController.performElasticSearch
+  listingController.performMongoDBSearch
 );
 
 /**
@@ -512,17 +512,13 @@ router.delete(
     try {
       listing.remove(function (err) {
         if (err) throw err;
-        /* Document unindexing in the background */
-        listing.on("es-removed", function (err, _res) {
-          res.send(
-            createResObject(
-              true,
-              { listing },
-              stringConstants.LISTING_DELETE_SUCCESSFULLY
-            )
-          );
-          if (err) throw err;
-        });
+        res.send(
+          createResObject(
+            true,
+            { listing },
+            stringConstants.LISTING_DELETE_SUCCESSFULLY
+          )
+        );
       });
     } catch (error) {
       res.send(createResObject(false, {}, error.message));

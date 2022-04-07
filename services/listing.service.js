@@ -1,33 +1,39 @@
 const { Listing } = require("../models/listing");
 const SimpleLogger = require("../utils/simpleLogger");
 
-/**
- * Async and await conversion of function
- */
-function searchAsAyncAwait(query, limit) {
-  return new Promise((resolve, reject) => {
-    Listing.search(
+const performMongoDBSearch = async (query, limit = 5) => {
+  try {
+    agg = [
       {
-        query_string: { query: query.match(/^-?\d+$/) ? query : `*${query}*` },
-      },
-      {
-        size: limit,
-        hydrate: true,
-        hydrateOptions: {
-          select: "title images year grade price product playerNames brand",
+        $search: {
+          wildcard: {
+            query: `*${query}*`,
+            path: {
+              wildcard: "*",
+            },
+            allowAnalyzedField: true,
+          },
         },
       },
-      function (err, confirmation) {
-        if (err) return reject(err);
-        return resolve(confirmation);
-      }
-    );
-  });
-}
+      { $limit: parseInt(limit) },
+      {
+        $project: {
+          _id: 1,
+          title: 1,
+          brand: 1,
+          cardType: 1,
+          grade: 1,
+          modelNo: 1,
+          playerNames: 1,
+          sport: 1,
+          year: 1,
+          price: 1,
+          images: 1,
+        },
+      },
+    ];
 
-const performElasticSearch = async (query, limit = 5) => {
-  try {
-    return await searchAsAyncAwait(query, limit);
+    return await Listing.aggregate(agg);
   } catch (error) {
     SimpleLogger.error(error);
     throw new Error(error.message);
@@ -35,5 +41,5 @@ const performElasticSearch = async (query, limit = 5) => {
 };
 
 module.exports = {
-  performElasticSearch,
+  performMongoDBSearch,
 };

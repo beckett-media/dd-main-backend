@@ -2,9 +2,9 @@ const { storeService } = require("../services");
 const { createResObject } = require("../utils/utilFunctions");
 const { stringConstants } = require("../utils/constants");
 
-const performElasticSearch = async (req, res) => {
+const performMongoDBSearch = async (req, res) => {
   try {
-    const totalStores = await storeService.performElasticSearch(
+    const totalStores = await storeService.performMongoDBSearch(
       req.query.search
     );
     return res.send(
@@ -20,5 +20,5 @@ const performElasticSearch = async (req, res) => {
 };
 
 module.exports = {
-  performElasticSearch,
+  performMongoDBSearch,
 };
