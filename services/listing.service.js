@@ -15,7 +15,7 @@ const performMongoDBSearch = async (query, limit = 5) => {
           },
         },
       },
-      { $limit: Integer.parseInt(limit) },
+      { $limit: parseInt(limit) },
       {
         $project: {
           _id: 1,
