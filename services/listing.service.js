@@ -29,6 +29,7 @@ const performMongoDBSearch = async (query, limit = 5) => {
           year: 1,
           price: 1,
           images: 1,
+          product: 1,
         },
       },
     ];
