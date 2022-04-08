@@ -119,12 +119,12 @@ module.exports = {
       expMonth: Joi.number().required().min(1).max(12),
       expYear: Joi.number().required().min(year).max(9999),
       fullName: Joi.string().required().min(2).max(255),
-      address_city: Joi.string().max(255).allow(null).allow(''),
-      address_country: Joi.string().max(255).allow(null).allow(''),
-      address_line1: Joi.string().max(255).allow(null).allow(''),
-      address_line2: Joi.string().max(255).allow(null).allow(''),
-      address_state: Joi.string().max(255).allow(null).allow(''),
-      address_zip: Joi.string().max(255).allow(null).allow('')
+      address_city: Joi.string().max(255).allow(null).allow(""),
+      address_country: Joi.string().max(255).allow(null).allow(""),
+      address_line1: Joi.string().max(255).allow(null).allow(""),
+      address_line2: Joi.string().max(255).allow(null).allow(""),
+      address_state: Joi.string().max(255).allow(null).allow(""),
+      address_zip: Joi.string().max(255).allow(null).allow(""),
     });
 
     const { error } = schema.validate(req.body);
@@ -729,7 +729,12 @@ module.exports = {
       state: Joi.string().required().min(1).max(50),
       zipcode: Joi.string()
         .pattern(/^([0-9]{5})(?:[-\s]*([0-9]{4}))?$/)
-        .required(),
+        .required()
+        .messages({
+          "string.min": "Must have at least 4 characters",
+          "object.regex": "Must have at least 4 characters",
+          "string.pattern.base": "Zip code is not valid",
+        }),
       isDefaultAddress: Joi.boolean(),
     });
 
