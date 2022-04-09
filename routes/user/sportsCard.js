@@ -1103,8 +1103,13 @@ router.get("/card-fac/:cardId", [valCard], async (req, res, next) => {
         {
           card,
           user: user ? user.getUserBasicInfo() : {},
-          price: listing ? listing.price : null,
-          quantity: listing ? listing.availableQuantity : null,
+          listing: listing
+            ? {
+                price: listing.price,
+                quantity: listing.availableQuantity,
+                _id: listing._id,
+              }
+            : null,
         },
         stringConstants.CARD_FAC
       )
