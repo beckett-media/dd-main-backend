@@ -1,9 +1,5 @@
 const request = require("request");
 const fs = require("fs");
-const https = require("https");
-https.globalAgent.options.ca = fs.readFileSync(
-  "node_modules/node_extra_ca_certs_mozilla_bundle/ca_bundle/ca_intermediate_root_bundle.pem"
-);
 const path = require("path");
 const config = require("config");
 const { gradePhase } = require("./helper");
@@ -37,7 +33,10 @@ const combinedGrading = (cardId, imagePath, userId, newApp = false) => {
   };
 
   const promise = new Promise((resolve, reject) => {
-    request(options, function (err, res, body) {
+    request({
+      ...options,
+      rejectUnauthorized: false
+    }, function (err, res, body) {
       if (err) {
         console.log(err);
         logHandledErrorAsCritical(`Grading API Not working ${err.message}`);
