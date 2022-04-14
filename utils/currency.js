@@ -1,10 +1,3 @@
-/*
- currency.js - v1.2.2
- http://scurker.github.io/currency.js
-
- Copyright (c) 2019 Jason Wilson
- Released under MIT license
-*/
 (function (d, c) {
   "object" === typeof exports && "undefined" !== typeof module
     ? (module.exports = c())

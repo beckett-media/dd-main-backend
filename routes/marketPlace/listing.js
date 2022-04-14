@@ -27,6 +27,14 @@ const { uploadMultiImage } = require("../../middlewares/multerSingle");
 const { Order } = require("../../models/order");
 const { StripeConnect } = require("../../models/stripeConnect");
 const { OrderItem } = require("../../models/orderItem");
+const { listingValidation } = require("../../middlewares/validators");
+const { listingController } = require("../../controllers");
+
+router.get(
+  "/search/elastic",
+  [appAuth],
+  listingController.performMongoDBSearch
+);
 
 /**
  * Route to get listing by user
@@ -67,87 +75,91 @@ router.get(
  * Route to get list/card detail
  */
 
-router.get("/:cardId", [appAuth], async (req, res) => {
-  const cardId = req.params.cardId;
-  const cardDetail = await Listing.aggregate([
-    { $match: { _id: mongoose.Types.ObjectId(cardId), auctionId: null } },
-    {
-      $lookup: {
-        from: "users",
-        localField: "user",
-        foreignField: "_id",
-        as: "seller",
+router.get(
+  "/:cardId",
+  [appAuth, listingValidation.getListing],
+  async (req, res) => {
+    const cardId = req.params.cardId;
+    const cardDetail = await Listing.aggregate([
+      { $match: { _id: mongoose.Types.ObjectId(cardId), auctionId: null } },
+      {
+        $lookup: {
+          from: "users",
+          localField: "user",
+          foreignField: "_id",
+          as: "seller",
+        },
       },
-    },
-    {
-      $lookup: {
-        from: "stores",
-        localField: "store",
-        foreignField: "_id",
-        as: "storeDetails",
+      {
+        $lookup: {
+          from: "stores",
+          localField: "store",
+          foreignField: "_id",
+          as: "storeDetails",
+        },
       },
-    },
-    { $unwind: { path: "$seller" } },
-    { $unwind: { path: "$storeDetails", preserveNullAndEmptyArrays: true } },
-    {
-      $lookup: {
-        let: {
-          cardObjId: {
-            $cond: {
-              if: { card: { $ne: ["$card", ""] } },
-              then: "$card",
-              else: { $toObjectId: "$card" },
+      { $unwind: { path: "$seller" } },
+      { $unwind: { path: "$storeDetails", preserveNullAndEmptyArrays: true } },
+      {
+        $lookup: {
+          let: {
+            cardObjId: {
+              $cond: {
+                if: { card: { $ne: ["$card", ""] } },
+                then: "$card",
+                else: { $toObjectId: "$card" },
+              },
             },
           },
-        },
-        from: "cards",
-        pipeline: [{ $match: { $expr: { $eq: ["$_id", "$$cardObjId"] } } }],
-        as: "cardDetail",
-      },
-    },
-    { $unwind: { path: "$cardDetail", preserveNullAndEmptyArrays: true } },
-    {
-      $project: {
-        _id: "$_id",
-        tags: "$tags",
-        images: "$images",
-        product: "$product",
-        grade: "$grade",
-        title: "$title",
-        card: "$cardDetail",
-        description: "$description",
-        price: "$price",
-        quantity: "$quantity",
-        availableQuantity: "$availableQuantity",
-        condition: "$condition",
-        isPublic: "$isPublic",
-        status: "$status",
-        playerNames: "$playerNames",
-        serialNumber: "$serialNumber",
-        cardType: "$cardType",
-        sport: "$sport",
-        store: "$store",
-        cardNumber: "$cardNumber",
-        printRun: "$printRun",
-        year: "$year",
-        brand: "$brand",
-        modelNo: "$modelNo",
-        seller: {
-          _id: "$seller._id",
-          fullName: "$seller.fullName",
-          email: "$seller.email",
-        },
-        storeDetails: {
-          _id: "$storeDetails._id",
-          title: "$storeDetails.title",
+          from: "cards",
+          pipeline: [{ $match: { $expr: { $eq: ["$_id", "$$cardObjId"] } } }],
+          as: "cardDetail",
         },
       },
-    },
-  ]);
-  return res.send(
-    createResObject(true, { cardDetail }, stringConstants.FETCH_SUCESSFUL)
-  );
-});
+      { $unwind: { path: "$cardDetail", preserveNullAndEmptyArrays: true } },
+      {
+        $project: {
+          _id: "$_id",
+          tags: "$tags",
+          images: "$images",
+          product: "$product",
+          grade: "$grade",
+          title: "$title",
+          card: "$cardDetail",
+          description: "$description",
+          price: "$price",
+          quantity: "$quantity",
+          availableQuantity: "$availableQuantity",
+          condition: "$condition",
+          isPublic: "$isPublic",
+          status: "$status",
+          playerNames: "$playerNames",
+          serialNumber: "$serialNumber",
+          cardType: "$cardType",
+          sport: "$sport",
+          store: "$store",
+          cardNumber: "$cardNumber",
+          printRun: "$printRun",
+          year: "$year",
+          brand: "$brand",
+          modelNo: "$modelNo",
+          seller: {
+            _id: "$seller._id",
+            fullName: "$seller.fullName",
+            email: "$seller.email",
+          },
+          storeDetails: {
+            _id: "$storeDetails._id",
+            title: "$storeDetails.title",
+          },
+        },
+      },
+    ]);
+    return res.send(
+      createResObject(true, { cardDetail }, stringConstants.FETCH_SUCESSFUL)
+    );
+  }
+);
 
 /**
  * POST route to add card to listing
@@ -286,7 +298,6 @@ router.post(
     listing = await listing.save();
     if (isPublic) {
       let marketplace = await Marketplace.findOne({ listing: listing._id });
-      console.log("marketplace", marketplace);
       if (!marketplace) {
         let addListingMarket = await Marketplace.create({
           listing: listing._id,
@@ -462,7 +473,6 @@ router.delete(
 
     const userId = req.user._id;
     const user = await User.findById(userId);
-
     const listing = await Listing.findById(listingId);
     if (!user)
       return res
@@ -498,13 +508,21 @@ router.delete(
             errorObjects.UNAUTHENTICATE_USER
           )
         );
-    await Listing.deleteOne({
-      _id: mongoose.Types.ObjectId(listingId),
-    });
 
-    return res.send(
-      createResObject(true, {}, stringConstants.LISTING_DELETE_SUCCESSFULLY)
-    );
+    try {
+      listing.remove(function (err) {
+        if (err) throw err;
+        res.send(
+          createResObject(
+            true,
+            { listing },
+            stringConstants.LISTING_DELETE_SUCCESSFULLY
+          )
+        );
+      });
+    } catch (error) {
+      res.send(createResObject(false, {}, error.message));
+    }
   }
 );
 

@@ -8,6 +8,7 @@ module.exports = {
   valCreateAuction: (req, res, next) => {
     const schema = Joi.object({
       listingId: Joi.objectId().required(),
+      startNow: Joi.boolean().required(),
       bidStart: Joi.date().optional(),
       bidEnd: Joi.date().required(),
       startingBid: Joi.number().required(),

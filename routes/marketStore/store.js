@@ -7,31 +7,25 @@ const authAdminOrUser = require("../../middlewares/authenticateAdminOrUser");
 const appAuth = require("../../middlewares/authenticateApp");
 const fs = require("fs");
 const {
-  valCardPost,
   valStoreData,
   valObjectIdInUrl,
 } = require("../../middlewares/validation");
 const SimpleLogger = require("../../utils/simpleLogger");
 const path = require("path");
 const fsPromises = require("fs").promises;
-const _ = require("lodash");
-const Jimp = require("jimp");
 
 const { valPageSizeNumber } = require("../../middlewares/validation");
 const { Store } = require("../../models/store");
-const { Marketplace } = require("../../models/marketplace");
 const { Listing } = require("../../models/listing");
 const { User } = require("../../models/user");
-const { Card } = require("../../models/card");
-const { Product } = require("../../models/product");
-const { Grade } = require("../../models/grade");
 const { createResObject } = require("../../utils/utilFunctions");
 const { stringConstants } = require("../../utils/constants");
 const { errorObjects } = require("../../utils/errorObjects");
 const { uploadMultiImageStore } = require("../../middlewares/multerSingle");
-const { Order } = require("../../models/order");
 const { StripeConnect } = require("../../models/stripeConnect");
-const { OrderItem } = require("../../models/orderItem");
+const { storeController } = require("../../controllers");
+
+router.get("/search/elastic", [appAuth], storeController.performMongoDBSearch);
 
 /**
  * Route to get store products by user of seller side
@@ -239,9 +233,6 @@ router.post(
     const isPublic = req.body.isPublic;
     const images = req.body.images ? req.body.images : [];
     const user = await User.findById(userId);
-    // const stripe = await StripeConnect.findOne({
-    //   user: mongoose.Types.ObjectId(userId),
-    // });
 
     let alreadyStore = await Store.findOne({ title });
 
@@ -672,15 +663,28 @@ router.delete(
     const totalListing = await Listing.find({ store: storeId });
 
     if (totalListing.length > 0) {
-      return res.send(createResObject(false, {}, "STORE NOT DELETED"));
-    } else {
-      await store.deleteOne({
-        _id: mongoose.Types.ObjectId(storeId),
-      });
-
       return res.send(
-        createResObject(true, {}, stringConstants.STORE_DELETE_SUCCESSFULLY)
+        createResObject(false, {}, "STORE NOT DELETED AS IT CONTAINS LISTING")
       );
+    } else {
+      try {
+        store.remove(function (err) {
+          if (err) {
+            return res
+              .status(400)
+              .send(createResObject(false, {}, error.message));
+          }
+          return res.send(
+            createResObject(
+              true,
+              { store },
+              stringConstants.STORE_DELETE_SUCCESSFULLY
+            )
+          );
+        });
+      } catch (error) {
+        res.status(400).send(createResObject(false, {}, error.message));
+      }
     }
   }
 );
