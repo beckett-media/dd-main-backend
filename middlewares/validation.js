@@ -720,9 +720,17 @@ module.exports = {
         .pattern(/^(\+?\d{1,3}|\d{1,4})$/)
         .required(),
       mobile: Joi.string()
-        .length(10)
-        .pattern(/^[0-9]+$/)
-        .required(),
+        .min(4)
+        .max(15)
+        .pattern(/^[0-9]*$/)
+        .required()
+        .messages({
+          "string.base": `"mobile" should be a type of 'text'`,
+          "string.empty": `"mobile" cannot be an empty field`,
+          "string.min": `"mobile" should have a minimum length of {#limit}`,
+          "any.required": `"mobile" is a required field`,
+          "string.pattern.base": `"mobile" must conatin only numbers`
+        }),
       streetAddress: Joi.string().required().min(1).max(250),
       streetAddress2: Joi.string().allow("").min(1).max(250),
       city: Joi.string().required().min(1).max(50),
