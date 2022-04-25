@@ -34,8 +34,7 @@ const combinedGrading = (cardId, imagePath, userId, newApp = false) => {
 
   const promise = new Promise((resolve, reject) => {
     request({
-      ...options,
-      rejectUnauthorized: false
+      ...options
     }, function (err, res, body) {
       if (err) {
         console.log(err);
