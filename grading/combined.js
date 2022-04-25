@@ -43,10 +43,7 @@ const combinedGrading = (cardId, imagePath, userId, newApp = false) => {
         resolve(0);
       } else {
         try {
-          const data =
-            typeof body === "string" && !body.includes("error")
-              ? JSON.parse(body)
-              : body;
+          const data = typeof body === "string" ? JSON.parse(body) : body;
           resolve(data);
         } catch (error) {
           console.log(error);
