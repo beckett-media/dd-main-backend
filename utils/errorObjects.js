@@ -413,4 +413,25 @@ module.exports.errorObjects = {
     errorSubCode: getKey(stringConstants, stringConstants.PROMO_NOT_VALIDATED),
     errorMessage: stringConstants.PROMO_NOT_VALIDATED,
   },
+  MONGO_DB_BASE_ERROR: {
+    errorCode: 223,
+    errorSubCode: getKey(stringConstants, stringConstants.MONGO_DB_BASE_ERROR),
+    errorMessage: stringConstants.MONGO_DB_BASE_ERROR,
+  },
+  MONGO_DB_VALIDATION_ERROR: {
+    errorCode: 224,
+    errorSubCode: getKey(
+      stringConstants,
+      stringConstants.MONGO_DB_VALIDATION_ERROR
+    ),
+    errorMessage: stringConstants.MONGO_DB_VALIDATION_ERROR,
+  },
+  MONGO_DB_DUPLICATE_ERROR: {
+    errorCode: 225,
+    errorSubCode: getKey(
+      stringConstants,
+      stringConstants.MONGO_DB_DUPLICATE_ERROR
+    ),
+    errorMessage: stringConstants.MONGO_DB_DUPLICATE_ERROR,
+  },
 };

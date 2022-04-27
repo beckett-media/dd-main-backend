@@ -471,4 +471,9 @@ module.exports.stringConstants = {
   },
   AUCTION_ID_NOT_FOUND: "No auction forund for respective auction ID",
   ROLL_BAR_ACCESS_TOKEN: "rollBarAcessToken",
+  USERNAME_REGEX_VALIDATION:
+    /^(?=.{5,20}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$/,
+  MONGO_DB_BASE_ERROR: "DB base error occured",
+  MONGO_DB_VALIDATION_ERROR: "DB Validation error occured",
+  MONGO_DB_DUPLICATE_ERROR: "DB Duplicate key error occured",
 };
