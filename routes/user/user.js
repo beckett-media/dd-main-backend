@@ -232,7 +232,7 @@ router.post(
     user.username = username;
     user.isComplete = user.isBasicInfoCompleted();
     user = await user.save();
-
+    
     user = user.getUserBasicInfo();
     const headers = req.headers;
     breakingLiveWebhook(user, headers);

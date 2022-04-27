@@ -63,7 +63,20 @@ module.exports = {
 
   valUsernameRequest: (req, res, next) => {
     const schema = Joi.object({
-      username: Joi.string().required().min(5).max(255),
+      username: Joi.string()
+        .required()
+        .min(5)
+        .message("username should have a minimum length of 5")
+        .max(20)
+        .message("username should have a maximum length of 20")
+        .pattern(/^(?![_.])/)
+        .message("_ and . can't be at the start of a username")
+        .pattern(/^(?!.*[_.]{2})/)
+        .message(
+          "_ and . can't be used multiple times in a row (e.g user__name / user_.name))"
+        )
+        .pattern(/^[a-zA-Z0-9._]+(?<![_.])$/)
+        .message("username must contain alphabets or numbers and can't end with _ or ."),
     });
 
     const { error } = schema.validate(req.body);
