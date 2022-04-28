@@ -90,8 +90,8 @@ router.post(
               {},
               grading.error,
               {
-                errorCode: 444,
-                errorSubCode: 'API_ERROR',
+                errorCode: 323,
+                errorSubCode: 'ASSESSMENT_ERROR',
                 errorMessage: grading.error
               }
             )
@@ -207,8 +207,8 @@ router.post(
               {},
               grading.error,
               {
-                errorCode: 444,
-                errorSubCode: 'API_ERROR',
+                errorCode: 323,
+                errorSubCode: 'ASSESSMENT_ERROR',
                 errorMessage: grading.error
               }
             )
