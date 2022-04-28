@@ -14,8 +14,8 @@ module.exports = function (err, req, res, next) {
   if (err.name === "MongoError") {
     switch (err.code) {
       case 11000:
-        res
-          .status(400)
+        return res
+          .status(500)
           .send(
             createResObject(
               false,
@@ -25,8 +25,8 @@ module.exports = function (err, req, res, next) {
             )
           );
       default:
-        res
-          .status(400)
+        return res
+          .status(500)
           .send(
             createResObject(
               false,
@@ -39,7 +39,7 @@ module.exports = function (err, req, res, next) {
   } else if (err instanceof mongoose.Error) {
     if (err instanceof mongoose.Error.ValidationError) {
       res
-        .status(400)
+        .status(500)
         .send(
           createResObject(
             false,
@@ -50,7 +50,7 @@ module.exports = function (err, req, res, next) {
         );
     } else {
       res
-        .status(400)
+        .status(500)
         .send(
           createResObject(
             false,
