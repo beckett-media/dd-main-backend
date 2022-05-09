@@ -40,7 +40,7 @@ const userSchema = new mongoose.Schema(
 			type: String,
 			unique: true,
 			minlength: 5,
-			maxlength: 255, // not changing this currently as we need to fix all previous usernames first
+			maxlength: 20,
 			lowercase: true,
 			required: false,
 			validate: stringConstants.USERNAME_REGEX_VALIDATION,

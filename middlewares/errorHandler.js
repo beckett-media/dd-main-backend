@@ -3,7 +3,7 @@
  * thrown by calling next(err) in routes
  */
 const SimpleLogger = require("../utils/simpleLogger");
-const { createResObject } = require("../utils/utilFunctions");
+const { createResObject, errorResponse } = require("../utils/utilFunctions");
 const { errorObjects } = require("../utils/errorObjects");
 const mongoose = require("mongoose");
 
@@ -14,51 +14,35 @@ module.exports = function (err, req, res, next) {
   if (err.name === "MongoError") {
     switch (err.code) {
       case 11000:
-        return res
-          .status(500)
-          .send(
-            createResObject(
-              false,
-              {},
-              err.message,
-              errorObjects.MONGO_DB_DUPLICATE_ERROR
-            )
-          );
+        return errorResponse(
+          res,
+          errorObjects.MONGO_DB_DUPLICATE_ERROR,
+          err.message,
+          400
+        );
       default:
-        return res
-          .status(500)
-          .send(
-            createResObject(
-              false,
-              {},
-              err.message,
-              errorObjects.MONGO_DB_BASE_ERROR
-            )
-          );
+        return errorResponse(
+          res,
+          errorObjects.MONGO_DB_BASE_ERROR,
+          err.message,
+          400
+        );
     }
   } else if (err instanceof mongoose.Error) {
     if (err instanceof mongoose.Error.ValidationError) {
-      res
-        .status(500)
-        .send(
-          createResObject(
-            false,
-            {},
-            err.message,
-            errorObjects.MONGO_DB_VALIDATION_ERROR
-          )
-        );
+      return errorResponse(
+        res,
+        errorObjects.MONGO_DB_VALIDATION_ERROR,
+        err.message,
+        400
+      );
     } else {
-      res
-        .status(500)
-        .send(
-          createResObject(
-            false,
-            {},
-            err.message,
-            errorObjects.MONGO_DB_BASE_ERROR
-          )
-        );
+      return errorResponse(
+        res,
+        errorObjects.MONGO_DB_BASE_ERROR,
+        err.message,
+        400
+      );
     }
   } else {
     res
