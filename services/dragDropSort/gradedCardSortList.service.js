@@ -6,36 +6,39 @@ const { Card } = require("../../models/card");
 const SimpleLogger = require("../../utils/simpleLogger");
 const { stringConstants } = require("../../utils/constants");
 
-const changeIndexOfCardSortList = async (req) => {
-  const { toIndex, cardId, gradedListId } = req.body;
-
+const changeIndexOfCardSortList = async (
+  toIndex,
+  cardId,
+  gradedListId,
+  userId
+) => {
   let gradedCardsSortedList = await GradedCardSortList.findById(gradedListId);
 
   if (!gradedCardsSortedList) {
     gradedCardsSortedList = await GradedCardSortList.findOne({
-      user: req.user._id,
+      user: userId,
     });
 
     if (!gradedCardsSortedList) {
-      await createUserListForGradedCards(req.user._id);
+      await createUserListForGradedCards(userId);
       return {
-        success: false,
+        isSuccess: false,
         status: 404,
         message:
           "Sorted Id for this user was not existed. Its created now. Try again.",
       };
     } else {
       return {
-        success: false,
+        isSuccess: false,
         status: 200,
         message: "You are providing wrong graded sorted list id",
       };
     }
   }
 
-  if (toIndex > gradedCardsSortedList.length) {
+  if (toIndex >= gradedCardsSortedList.cards.length) {
     return {
-      success: false,
+      isSuccess: false,
       status: 400,
       message:
         "toIndex is greater than user graded list size. Array starts from 0 index",
@@ -49,15 +52,17 @@ const changeIndexOfCardSortList = async (req) => {
     const updatedGradedSortedList = await gradedCardsSortedList.save();
 
     return {
-      success: true,
+      isSuccess: true,
       status: 200,
       message: `Card successfully moved from ${fromIndex} index to ${toIndex} index.`,
-      updatedGradedSortedList,
-      oldGradedSortedList: gradedCardsSortedList,
+      updatedGradedSortedList: {
+        cards: updatedGradedSortedList.cards,
+        _id: updatedGradedSortedList._id,
+      },
     };
   } else {
     return {
-      success: false,
+      isSuccess: false,
       status: 404,
       message: "CardId not found in user graded sorted list.",
     };

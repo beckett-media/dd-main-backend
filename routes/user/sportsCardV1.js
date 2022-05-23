@@ -16,7 +16,7 @@ const {
 const {
   getOrCreateAndGetUserGradedSortedList 
 } = require("../../services/dragDropSort/gradedCardSortList.service")
-
+const { gradedCardSortController } = require("../../controllers/")
 
 /**
  * Step 1: Create a new card and upload card front
@@ -261,5 +261,7 @@ router.post(
     );
   }
 );
+
+router.post('/move-graded-card/:cardId', [appAuth, auth], gradedCardSortController.changeIndexOfCardSortList)
 
 module.exports = router;
