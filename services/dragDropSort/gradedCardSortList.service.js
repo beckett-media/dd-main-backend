@@ -121,22 +121,41 @@ const createUserListForGradedCards = async (userId) => {
   return userGradedCardList;
 };
 
-const removeCardFromSortedList = async (cardId, userId) => {
+const removeCardFromGradedSortedList = async (cardId, userId) => {
   const gradedCardsList = await getUserGradedCardsList(userId);
 
   if (gradedCardsList) {
     const indexOfCard = gradedCardsList.cards.indexOf(cardId);
 
-    if (indexOfCard) {
+    if (indexOfCard >= 0) {
       gradedCardsList.cards.splice(indexOfCard, 1);
       await gradedCardsList.save();
+      return true;
     }
   }
+};
+
+const addCardInGradedSortedList = async ({ cardId, userId }) => {
+  const gradedCardsList = await getUserGradedCardsList(userId);
+
+  if (gradedCardsList) {
+    const indexOfCard = gradedCardsList.cards.indexOf(cardId);
+    if (indexOfCard === -1) {
+      gradedCardsList.cards.push(cardId);
+      await gradedCardsList.save();
+    }
+  } else {
+    const gradedList = await createUserListForGradedCards(userId);
+    gradedList.cards.push(cardId);
+    await gradedList.save();
+  }
+  return true;
 };
 
 module.exports = {
   changeIndexOfCardSortList,
   createUserListForGradedCards,
   getOrCreateAndGetUserGradedSortedList,
-  removeCardFromSortedList,
+  removeCardFromGradedSortedList,
+  addCardInGradedSortedList,
 };

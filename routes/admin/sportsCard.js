@@ -23,6 +23,8 @@ const {
   valPageSizeNumber,
   valCardGradeReq,
 } = require("../../middlewares/validation");
+const { addCardInGradedSortedList } = require("../../services/dragDropSort/gradedCardSortList.service");
+const { logHandledErrorAsCritical } = require("../../services/rollbar.service");
 
 /**
  * Get all the cards that need to be graded
@@ -173,6 +175,12 @@ router.post(
       },
       { new: true }
     );
+
+    // add card to user graded sort list
+    const isAdded = await addCardInGradedSortedList(card)
+    if(!isAdded){
+      logHandledErrorAsCritical(`Unable to add card =${card._id} in graded list by admin`)
+    }
 
     const user = await User.findById(card.user);
     if (user) {
