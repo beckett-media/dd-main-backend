@@ -7,7 +7,9 @@ const rimraf = require("rimraf");
 const _ = require("lodash");
 const { PendingDeletion } = require("./pendingDeletion");
 const { stringConstants } = require("../utils/constants");
-const { removeCardFromSortedList } = require("../services/dragDropSort/gradedCardSortList.service")
+const {
+  removeCardFromSortedList,
+} = require("../services/dragDropSort/gradedCardSortList.service");
 
 const cardSchema = new mongoose.Schema(
   {
@@ -179,7 +181,9 @@ cardSchema.pre("remove", async function () {
     `${this._id}/`
   );
   try {
-    await removeCardFromSortedList(this._id, this.user)
+    if (this.status === stringConstants.cardState.GRADED) {
+      await removeCardFromSortedList(this._id, this.user);
+    }
     rimraf.sync(cardDir);
   } catch (error) {
     SimpleLogger.error(error);
