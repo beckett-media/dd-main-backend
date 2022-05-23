@@ -1,10 +1,14 @@
+const CardModel = require("../../models/card");
 const {
   GradedCardSortList,
 } = require("../../models/dragDropSort/graded-cards-sort-list");
-const { Card } = require("../../models/card");
 const { errorObjects } = require("../../utils/errorObjects");
 
 const { stringConstants } = require("../../utils/constants");
+
+const getUserGradedCardsList = (userId) => {
+  return GradedCardSortList.findOne({ user: userId });
+};
 
 const changeIndexOfCardSortList = async (
   toIndex,
@@ -100,7 +104,7 @@ const getOrCreateAndGetUserGradedSortedList = async (
 };
 
 const createUserListForGradedCards = async (userId) => {
-  const cards = await Card.find({
+  const cards = await CardModel.Card.find({
     $and: [
       { user: userId },
       { status: stringConstants.cardState.GRADED },
@@ -117,8 +121,22 @@ const createUserListForGradedCards = async (userId) => {
   return userGradedCardList;
 };
 
+const removeCardFromSortedList = async (cardId, userId) => {
+  const gradedCardsList = await getUserGradedCardsList(userId);
+
+  if (gradedCardsList) {
+    const indexOfCard = gradedCardsList.cards.indexOf(cardId);
+
+    if (indexOfCard) {
+      gradedCardsList.cards.splice(indexOfCard, 1);
+      await gradedCardsList.save();
+    }
+  }
+};
+
 module.exports = {
   changeIndexOfCardSortList,
   createUserListForGradedCards,
   getOrCreateAndGetUserGradedSortedList,
+  removeCardFromSortedList,
 };
