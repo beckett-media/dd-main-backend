@@ -231,6 +231,8 @@ module.exports.stringConstants = {
     USER_COLLECTION: "User",
     PENDING_DELETION: "Pending_Deletion",
     CARD_COLLECTION: "Card",
+    GRADED_CARD_SORT_LIST_COLLECTION: "Graded_Card_Sort_List",
+    COLLECTION_SORT_LIST_COLLECTION: "Collection_Sort_List",
     TRANSACTION_COLLECTION: "Transaction",
     TRANSACTION_LOG_COLLECTION: "Transaction_log",
     SCHEDULE_COLLECTION: "Schedule",
@@ -476,4 +478,5 @@ module.exports.stringConstants = {
   MONGO_DB_BASE_ERROR: "DB base error occured",
   MONGO_DB_VALIDATION_ERROR: "DB Validation error occured",
   MONGO_DB_DUPLICATE_ERROR: "DB Duplicate key error occured",
+  SORTED_ID_NOT_FOUND: "sortedIdNotFound"
 };
