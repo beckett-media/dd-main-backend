@@ -14,6 +14,9 @@ const {
   valPageSizeNumber
 } = require('../../middlewares/validation');
 const {
+  dragDropValidation
+} = require('../../middlewares/validators');
+const {
   getOrCreateAndGetUserGradedSortedList 
 } = require("../../services/dragDropSort/gradedCardSortList.service")
 const { gradedCardSortController } = require("../../controllers/")
@@ -262,6 +265,8 @@ router.post(
   }
 );
 
-router.post('/move-graded-card/:cardId', [appAuth, auth], gradedCardSortController.changeIndexOfCardSortList)
+router.post('/move-graded-card/:cardId', [
+  appAuth, auth, dragDropValidation.changeIndexOfCardSortList
+], gradedCardSortController.changeIndexOfCardSortList)
 
 module.exports = router;

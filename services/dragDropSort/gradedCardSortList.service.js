@@ -2,8 +2,8 @@ const {
   GradedCardSortList,
 } = require("../../models/dragDropSort/graded-cards-sort-list");
 const { Card } = require("../../models/card");
+const { errorObjects } = require("../../utils/errorObjects");
 
-const SimpleLogger = require("../../utils/simpleLogger");
 const { stringConstants } = require("../../utils/constants");
 
 const changeIndexOfCardSortList = async (
@@ -25,13 +25,14 @@ const changeIndexOfCardSortList = async (
         isSuccess: false,
         status: 404,
         message:
-          "Sorted Id for this user was not existed. Its created now. Try again.",
+          "Sorted List for this user was not existed. It's created now. Try again.",
       };
     } else {
       return {
         isSuccess: false,
-        status: 200,
-        message: "You are providing wrong graded sorted list id",
+        status: 404,
+        message: stringConstants.GRADED_SORTED_ID_NOT_FOUND,
+        error: errorObjects.GRADED_SORTED_ID_NOT_FOUND,
       };
     }
   }
@@ -40,8 +41,8 @@ const changeIndexOfCardSortList = async (
     return {
       isSuccess: false,
       status: 400,
-      message:
-        "toIndex is greater than user graded list size. Array starts from 0 index",
+      message: stringConstants.TO_INDEX_OVERFLOW,
+      error: errorObjects.TO_INDEX_OVERFLOW,
     };
   }
 
@@ -64,7 +65,8 @@ const changeIndexOfCardSortList = async (
     return {
       isSuccess: false,
       status: 404,
-      message: "CardId not found in user graded sorted list.",
+      message: stringConstants.CARD_ID_NOT_FOUND_GRADED_LIST,
+      error: errorObjects.CARD_ID_NOT_FOUND_GRADED_LIST,
     };
   }
 };

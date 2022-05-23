@@ -14,7 +14,7 @@ const changeIndexOfCardSortList = async (req, res) => {
       createResObject(
         response.isSuccess,
         {
-          updatedGradedSortedList: response.updatedGradedSortedList
+          updatedGradedSortedList: response.updatedGradedSortedList,
         },
         response.message
       )
@@ -27,7 +27,7 @@ const changeIndexOfCardSortList = async (req, res) => {
           response.isSuccess,
           {},
           response.message,
-          errorObjects.PROMO_CODE_ALREADY_EXISTS
+          response.error || {}
         )
       );
   }
