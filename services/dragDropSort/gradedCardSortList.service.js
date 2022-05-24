@@ -112,21 +112,22 @@ const createUserListForGradedCards = async (userId) => {
     ],
   })
     .select("_id")
-    .sort({ createdAt: 1 });
+    .sort({ createdAt: -1 });
+
+  let cardsId = cards.map((card) => card._id);
 
   const userGradedCardList = await GradedCardSortList.create({
     user: userId,
-    cards,
+    cards: cardsId,
   });
+
   return userGradedCardList;
 };
 
 const removeCardFromGradedSortedList = async (cardId, userId) => {
   const gradedCardsList = await getUserGradedCardsList(userId);
-
   if (gradedCardsList) {
     const indexOfCard = gradedCardsList.cards.indexOf(cardId);
-
     if (indexOfCard >= 0) {
       gradedCardsList.cards.splice(indexOfCard, 1);
       await gradedCardsList.save();
@@ -135,19 +136,21 @@ const removeCardFromGradedSortedList = async (cardId, userId) => {
   }
 };
 
-const addCardInGradedSortedList = async ({ cardId, userId }) => {
+const addCardInGradedSortedList = async ({ _id: cardId, user: userId }) => {
   const gradedCardsList = await getUserGradedCardsList(userId);
-
   if (gradedCardsList) {
     const indexOfCard = gradedCardsList.cards.indexOf(cardId);
     if (indexOfCard === -1) {
-      gradedCardsList.cards.push(cardId);
+      gradedCardsList.cards.unshift(cardId);
       await gradedCardsList.save();
     }
   } else {
     const gradedList = await createUserListForGradedCards(userId);
-    gradedList.cards.push(cardId);
-    await gradedList.save();
+    const indexOfCard = gradedList.cards.indexOf(cardId);
+    if (indexOfCard === -1) {
+      gradedList.cards.unshift(cardId);
+      await gradedList.save();
+    }
   }
   return true;
 };

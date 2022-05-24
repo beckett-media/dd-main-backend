@@ -1,6 +1,5 @@
 const { createResObject } = require("../../utils/utilFunctions");
 const { gradedCardSortList } = require("../../services/");
-const { errorObjects } = require("../../utils/errorObjects");
 
 const changeIndexOfCardSortList = async (req, res) => {
   const response = await gradedCardSortList.changeIndexOfCardSortList(
