@@ -203,8 +203,8 @@ router.post(
   "/graded-cards/:pageSize/:pageNumber",
   [appAuth, auth, valPageSizeNumber],
   async (req, res) => {
-    const pageSize = parseInt(req.params.pageSize);
-    const pageNumber = parseInt(req.params.pageNumber);
+    const pageSize = parseInt(req.params.pageSize, 10);
+    const pageNumber = parseInt(req.params.pageNumber, 10);
     const userId = req.user._id;
     const userGradedList = await getOrCreateAndGetUserGradedSortedList(
       userId,
