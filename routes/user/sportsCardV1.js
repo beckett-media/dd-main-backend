@@ -214,14 +214,16 @@ router.post(
 
     const numCards = userGradedList.gradedList.cards.length;
 
-    let cards = await Card.find({
-      _id: {
-        $in: userGradedList.cardsToFetch,
-      },
-    });
+    let m = { $match : { "_id" : { "$in" : userGradedList.cardsToFetch } } };
+    let a = { $addFields : { "__order" : { $indexOfArray : [ userGradedList.cardsToFetch, "$_id" ] } } };
+    let s = { $sort : { "__order" : 1 } };
+
+    let cards = await Card.aggregate([m,a,s]);    
+
+    
 
     cards = cards.map((card) => {
-      return card.getCardDetailsWithGrading();
+      return Card.getCardDetailsWithGrading(card);
     });
 
     const collectionCards = await Collection.find({

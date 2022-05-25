@@ -198,6 +198,28 @@ cardSchema.pre("remove", async function () {
   }
 });
 
+cardSchema.statics.getCardDetailsWithGrading = function (card) {      
+  return {
+    id: card._id || null,
+    front: card.front || null,
+    back: card.back || null,
+    video: card.video || null,
+    thumbnail: card.thumbnail || null,
+    gradedImage: card.gradedImage || null,
+    year: card.year || null,
+    brand: card.brand || null,
+    cardNumber:card.cardNumber || null,
+    playerNames: card.playerNames|| null,
+    grading:  card.grading || null,
+    status: card.status || null,
+    createdAt: card.createdAt || null,
+    updatedAt: card.updatedAt || null,
+    modelNo: card.modelNo || null,
+    serialNo: card.serialNo || null,
+    cardType: card.cardType || null
+  };
+}
+
 const Card = mongoose.model(
   stringConstants.collectionNames.CARD_COLLECTION,
   cardSchema
