@@ -10,35 +10,19 @@ const getUserGradedCardsList = (userId) => {
   return GradedCardSortList.findOne({ user: userId });
 };
 
-const changeIndexOfCardSortList = async (
-  toIndex,
-  cardId,
-  gradedListId,
-  userId
-) => {
-  let gradedCardsSortedList = await GradedCardSortList.findById(gradedListId);
+const changeIndexOfCardSortList = async (toIndex, cardId, userId) => {
+  let gradedCardsSortedList = await GradedCardSortList.findOne({
+    user: userId,
+  });
 
   if (!gradedCardsSortedList) {
-    gradedCardsSortedList = await GradedCardSortList.findOne({
-      user: userId,
-    });
-
-    if (!gradedCardsSortedList) {
-      await createUserListForGradedCards(userId);
-      return {
-        isSuccess: false,
-        status: 404,
-        message:
-          "Sorted List for this user was not existed. It's created now. Try again.",
-      };
-    } else {
-      return {
-        isSuccess: false,
-        status: 404,
-        message: stringConstants.GRADED_SORTED_ID_NOT_FOUND,
-        error: errorObjects.GRADED_SORTED_ID_NOT_FOUND,
-      };
-    }
+    await createUserListForGradedCards(userId);
+    return {
+      isSuccess: false,
+      status: 404,
+      message:
+        "Sorted List for this user was not existed. It's created now. Try again.",
+    };
   }
 
   if (toIndex >= gradedCardsSortedList.cards.length) {

@@ -5,6 +5,7 @@ const gradedCardSortListSchema = mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: stringConstants.collectionNames.USER_COLLECTION,
+    index: true
   },
   cards: [
     {

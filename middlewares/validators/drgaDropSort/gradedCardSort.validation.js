@@ -18,7 +18,6 @@ module.exports = {
     });
 
     const schemaBody = Joi.object({
-      gradedListId: Joi.required().custom(objectId),
       toIndex: Joi.number().min(0).required(),
     });
 
