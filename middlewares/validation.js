@@ -70,10 +70,10 @@ module.exports = {
         .max(20)
         .message("username should have a maximum length of 20")
         .pattern(/^(?![_.])/)
-        .message("_ or . can't be at the start of a username")
+        .message("_ or . can't be at the start of a username (e.g _test, .test)")
         .pattern(/^(?!.*[_.]{2})/)
         .message(
-          "_ or . can't be used multiple times in a row (e.g user__name / user_.name)"
+          "_ or . can't be used multiple times in a row (e.g test__user, test_.user)"
         )
         .pattern(/^[a-zA-Z0-9._]+(?<![_.])$/)
         .message(
