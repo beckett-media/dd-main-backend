@@ -76,7 +76,7 @@ module.exports = {
           "_ and . can't be used multiple times in a row (e.g user__name / user_.name))"
         )
         .pattern(/^[a-zA-Z0-9._]+(?<![_.])$/)
-        .message("username must contain alphabets or numbers and can't end with _ or ."),
+        .message("username must contain alphabets (a-z), numbers (1-9) and cannot start or end with _ or ."),
     });
 
     const { error } = schema.validate(req.body);
