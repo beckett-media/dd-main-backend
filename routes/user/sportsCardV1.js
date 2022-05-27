@@ -4,22 +4,12 @@ const auth = require('../../middlewares/authenticateUser');
 const appAuth = require('../../middlewares/authenticateApp');
 const { User } = require('../../models/user');
 const { Card } = require('../../models/card');
-const { Listing } = require('../../models/listing');
-const { Collection } = require('../../models/collection');
 const { stringConstants } = require('../../utils/constants');
 const { errorObjects } = require('../../utils/errorObjects');
 const { createResObject } = require('../../utils/utilFunctions');
 const {
   valObjectIdInUrl,
-  valPageSizeNumber
 } = require('../../middlewares/validation');
-const {
-  dragDropValidation
-} = require('../../middlewares/validators');
-const {
-  getOrCreateAndGetUserGradedSortedList 
-} = require("../../services/dragDropSort/gradedCardSortList.service")
-const { gradedCardSortController } = require("../../controllers/")
 
 /**
  * Step 1: Create a new card and upload card front
@@ -194,81 +184,5 @@ router.post(
     );
   }
 );
-
-
-/**
- * Get all graded cards for the user with sorted list for drag and drop functionality
- */
- router.get(
-  "/graded-cards/:pageSize/:pageNumber",
-  [appAuth, auth, valPageSizeNumber],
-  async (req, res) => {
-    const pageSize = parseInt(req.params.pageSize, 10);
-    const pageNumber = parseInt(req.params.pageNumber, 10);
-    const userId = req.user._id;
-    const userGradedList = await getOrCreateAndGetUserGradedSortedList(
-      userId,
-      pageSize,
-      pageNumber
-    );
-
-    const numCards = userGradedList.gradedList.cards.length;
-
-    let m = { $match : { "_id" : { "$in" : userGradedList.cardsToFetch } } };
-    let a = { $addFields : { "__order" : { $indexOfArray : [ userGradedList.cardsToFetch, "$_id" ] } } };
-    let s = { $sort : { "__order" : 1 } };
-
-    let cards = await Card.aggregate([m,a,s]);    
-
-    
-
-    cards = cards.map((card) => {
-      return Card.getCardDetailsWithGrading(card);
-    });
-
-    const collectionCards = await Collection.find({
-      card: {
-        $in: userGradedList.cardsToFetch,
-      },
-    });
-
-    const stringCards =
-      collectionCards.length > 0
-        ? collectionCards.map((collection) => collection.card.toString())
-        : [];
-
-    const inListing = await Listing.find({
-      card: {
-        $in: userGradedList.cardsToFetch,
-      },
-    });
-
-    const stringListingCards =
-      inListing.length > 0
-        ? inListing.map((listing) => listing.card.toString())
-        : [];
-
-    cards = cards.map((card) => {
-      const { id = "" } = card;
-      return {
-        ...card,
-        inCollection: stringCards.includes(id.toString()),
-        inListing: stringListingCards.includes(id.toString()),
-      };
-    });
-
-    return res.send(
-      createResObject(
-        true,
-        { cards, numCards, userGradedList },
-        stringConstants.FETCH_SUCESSFUL
-      )
-    );
-  }
-);
-
-router.post('/move-graded-card/:cardId', [
-  appAuth, auth, dragDropValidation.changeIndexOfCardSortList
-], gradedCardSortController.changeIndexOfCardSortList)
 
 module.exports = router;
