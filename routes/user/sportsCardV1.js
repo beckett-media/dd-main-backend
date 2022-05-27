@@ -8,7 +8,7 @@ const { stringConstants } = require('../../utils/constants');
 const { errorObjects } = require('../../utils/errorObjects');
 const { createResObject } = require('../../utils/utilFunctions');
 const {
-  valObjectIdInUrl,
+  valObjectIdInUrl
 } = require('../../middlewares/validation');
 
 /**
