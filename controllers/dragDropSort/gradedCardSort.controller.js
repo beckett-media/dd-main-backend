@@ -8,15 +8,9 @@ const changeIndexOfCardSortList = async (req, res) => {
     req.user._id
   );
   if (response.isSuccess)
-    res.status(response.status || 200).send(
-      createResObject(
-        response.isSuccess,
-        {
-          updatedGradedSortedList: response.updatedGradedSortedList,
-        },
-        response.message
-      )
-    );
+    res
+      .status(response.status || 200)
+      .send(createResObject(response.isSuccess, {}, response.message));
   else {
     res
       .status(response.status || 400)

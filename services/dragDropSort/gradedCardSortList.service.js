@@ -16,13 +16,7 @@ const changeIndexOfCardSortList = async (toIndex, cardId, userId) => {
   });
 
   if (!gradedCardsSortedList) {
-    await createUserListForGradedCards(userId);
-    return {
-      isSuccess: false,
-      status: 404,
-      message:
-        "Sorted List for this user was not existed. It's created now. Try again.",
-    };
+    gradedCardsSortedList = await createUserListForGradedCards(userId);
   }
 
   if (toIndex >= gradedCardsSortedList.cards.length) {
