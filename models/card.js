@@ -174,6 +174,12 @@ cardSchema.methods.getCardDetailsWithGrading = function () {
  * Pre hook to clean card data
  */
 cardSchema.pre("remove", async function () {
+  if (this.status === stringConstants.cardState.GRADED) {
+    const isRemoved = await removeCardFromGradedSortedList(this._id, this.user);
+    if(!isRemoved){
+      logHandledErrorAsCritical(`Not able to remove card = ${this_id} for user = ${this.user}`)
+    }
+  }
   const cardDir = path.join(
     __dirname,
     "../public",
@@ -182,12 +188,6 @@ cardSchema.pre("remove", async function () {
     `${this._id}/`
   );
   try {
-    if (this.status === stringConstants.cardState.GRADED) {
-      const isRemoved = await removeCardFromGradedSortedList(this._id, this.user);
-      if(!isRemoved){
-        logHandledErrorAsCritical(`Not able to remove card = ${this_id} for user = ${this.user}`)
-      }
-    }
     rimraf.sync(cardDir);
   } catch (error) {
     SimpleLogger.error(error);

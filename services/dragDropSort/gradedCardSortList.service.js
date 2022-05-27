@@ -130,7 +130,6 @@ const addCardInGradedSortedList = async ({ _id: cardId, user: userId }) => {
       await gradedList.save();
     }
   }
-  return true;
 };
 
 module.exports = {

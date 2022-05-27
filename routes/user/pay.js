@@ -123,10 +123,7 @@ router.post(
         );
 
         // add card to user graded sort list
-        const isAdded = await addCardInGradedSortedList(card)
-        if(!isAdded){
-          logHandledErrorAsCritical(`Unable to add card =${card._id} in graded list for user = ${userId}`)
-        }
+        await addCardInGradedSortedList(card)
 
         // reducing cards left in subscription by 1
         await User.findByIdAndUpdate(
@@ -246,10 +243,7 @@ router.post(
         );
 
         // add card to user graded sort list
-        const isAdded = await addCardInGradedSortedList(card)
-        if(!isAdded){
-          logHandledErrorAsCritical(`Unable to add card =${card._id} in graded list for user = ${userId}`)
-        }
+        await addCardInGradedSortedList(card)
 
         // reducing cards left in subscription by 1
         await User.findByIdAndUpdate(
