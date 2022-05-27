@@ -865,28 +865,32 @@ router.get(
     let a = { $addFields : { "__order" : { $indexOfArray : [ userGradedList.cardsToFetch, "$_id" ] } } };
     let s = { $sort : { "__order" : 1 } };
 
-    let cards = await Card.aggregate([m,a,s]);    
+    const cardsFetchPromise = Card.aggregate([m,a,s]);    
 
-    cards = cards.map((card) => {
-      return Card.getCardDetailsWithGrading(card);
-    });
-
-    const collectionCards = await Collection.find({
+    const collectionCardsPromise = Collection.find({
       card: {
         $in: userGradedList.cardsToFetch,
       },
+    });
+
+    const inListingPromise = Listing.find({
+      card: {
+        $in: userGradedList.cardsToFetch,
+      },
+    });
+
+    let [cards, collectionCards, inListing] = await Promise.all(
+      [cardsFetchPromise, collectionCardsPromise, inListingPromise]
+    )
+
+    cards = cards.map((card) => {
+      return Card.getCardDetailsWithGrading(card);
     });
 
     const stringCards =
       collectionCards.length > 0
         ? collectionCards.map((collection) => collection.card.toString())
         : [];
-
-    const inListing = await Listing.find({
-      card: {
-        $in: userGradedList.cardsToFetch,
-      },
-    });
 
     const stringListingCards =
       inListing.length > 0
