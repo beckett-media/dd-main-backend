@@ -203,7 +203,6 @@ router.post(
         email,
         twitterId,
         "metadata.signupType": stringConstants.signupType.TWITTER,
-        username: fullName
       });
     } else {
       const role = user.role;
@@ -374,7 +373,6 @@ router.post(
         email,
         facebookId,
         "metadata.signupType": stringConstants.signupType.FACEBOOK,
-        username: fullName
       });
     } else {
       const role = user.role;
@@ -543,7 +541,6 @@ router.post(
         email,
         googleId,
         "metadata.signupType": stringConstants.signupType.GOOGLE,
-        username: fullName || 'name'
       });
     } else {
       const role = user.role;
@@ -705,7 +702,6 @@ router.post(
         email: email,
         appleId: appleId,
         "metadata.signupType": stringConstants.signupType.APPLE,
-        username: fullName
       });
     } else {
       const role = user.role;
@@ -918,7 +914,6 @@ router.post(
         email: reqEmail,
         "metadata.osType": osType,
         "metadata.signupType": stringConstants.signupType.EBAY,
-        username: reqFullName
       });
     } else {
       const role = user.role;

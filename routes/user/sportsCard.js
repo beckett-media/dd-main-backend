@@ -33,6 +33,13 @@ const {
 const centerGrading = require("../../grading/center");
 const cornerGrading = require("../../grading/corner");
 const cardHelper = require("../../helpers/cardHelper");
+const { gradedCardSortController } = require("../../controllers/")
+const {
+  dragDropValidation
+} = require('../../middlewares/validators');
+const {
+  getOrCreateAndGetUserGradedSortedList 
+} = require("../../services/dragDropSort/gradedCardSortList.service")
 
 /**
  * Step 0: Create a new card and upload card details at once
@@ -837,79 +844,57 @@ router.get(
 );
 
 /**
- * Get all graded cards for the user
+ * Get all graded cards for the user with sorted list for drag and drop functionality
  */
-router.get(
+ router.get(
   "/graded-cards/:pageSize/:pageNumber",
   [appAuth, auth, valPageSizeNumber],
   async (req, res) => {
-    const pageSize = parseInt(req.params.pageSize);
-    const pageNumber = parseInt(req.params.pageNumber);
+    const pageSize = parseInt(req.params.pageSize, 10);
+    const pageNumber = parseInt(req.params.pageNumber, 10);
     const userId = req.user._id;
+    const userGradedList = await getOrCreateAndGetUserGradedSortedList(
+      userId,
+      pageSize,
+      pageNumber
+    );
 
-    let cards = await Card.find({
-      $and: [
-        { user: userId },
-        { status: stringConstants.cardState.GRADED },
-        { isCompleted: true },
-      ],
+    const numCards = userGradedList.gradedList.cards.length;
+
+    let m = { $match : { "_id" : { "$in" : userGradedList.cardsToFetch } } };
+    let a = { $addFields : { "__order" : { $indexOfArray : [ userGradedList.cardsToFetch, "$_id" ] } } };
+    let s = { $sort : { "__order" : 1 } };
+
+    const cardsFetchPromise = Card.aggregate([m,a,s]);    
+
+    const collectionCardsPromise = Collection.find({
+      card: {
+        $in: userGradedList.cardsToFetch,
+      },
     });
 
-    const numCards = cards.length;
+    const inListingPromise = Listing.find({
+      card: {
+        $in: userGradedList.cardsToFetch,
+      },
+    });
 
-    cards = await Card.find({
-      $and: [
-        { user: req.user._id },
-        { status: stringConstants.cardState.GRADED },
-        { isCompleted: true },
-      ],
-    })
-      .sort({ createdAt: 1 })
-      .skip((pageNumber - 1) * pageSize)
-      .limit(pageSize);
+    let [cards, collectionCards, inListing] = await Promise.all(
+      [cardsFetchPromise, collectionCardsPromise, inListingPromise]
+    )
 
     cards = cards.map((card) => {
-      return card.getCardDetailsWithGrading();
+      return Card.getCardDetailsWithGrading(card);
     });
 
-    const collectionCards = await Collection.aggregate([
-      { $match: { user: mongoose.Types.ObjectId(userId) } },
-      {
-        $group: {
-          _id: { user: "$user" },
-          user: { $first: "$user" },
-          card: { $addToSet: "$card" },
-        },
-      },
-      { $skip: (pageNumber - 1) * pageSize },
-      { $sort: { createdAt: 1 } },
-      { $limit: pageSize },
-    ]);
-    const [onlyCollection = {}] = collectionCards || [];
-    const { card: innerCards = [] } = onlyCollection;
     const stringCards =
-      innerCards.length > 0
-        ? JSON.stringify(innerCards.map((card) => card.toString()))
+      collectionCards.length > 0
+        ? collectionCards.map((collection) => collection.card.toString())
         : [];
 
-    // getting card Ids
-    const cardIds = cards.map((card) => card.id);
-
-    const inListing = await Listing.aggregate([
-      { $match: { card: { $in: cardIds } } },
-      {
-        $group: {
-          _id: { user: "$user" },
-          card: { $addToSet: "$card" },
-        },
-      },
-    ]);
-
-    const [userList = {}] = inListing || [];
-    const { card: listingCards = [] } = userList;
     const stringListingCards =
-      listingCards.length > 0
-        ? JSON.stringify(listingCards.map((card) => card.toString()))
+      inListing.length > 0
+        ? inListing.map((listing) => listing.card.toString())
         : [];
 
     cards = cards.map((card) => {
@@ -1172,5 +1157,9 @@ router.get(
     }
   }
 );
+
+router.put('/move-graded-card/:cardId', [
+  appAuth, auth, dragDropValidation.changeIndexOfCardSortList
+], gradedCardSortController.changeIndexOfCardSortList)
 
 module.exports = router;

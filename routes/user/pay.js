@@ -24,6 +24,8 @@ const mongoose = require("mongoose");
 const { sendNotiToUser } = require("../../utils/sendNotifications");
 const combinedGrading = require('../../grading/combined');
 const createGradedImage = require('../../utils/digitalOverlay');
+const { addCardInGradedSortedList } = require("../../services/dragDropSort/gradedCardSortList.service");
+const { logHandledErrorAsCritical } = require("../../services/rollbar.service");
 
 router.post(
   "/for-pending-cards",
@@ -119,6 +121,9 @@ router.post(
           cardId,
           { $set: { status: stringConstants.cardState.GRADED, grading, gradedImage } }
         );
+
+        // add card to user graded sort list
+        await addCardInGradedSortedList(card)
 
         // reducing cards left in subscription by 1
         await User.findByIdAndUpdate(
@@ -236,6 +241,9 @@ router.post(
           cardId,
           { $set: { status: stringConstants.cardState.GRADED, grading, gradedImage } }
         );
+
+        // add card to user graded sort list
+        await addCardInGradedSortedList(card)
 
         // reducing cards left in subscription by 1
         await User.findByIdAndUpdate(

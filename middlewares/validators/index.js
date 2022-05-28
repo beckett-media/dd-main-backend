@@ -4,3 +4,4 @@ module.exports.auctionValidation = require("./auction.validation");
 module.exports.orderValidation = require("./order.validation");
 module.exports.promoValidation = require("./promo.validation");
 module.exports.listingValidation = require("./marketPlace/listing.validation");
+module.exports.dragDropValidation = require("./drgaDropSort/gradedCardSort.validation");

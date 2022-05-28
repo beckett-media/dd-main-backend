@@ -413,4 +413,40 @@ module.exports.errorObjects = {
     errorSubCode: getKey(stringConstants, stringConstants.PROMO_NOT_VALIDATED),
     errorMessage: stringConstants.PROMO_NOT_VALIDATED,
   },
+  MONGO_DB_BASE_ERROR: {
+    errorCode: 223,
+    errorSubCode: getKey(stringConstants, stringConstants.MONGO_DB_BASE_ERROR),
+    errorMessage: stringConstants.MONGO_DB_BASE_ERROR,
+  },
+  MONGO_DB_VALIDATION_ERROR: {
+    errorCode: 224,
+    errorSubCode: getKey(
+      stringConstants,
+      stringConstants.MONGO_DB_VALIDATION_ERROR
+    ),
+    errorMessage: stringConstants.MONGO_DB_VALIDATION_ERROR,
+  },
+  MONGO_DB_DUPLICATE_ERROR: {
+    errorCode: 225,
+    errorSubCode: getKey(
+      stringConstants,
+      stringConstants.MONGO_DB_DUPLICATE_ERROR
+    ),
+    errorMessage: stringConstants.MONGO_DB_DUPLICATE_ERROR
+  },
+  GRADED_SORTED_ID_NOT_FOUND: {
+    errorCode: 138,
+    errorSubCode: getKey(stringConstants, stringConstants.GRADED_SORTED_ID_NOT_FOUND),
+    errorMessage: stringConstants.GRADED_SORTED_ID_NOT_FOUND,
+  },
+  TO_INDEX_OVERFLOW: {
+    errorCode: 141,
+    errorSubCode: getKey(stringConstants, stringConstants.TO_INDEX_OVERFLOW),
+    errorMessage: stringConstants.TO_INDEX_OVERFLOW,
+  },
+  CARD_ID_NOT_FOUND_GRADED_LIST: {
+    errorCode: 140,
+    errorSubCode: getKey(stringConstants, stringConstants.CARD_ID_NOT_FOUND_GRADED_LIST),
+    errorMessage: stringConstants.CARD_ID_NOT_FOUND_GRADED_LIST,
+  }
 };

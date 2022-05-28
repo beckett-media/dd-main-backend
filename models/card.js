@@ -7,6 +7,10 @@ const rimraf = require("rimraf");
 const _ = require("lodash");
 const { PendingDeletion } = require("./pendingDeletion");
 const { stringConstants } = require("../utils/constants");
+const {
+  removeCardFromGradedSortedList,
+} = require("../services/dragDropSort/gradedCardSortList.service");
+const { logHandledErrorAsCritical } = require("../services/rollbar.service");
 
 const cardSchema = new mongoose.Schema(
   {
@@ -170,6 +174,12 @@ cardSchema.methods.getCardDetailsWithGrading = function () {
  * Pre hook to clean card data
  */
 cardSchema.pre("remove", async function () {
+  if (this.status === stringConstants.cardState.GRADED) {
+    const isRemoved = await removeCardFromGradedSortedList(this._id, this.user);
+    if(!isRemoved){
+      logHandledErrorAsCritical(`Not able to remove card = ${this_id} for user = ${this.user}`)
+    }
+  }
   const cardDir = path.join(
     __dirname,
     "../public",
@@ -187,6 +197,28 @@ cardSchema.pre("remove", async function () {
     }).save();
   }
 });
+
+cardSchema.statics.getCardDetailsWithGrading = function (card) {      
+  return {
+    id: card._id || null,
+    front: card.front || null,
+    back: card.back || null,
+    video: card.video || null,
+    thumbnail: card.thumbnail || null,
+    gradedImage: card.gradedImage || null,
+    year: card.year || null,
+    brand: card.brand || null,
+    cardNumber:card.cardNumber || null,
+    playerNames: card.playerNames|| null,
+    grading:  card.grading || null,
+    status: card.status || null,
+    createdAt: card.createdAt || null,
+    updatedAt: card.updatedAt || null,
+    modelNo: card.modelNo || null,
+    serialNo: card.serialNo || null,
+    cardType: card.cardType || null
+  };
+}
 
 const Card = mongoose.model(
   stringConstants.collectionNames.CARD_COLLECTION,

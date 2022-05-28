@@ -1,6 +1,6 @@
 const _ = require('lodash');
 
-module.exports.createResObject = (success, object = {}, message, error) => {
+const createResObject = (success, object = {}, message, error) => {
   if (error) {
     return {
       success,
@@ -15,6 +15,19 @@ module.exports.createResObject = (success, object = {}, message, error) => {
     message,
   };
 };
+
+module.exports.createResObject = createResObject;
+
+module.exports.errorResponse = (
+  res,
+  errorObject,
+  errorMessage,
+  code = 500,
+  response = {}
+) =>
+  res
+    .status(code)
+    .send(createResObject(false, response, errorMessage, errorObject));
 
 module.exports.getKey = (object, value) => {
   return _.invert(object)[value];

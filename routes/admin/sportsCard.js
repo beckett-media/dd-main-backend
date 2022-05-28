@@ -23,6 +23,7 @@ const {
   valPageSizeNumber,
   valCardGradeReq,
 } = require("../../middlewares/validation");
+const { addCardInGradedSortedList } = require("../../services/dragDropSort/gradedCardSortList.service");
 
 /**
  * Get all the cards that need to be graded
@@ -173,6 +174,9 @@ router.post(
       },
       { new: true }
     );
+
+    // add card to user graded sort list
+    await addCardInGradedSortedList(card)
 
     const user = await User.findById(card.user);
     if (user) {

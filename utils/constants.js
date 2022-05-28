@@ -231,6 +231,8 @@ module.exports.stringConstants = {
     USER_COLLECTION: "User",
     PENDING_DELETION: "Pending_Deletion",
     CARD_COLLECTION: "Card",
+    GRADED_CARD_SORT_LIST_COLLECTION: "Graded_Card_Sort_List",
+    COLLECTION_SORT_LIST_COLLECTION: "Collection_Sort_List",
     TRANSACTION_COLLECTION: "Transaction",
     TRANSACTION_LOG_COLLECTION: "Transaction_log",
     SCHEDULE_COLLECTION: "Schedule",
@@ -471,4 +473,12 @@ module.exports.stringConstants = {
   },
   AUCTION_ID_NOT_FOUND: "No auction forund for respective auction ID",
   ROLL_BAR_ACCESS_TOKEN: "rollBarAcessToken",
+  USERNAME_REGEX_VALIDATION:
+    /^(?=.{5,20}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$/,
+  MONGO_DB_BASE_ERROR: "DB base error occured",
+  MONGO_DB_VALIDATION_ERROR: "DB Validation error occured",
+  MONGO_DB_DUPLICATE_ERROR: "DB Duplicate key error occured",
+  GRADED_SORTED_ID_NOT_FOUND: "Graded Sorted Id Not Found",
+  TO_INDEX_OVERFLOW: "toIndex is greater than user graded list size. Array starts from 0 index",
+  CARD_ID_NOT_FOUND_GRADED_LIST: "CardId not found in user graded sorted list.",
 };

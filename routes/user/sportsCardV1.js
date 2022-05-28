@@ -11,7 +11,6 @@ const {
   valObjectIdInUrl
 } = require('../../middlewares/validation');
 
-
 /**
  * Step 1: Create a new card and upload card front
  */

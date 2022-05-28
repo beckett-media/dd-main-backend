@@ -38,9 +38,12 @@ const userSchema = new mongoose.Schema(
 		},
 		username: {
 			type: String,
+			unique: true,
 			minlength: 5,
-			maxlength: 255,
+			maxlength: 20,
 			lowercase: true,
+			required: false,
+			validate: stringConstants.USERNAME_REGEX_VALIDATION,
 		},
 		role: {
 			type: String,
