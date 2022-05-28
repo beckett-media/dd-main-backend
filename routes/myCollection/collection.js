@@ -12,6 +12,11 @@ const { Card } = require("../../models/card");
 const { createResObject } = require("../../utils/utilFunctions");
 const { stringConstants } = require("../../utils/constants");
 const { errorObjects } = require("../../utils/errorObjects");
+const { getOrCreateAndGetUserCollectionSortedList, removeCardFromCollectionSortedList, addCardInCollectionSortedList } = require("../../services/dragDropSort/collectionCardSortList.service");
+const { collectionCardSortController } = require("../../controllers/")
+const {
+  collectionListValidation
+} = require('../../middlewares/validators');
 
 /**
  * POST route to add card to collection
@@ -62,6 +67,7 @@ router.post("/add", [appAuth, auth, valCardPost], async (req, res) => {
         card: cardId
     });
     collection = await collection.save();
+    await addCardInCollectionSortedList(collection)
     return res.send(
         createResObject(true, { }, stringConstants.UPDATE_SUCCESSFUL)
     );
@@ -77,47 +83,32 @@ router.get(
         const pageSize = parseInt(req.params.pageSize);
         const pageNumber = parseInt(req.params.pageNumber);
         const userId = req.user._id;
-    
-        const numCollection = await Collection.count({ user: userId });
 
-        const collection = await Collection.aggregate([
-            { $match: { user: mongoose.Types.ObjectId(userId) } },
-            { $skip: (pageNumber - 1) * pageSize },
-            { $sort : { createdAt : 1 } },
-            { $limit: pageSize },
-            { $group: {
-                    _id: { user: "$user" },
-                    user:  { $first: "$user" },
-                    card: { $addToSet: "$card" }
-                }
-            }
-        ]);
+        const userCollectionList = await getOrCreateAndGetUserCollectionSortedList(
+            userId,
+            pageSize,
+            pageNumber
+          );
 
-        if (collection && collection.length) {
-            const [onlyCollection] = collection;
+        const numCollection = userCollectionList.collectionList.cards.length;
 
-            const { card } = onlyCollection;
-            let cardData = await Card.find({ _id: { $in: card }});
-            cardData = cardData.map((card) => {
-                return card.getCardDetailsWithGrading();
-            });
+        let m = { $match : { "_id" : { "$in" : userCollectionList.cardsToFetch } } };
+        let a = { $addFields : { "__order" : { $indexOfArray : [ userCollectionList.cardsToFetch, "$_id" ] } } };
+        let s = { $sort : { "__order" : 1 } };
 
-            return res.send(
-                createResObject(
-                    true,
-                    { cards: cardData, numCards: numCollection },
-                    stringConstants.FETCH_SUCESSFUL
-                )
-            );
-        } else {
-            return res.send(
-                createResObject(
-                    true,
-                    { cards: [], numCards: numCollection },
-                    stringConstants.FETCH_SUCESSFUL
-                )
-            );
-        }
+        let cards = await Card.aggregate([m,a,s]); 
+
+        cards = cards.map((card) => {
+            return Card.getCardDetailsWithGrading(card);
+        });
+
+        return res.send(
+            createResObject(
+                true,
+                { cards, numCards: numCollection },
+                stringConstants.FETCH_SUCESSFUL
+            )
+        );
     }
 );
 
@@ -145,7 +136,8 @@ router.delete("/delete", [appAuth, auth], async (req, res) => {
         const card = mongoose.Types.ObjectId(cardId);
         let collection = await Collection.find({ user, card });
         if (collection && collection.length) {
-            collection = await Collection.remove({ user, card });
+            collection = await Collection.deleteOne({ user, card });
+            await removeCardFromCollectionSortedList(card, user)
             return res.send(
                 createResObject(true, { deletedCount: collection.deletedCount }, stringConstants.DELETED_SUCCESSFULLY)
             );
@@ -175,5 +167,9 @@ router.delete("/delete", [appAuth, auth], async (req, res) => {
             );
     }
 });
+
+router.put('/move-collection-card/:cardId', [
+    appAuth, auth, collectionListValidation.changeIndexOfCardSortList
+  ], collectionCardSortController.changeIndexOfCardSortList)
 
 module.exports = router;

@@ -448,5 +448,10 @@ module.exports.errorObjects = {
     errorCode: 140,
     errorSubCode: getKey(stringConstants, stringConstants.CARD_ID_NOT_FOUND_GRADED_LIST),
     errorMessage: stringConstants.CARD_ID_NOT_FOUND_GRADED_LIST,
+  },
+  CARD_ID_NOT_FOUND_COLLECTION_LIST: {
+    errorCode: 142,
+    errorSubCode: getKey(stringConstants, stringConstants.CARD_ID_NOT_FOUND_COLLECTION_LIST),
+    errorMessage: stringConstants.CARD_ID_NOT_FOUND_COLLECTION_LIST,
   }
 };
