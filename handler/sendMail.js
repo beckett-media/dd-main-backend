@@ -4,11 +4,11 @@ const SENDGRID_API_KEY = 'SG.2NvoOz_-TGOBk5bLGNoMRQ.WxTQyxH0lN5SaPR0l1BtzGjz4dlb
 sgMail.setApiKey(SENDGRID_API_KEY);
 
 const getMessage = ({
-    email, subject, text
+    email, subject, text, from = 'a@duedilly.co'
 }) => {
       return {
         to: email,
-        from: 'a@duedilly.co',
+        from,
         subject,
         text
       };
