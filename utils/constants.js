@@ -479,6 +479,8 @@ module.exports.stringConstants = {
   MONGO_DB_VALIDATION_ERROR: "DB Validation error occured",
   MONGO_DB_DUPLICATE_ERROR: "DB Duplicate key error occured",
   GRADED_SORTED_ID_NOT_FOUND: "Graded Sorted Id Not Found",
+  COLLECTION_SORTED_ID_NOT_FOUND: "Collection Sorted Id Not Found",
   TO_INDEX_OVERFLOW: "toIndex is greater than user graded list size. Array starts from 0 index",
   CARD_ID_NOT_FOUND_GRADED_LIST: "CardId not found in user graded sorted list.",
+  CARD_ID_NOT_FOUND_COLLECTION_LIST: "CardId not found in user collection sorted list.",
 };

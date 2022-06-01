@@ -11,6 +11,7 @@ const {
   removeCardFromGradedSortedList,
 } = require("../services/dragDropSort/gradedCardSortList.service");
 const { logHandledErrorAsCritical } = require("../services/rollbar.service");
+const { removeCardFromCollectionSortedList } = require("../services/dragDropSort/collectionCardSortList.service");
 
 const cardSchema = new mongoose.Schema(
   {
@@ -180,6 +181,9 @@ cardSchema.pre("remove", async function () {
       logHandledErrorAsCritical(`Not able to remove card = ${this_id} for user = ${this.user}`)
     }
   }
+
+  await removeCardFromCollectionSortedList(this._id, this.user);
+
   const cardDir = path.join(
     __dirname,
     "../public",
