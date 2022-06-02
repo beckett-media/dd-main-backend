@@ -85,7 +85,7 @@ router.post(
 
         if (!grading.success) {
           return res
-          .status(500)
+          .status(400)
           .send(
             createResObject(
               false,
@@ -205,7 +205,7 @@ router.post(
 
         if (!grading.success) {
           return res
-          .status(500)
+          .status(400)
           .send(
             createResObject(
               false,
