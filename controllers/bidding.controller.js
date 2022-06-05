@@ -1,5 +1,6 @@
 const { Auction } = require("../models/auction.model");
 const authUser = require("../middlewares/socketAuthenticateUser");
+const { checkAndSendEmail } = require("../services/bid.service");
 
 const bidding = (server) => {
   const io = require("socket.io")(server, {
@@ -46,8 +47,7 @@ const bidding = (server) => {
                 $position: 0,
               },
             },
-          },
-          { new: true }
+          }
         )
           .populate("seller", "_id fullName")
           .populate(
@@ -62,6 +62,8 @@ const bidding = (server) => {
             data: { ...result, bidder: auth.user._id },
             message: "Bid placed successfully",
           });
+
+          await checkAndSendEmail(result, auth.user);
         } else {
           io.to(auction).emit("new bid", {
             success: false,

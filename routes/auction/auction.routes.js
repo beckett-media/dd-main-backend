@@ -20,8 +20,8 @@ router
   .get([appAuth, auth], auctionController.listBySeller);
 
 router
-  .route("/open/:productId/:pageSize/:pageNumber")
-  .get(auctionController.listOpen);
+  .route("/open/:pageSize/:pageNumber")
+  .get(auctionController.getAllAuctions);
 
 router
   .route("/list-by-bidder")

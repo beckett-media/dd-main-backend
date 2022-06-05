@@ -320,7 +320,7 @@ const remove = async (req, res) => {
   }
 };
 
-const listOpen = async (_req, res) => {
+const getAllAuctions = async (_req, res) => {
   try {
     let auctions = await Auction.find({})
       .sort("bidStart")
@@ -425,7 +425,7 @@ function verifyAuctionDates(body) {
 module.exports = {
   createAuction,
   auctionByID,
-  listOpen,
+  getAllAuctions,
   listBySeller,
   listByBidder,
   update,
