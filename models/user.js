@@ -28,11 +28,11 @@ const userSchema = new mongoose.Schema(
 			lowercase: true,
 			unique: true,
 		},
-    biddingEmail: {
-      type: String,
-      trim: true,
-      lowercase: true,
-    },
+		biddingEmail: {
+			type: String,
+			trim: true,
+			lowercase: true,
+		},
 		password: {
 			type: String,
 			minlength: 6,
