@@ -72,11 +72,12 @@ const bidding = (server) => {
           });
         }
       } else {
-        io.to(auction).emit("new bid", {
-          success: false,
-          data: { bidder: auth.user._id },
-          message: auth.message,
-        });
+        if (auth.user)
+          io.to(auction).emit("new bid", {
+            success: false,
+            data: { bidder: auth.user._id },
+            message: auth.message,
+          });
       }
     } catch (err) {
       console.log(err);

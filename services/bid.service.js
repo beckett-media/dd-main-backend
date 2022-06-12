@@ -3,25 +3,36 @@ const { User } = require("../models/user");
 
 async function checkAndSendEmail(result, user) {
   if (result._doc.bids.length === 0) {
-    sendMail({
-      email,
+    await sendMail({
+      email: user.biddingEmail || user.email,
       subject: "Your Bid Is Placed",
       text: `Send email to only this bidder as first bid is placed`,
-    }).then(({ _success }) => {});
+    });
     //send email to only this bidder as first bid is placed
-    console.log("");
-  } else if (result._doc.bids[0].bidder.toString() === user._id.toString()) {
+  } else if (
+    result._doc.bids[0].bidder._id.toString() === user._id.toString()
+  ) {
+    //send email to bid placer that you are winning
+    await sendMail({
+      email: user.biddingEmail || user.email,
+      subject: "Your bid is placed",
+      text: " Chances of your win are strong as you bid top of your own bid",
+    });
+  } else {
     const lostBidder = await User.findById(result._doc.bids[0].bidder);
 
-    //send email to bid placer that you are winning
-    console.log(
-      "send email to bid placer that you are winning and chances are strong as you bid top of your own bid"
-    );
-  } else {
     //send email to bidder
-    console.log("send email to bidder");
+    await sendMail({
+      email: user.biddingEmail || user.email,
+      subject: "Your Bid is Placed",
+      text: "New Bid Placed, Wait until new bid placed or auction to end",
+    });
     //send email to looser
-    console.log("send email to looser");
+    await sendMail({
+      email: lostBidder.biddingEmail || lostBidder.email,
+      subject: "Your Bid is down",
+      text: "New Bid Placed on your bid, to win auction place a new bid with higher price",
+    });
   }
 }
 

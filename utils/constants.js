@@ -40,6 +40,8 @@ module.exports.stringConstants = {
 
   REQUEST_VALIDATION_FAILED: "Request validation failed",
 
+  BIDDING_EMAIL_IS_REQUIRED: "Bidding email is required",
+
   KEYS_MISSING: "Year, Brand, and Players Name are required fields",
 
   USER_EMAIL_ALREADY_EXISTS: "User with the given email already exists",
