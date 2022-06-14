@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const { stringConstants } = require("../utils/constants");
+let mongoose_delete = require('mongoose-delete');
 
 const marketplaceSchema = new mongoose.Schema(
 	{
@@ -16,6 +17,8 @@ const marketplaceSchema = new mongoose.Schema(
 	},
 	{ timestamps: true, toJSON: { getters: true } }
 );
+
+marketplaceSchema.plugin(mongoose_delete)
 
 const Marketplace = mongoose.model(
 	stringConstants.collectionNames.MARKETPLACE_COLLECTION,

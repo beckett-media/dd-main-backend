@@ -12,6 +12,7 @@ const {
 } = require("../services/dragDropSort/gradedCardSortList.service");
 const { logHandledErrorAsCritical } = require("../services/rollbar.service");
 const { removeCardFromCollectionSortedList } = require("../services/dragDropSort/collectionCardSortList.service");
+let mongoose_delete = require('mongoose-delete');
 
 const cardSchema = new mongoose.Schema(
   {
@@ -223,6 +224,8 @@ cardSchema.statics.getCardDetailsWithGrading = function (card) {
     cardType: card.cardType || null
   };
 }
+
+cardSchema.plugin(mongoose_delete)
 
 const Card = mongoose.model(
   stringConstants.collectionNames.CARD_COLLECTION,

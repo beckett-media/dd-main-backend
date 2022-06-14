@@ -378,7 +378,9 @@ router.get("/user-details", [authAdminOrUser], async (req, res) => {
  * in productions
  * TODO: Remove route in production
  */
-router.delete("/delete-user", async (req, res) => {
+router.delete("/delete-user-admin",
+  [appAuth, authAdminOrUser],
+  async (req, res) => {
   const schema = Joi.object({
     emails: Joi.array().items(Joi.string().email()).required(),
   });
@@ -399,6 +401,13 @@ router.delete("/delete-user", async (req, res) => {
   }
   return res.send(
     createResObject(true, {}, `${userArray.length} user deleted`)
+  );
+});
+
+router.delete("/delete-account", [appAuth, auth], async (req, res) => {
+  await req.user.delete()
+  return res.send(
+    createResObject(true, {}, 'Account deleted successfully')
   );
 });
 

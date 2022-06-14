@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const { stringConstants } = require("../utils/constants");
+let mongoose_delete = require('mongoose-delete');
 
 const Schema = mongoose.Schema;
 
@@ -56,6 +57,8 @@ const storeSchema = new mongoose.Schema(
   },
   { timestamps: true, toJSON: { getters: true } }
 );
+
+storeSchema.plugin(mongoose_delete)
 
 const Store = mongoose.model(
   stringConstants.collectionNames.STORES_COLLECTION,

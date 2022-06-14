@@ -9,6 +9,13 @@ const rimraf = require("rimraf");
 const { stringConstants } = require("../utils/constants");
 const stripe = require("stripe")(config.get(stringConstants.STRIPE_TEST_KEY));
 const { Card } = require("./card");
+const { Auction } = require("./auction.model");
+const { Cart } = require("./cart");
+const { Listing } = require("./listing");
+const { Marketplace } = require("./marketplace");
+const { Store } = require("./store");
+let mongoose_delete = require('mongoose-delete');
+let uniqueValidator = require('mongoose-unique-validator');
 
 const userSchema = new mongoose.Schema(
 	{
@@ -26,7 +33,10 @@ const userSchema = new mongoose.Schema(
 			maxlength: 255,
 			trim: true,
 			lowercase: true,
-			unique: true,
+			index: {
+				unique: true,
+				partialFilterExpression: { deleted: false }
+			} 
 		},
 		biddingEmail: {
 			type: String,
@@ -43,12 +53,14 @@ const userSchema = new mongoose.Schema(
 		},
 		username: {
 			type: String,
-			unique: true,
 			minlength: 5,
 			maxlength: 20,
 			lowercase: true,
-			required: false,
 			validate: stringConstants.USERNAME_REGEX_VALIDATION,
+			index: {
+				unique: true,
+				partialFilterExpression: { deleted: false }
+			} 
 		},
 		role: {
 			type: String,
@@ -132,6 +144,23 @@ const userSchema = new mongoose.Schema(
 	},
 	{ timestamps: true }
 );
+
+userSchema.post("save", async function (doc) {
+	if(doc.deleted){
+		// auction
+		await Auction.delete({ seller: doc._id })
+		// card
+		await Card.delete({ user: doc._id })
+		// cart
+		await Cart.delete({ user: doc._id })
+		// listing
+		await Listing.delete({ user: doc._id })
+		// marketplace
+		await Marketplace.delete({ user: doc._id })
+		// store
+		await Store.delete({ user: doc._id })
+	}
+})
 
 /**
  * Pre hook to create all folders for user and stripe ID
@@ -330,6 +359,9 @@ userSchema.methods.removeToken = function (deviceToken) {
 		this.deviceTokens.splice(index, 1);
 	}
 };
+
+userSchema.plugin(uniqueValidator);
+userSchema.plugin(mongoose_delete, { deletedAt : true, overrideMethods: true })
 
 const User = mongoose.model(
 	stringConstants.collectionNames.USER_COLLECTION,
