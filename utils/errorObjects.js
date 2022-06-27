@@ -471,4 +471,12 @@ module.exports.errorObjects = {
     ),
     errorMessage: stringConstants.CARD_ID_NOT_FOUND_COLLECTION_LIST,
   },
+  OLD_PROFILE_PIC_MATCH: {
+    errorCode: 143,
+    errorSubCode: getKey(
+      stringConstants,
+      stringConstants.OLD_PROFILE_PIC_MATCH
+    ),
+    errorMessage: stringConstants.OLD_PROFILE_PIC_MATCH,
+  },
 };

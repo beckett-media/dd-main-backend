@@ -1,4 +1,3 @@
-const CardModel = require("../../models/card");
 const Collection = require("../../models/collection");
 const {
   CollectionCardSortList,

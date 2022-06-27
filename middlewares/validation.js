@@ -4,6 +4,30 @@ const { stringConstants } = require("../utils/constants");
 const { errorObjects } = require("../utils/errorObjects");
 const { createResObject } = require("../utils/utilFunctions");
 const { Question } = require("../models/question");
+
+const userSchema = {
+  username: Joi.string()
+    .min(5)
+    .message("username should have a minimum length of 5")
+    .max(20)
+    .message("username should have a maximum length of 20")
+    .pattern(/^(?![_.])/)
+    .message("_ or . can't be at the start of a username (e.g _test , .test)")
+    .pattern(/[^._]$/)
+    .message("_ or . can't be at the end of a username (e.g test_  , test.)")
+    .pattern(/^(?!.*[_.]{2})/)
+    .message(
+      "_ or . can't be used multiple times in a row (e.g test__user, test_.user)"
+    )
+    .pattern(/^[a-zA-Z0-9._]+(?<![_.])$/)
+    .message(
+      "username must contain alphabets (a-z), numbers (1-9), special characters ( . _ ) and cannot start or end with _ or ."
+    ),
+  email: Joi.string().email().max(255),
+  fullName: Joi.string().min(2).max(255),
+  profilePicture: Joi.string().allow(null).allow(''),
+};
+
 module.exports = {
   /**
    * Function to validate for mongoose object ID
@@ -62,30 +86,9 @@ module.exports = {
   },
 
   valUsernameRequest: (req, res, next) => {
-    const schema = Joi.object({
-      username: Joi.string()
-        .required()
-        .min(5)
-        .message("username should have a minimum length of 5")
-        .max(20)
-        .message("username should have a maximum length of 20")
-        .pattern(/^(?![_.])/)
-        .message(
-          "_ or . can't be at the start of a username (e.g _test , .test)"
-        )
-        .pattern(/[^._]$/)
-        .message(
-          "_ or . can't be at the end of a username (e.g test_  , test.)"
-        )
-        .pattern(/^(?!.*[_.]{2})/)
-        .message(
-          "_ or . can't be used multiple times in a row (e.g test__user, test_.user)"
-        )
-        .pattern(/^[a-zA-Z0-9._]+(?<![_.])$/)
-        .message(
-          "username must contain alphabets (a-z), numbers (1-9), special characters ( . _ ) and cannot start or end with _ or ."
-        ),
-    });
+    const schema = Joi.object(userSchema).fork(["username"], (schema) =>
+      schema.required()
+    );
 
     const { error } = schema.validate(req.body);
     if (error)
@@ -876,6 +879,24 @@ module.exports = {
 
     const { error } = schema.validate({ type: req.params.type });
 
+    if (error)
+      return res
+        .status(400)
+        .send(
+          createResObject(
+            false,
+            { errorMessage: error.details[0].message },
+            stringConstants.REQUEST_VALIDATION_FAILED,
+            errorObjects.REQUEST_VALIDATION_ERROR(error.details[0].message)
+          )
+        );
+    return next();
+  },
+  valUserInfoUpdate: (req, res, next) => {
+    const schema = Joi.object(userSchema)
+      .fork(["username", "fullName", "profilePicture"], (schema) => schema)
+      .min(1);
+    const { error } = schema.validate(req.body);
     if (error)
       return res
         .status(400)
