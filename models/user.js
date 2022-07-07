@@ -60,7 +60,8 @@ const userSchema = new mongoose.Schema(
 			index: {
 				unique: true,
 				partialFilterExpression: { deleted: false }
-			} 
+			},
+			sparse: true 
 		},
 		role: {
 			type: String,
