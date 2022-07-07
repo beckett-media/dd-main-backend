@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const { stringConstants } = require("../utils/constants");
+let mongoose_delete = require('mongoose-delete');
 
 const Schema = mongoose.Schema;
 
@@ -145,6 +146,8 @@ const listingSchema = new mongoose.Schema(
     toJSON: { getters: true },
   }
 );
+
+listingSchema.plugin(mongoose_delete)
 
 const Listing = mongoose.model(
   stringConstants.collectionNames.Listing_COLLECTION,

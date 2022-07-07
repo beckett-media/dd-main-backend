@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const { stringConstants } = require("../utils/constants");
+let mongoose_delete = require('mongoose-delete');
 
 const cartSchema = new mongoose.Schema(
 	{
@@ -21,6 +22,9 @@ const cartSchema = new mongoose.Schema(
 	},
 	{ timestamps: true, toJSON: { getters: true } }
 );
+
+cartSchema.plugin(mongoose_delete)
+
 const Cart = mongoose.model(
 	stringConstants.collectionNames.CART_COLLECTION,
 	cartSchema

@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const { stringConstants } = require("../utils/constants");
+let mongoose_delete = require('mongoose-delete');
 
 const AuctionSchema = new mongoose.Schema(
   {
@@ -41,6 +42,8 @@ const AuctionSchema = new mongoose.Schema(
   },
   { timestamps: true, toJSON: { getters: true } }
 );
+
+AuctionSchema.plugin(mongoose_delete)
 
 const Auction = mongoose.model(
   stringConstants.collectionNames.AUCTION_COLLECTION,
