@@ -20,6 +20,7 @@ const {
   valNewPasswordRequest,
   valVerifyOtp,
   valVerifyBiddingEmail,
+  valUserInfoUpdate
 } = require("../../middlewares/validation");
 const { createResObject, generate } = require("../../utils/utilFunctions");
 const { stringConstants } = require("../../utils/constants");
@@ -34,6 +35,7 @@ const breakingLiveWebhook = require("../../services/breakingLiveWebhook");
 const Joi = require("@hapi/joi");
 const { StripeConnect } = require("../../models/stripeConnect");
 const mongoose = require("mongoose");
+const { userController } = require("../../controllers");
 
 /**
  * Register user with full name, email and password
@@ -687,6 +689,15 @@ router.patch(
     await user.save();
     return res.status(204).send(); 
   }
+);
+
+/**
+ * Updating User info
+ */
+ router.patch(
+  "/update-info",
+  [appAuth, auth, valUserInfoUpdate],
+  userController.updateUser
 );
 
 module.exports = router;

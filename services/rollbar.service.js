@@ -7,8 +7,6 @@ const SimpleLogger = require("../utils/simpleLogger");
 // Rollbar integrated for error reporting
 var rollbar = new Rollbar({
   accessToken: config.get(stringConstants.ROLL_BAR_ACCESS_TOKEN),
-  captureUncaught: true,
-  captureUnhandledRejections: true,
 });
 
 const logHandledErrorAsCritical = (message) => {
