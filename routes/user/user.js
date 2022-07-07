@@ -19,6 +19,7 @@ const {
   valChangePasswordRequest,
   valNewPasswordRequest,
   valVerifyOtp,
+  valVerifyBiddingEmail,
 } = require("../../middlewares/validation");
 const { createResObject, generate } = require("../../utils/utilFunctions");
 const { stringConstants } = require("../../utils/constants");
@@ -27,7 +28,7 @@ const sendNotifications = require("../../utils/sendNotifications");
 const sendMail = require("./../../handler/sendMail");
 const config = require("config");
 const stripe = require("stripe")(config.get(stringConstants.STRIPE_TEST_KEY));
-const breakingLiveWebhook = require('../../services/breakingLiveWebhook');
+const breakingLiveWebhook = require("../../services/breakingLiveWebhook");
 
 // Dev remove in production
 const Joi = require("@hapi/joi");
@@ -663,5 +664,20 @@ router.post("/stripe-auth", [appAuth, auth], async (req, res) => {
     return res.send(createResObject(false, e.message));
   }
 });
+
+/**
+ * Updating Bidding email
+ */
+router.patch(
+  "/biddingEmail",
+  [appAuth, auth, valVerifyBiddingEmail],
+  async ( req, res ) =>
+  {
+    let user = req.user;
+    user.biddingEmail = req.body.biddingEmail;
+    await user.save();
+    return res.status(204).send(); 
+  }
+);
 
 module.exports = router;

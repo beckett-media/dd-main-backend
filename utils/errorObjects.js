@@ -135,6 +135,14 @@ module.exports.errorObjects = {
     errorSubCode: getKey(stringConstants, stringConstants.OTP_NOT_VERIFIED),
     errorMessage: stringConstants.OTP_NOT_VERIFIED,
   },
+  BIDDING_EMAIL_IS_REQUIRED: {
+    errorCode: 404,
+    errorSubCode: getKey(
+      stringConstants,
+      stringConstants.BIDDING_EMAIL_IS_REQUIRED
+    ),
+    errorMessage: stringConstants.BIDDING_EMAIL_IS_REQUIRED,
+  },
   INCORRECT_PASSWORD: {
     errorCode: 113,
     errorSubCode: getKey(stringConstants, stringConstants.INCORRECT_PASSWORD),
@@ -432,11 +440,14 @@ module.exports.errorObjects = {
       stringConstants,
       stringConstants.MONGO_DB_DUPLICATE_ERROR
     ),
-    errorMessage: stringConstants.MONGO_DB_DUPLICATE_ERROR
+    errorMessage: stringConstants.MONGO_DB_DUPLICATE_ERROR,
   },
   GRADED_SORTED_ID_NOT_FOUND: {
     errorCode: 138,
-    errorSubCode: getKey(stringConstants, stringConstants.GRADED_SORTED_ID_NOT_FOUND),
+    errorSubCode: getKey(
+      stringConstants,
+      stringConstants.GRADED_SORTED_ID_NOT_FOUND
+    ),
     errorMessage: stringConstants.GRADED_SORTED_ID_NOT_FOUND,
   },
   TO_INDEX_OVERFLOW: {
@@ -446,12 +457,18 @@ module.exports.errorObjects = {
   },
   CARD_ID_NOT_FOUND_GRADED_LIST: {
     errorCode: 140,
-    errorSubCode: getKey(stringConstants, stringConstants.CARD_ID_NOT_FOUND_GRADED_LIST),
+    errorSubCode: getKey(
+      stringConstants,
+      stringConstants.CARD_ID_NOT_FOUND_GRADED_LIST
+    ),
     errorMessage: stringConstants.CARD_ID_NOT_FOUND_GRADED_LIST,
   },
   CARD_ID_NOT_FOUND_COLLECTION_LIST: {
     errorCode: 142,
-    errorSubCode: getKey(stringConstants, stringConstants.CARD_ID_NOT_FOUND_COLLECTION_LIST),
+    errorSubCode: getKey(
+      stringConstants,
+      stringConstants.CARD_ID_NOT_FOUND_COLLECTION_LIST
+    ),
     errorMessage: stringConstants.CARD_ID_NOT_FOUND_COLLECTION_LIST,
-  }
+  },
 };

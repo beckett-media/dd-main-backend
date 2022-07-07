@@ -53,7 +53,7 @@ module.exports = async (req, res, next) => {
           )
         );
     }
-    req.user = decoded;
+    req.user = user;
     return next();
   } catch (ex) {
     SimpleLogger.error(ex);

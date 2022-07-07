@@ -70,9 +70,13 @@ module.exports = {
         .max(20)
         .message("username should have a maximum length of 20")
         .pattern(/^(?![_.])/)
-        .message("_ or . can't be at the start of a username (e.g _test , .test)")
+        .message(
+          "_ or . can't be at the start of a username (e.g _test , .test)"
+        )
         .pattern(/[^._]$/)
-        .message("_ or . can't be at the end of a username (e.g test_  , test.)")
+        .message(
+          "_ or . can't be at the end of a username (e.g test_  , test.)"
+        )
         .pattern(/^(?!.*[_.]{2})/)
         .message(
           "_ or . can't be used multiple times in a row (e.g test__user, test_.user)"
@@ -80,7 +84,7 @@ module.exports = {
         .pattern(/^[a-zA-Z0-9._]+(?<![_.])$/)
         .message(
           "username must contain alphabets (a-z), numbers (1-9), special characters ( . _ ) and cannot start or end with _ or ."
-          ),
+        ),
     });
 
     const { error } = schema.validate(req.body);
@@ -207,6 +211,27 @@ module.exports = {
     const schema = Joi.object({
       email: Joi.string().required(),
       otp: Joi.string().required().min(6),
+    });
+
+    const { error } = schema.validate(req.body);
+    if (error) {
+      return res
+        .status(400)
+        .send(
+          createResObject(
+            false,
+            { errorMessage: error.details[0].message },
+            stringConstants.REQUEST_VALIDATION_FAILED,
+            errorObjects.REQUEST_VALIDATION_ERROR(error.details[0].message)
+          )
+        );
+    }
+    return next();
+  },
+
+  valVerifyBiddingEmail: (req, res, next) => {
+    const schema = Joi.object({
+      biddingEmail: Joi.string().email().required(),
     });
 
     const { error } = schema.validate(req.body);
@@ -746,7 +771,7 @@ module.exports = {
           "string.empty": `"mobile" cannot be an empty field`,
           "string.min": `"mobile" should have a minimum length of {#limit}`,
           "any.required": `"mobile" is a required field`,
-          "string.pattern.base": `"mobile" must conatin only numbers`
+          "string.pattern.base": `"mobile" must conatin only numbers`,
         }),
       streetAddress: Joi.string().required().min(1).max(250),
       streetAddress2: Joi.string().allow("").min(1).max(250),
