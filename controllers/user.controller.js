@@ -18,7 +18,7 @@ const updateUser = async (req, res) => {
     if (oldProfilePic && req.body.hasOwnProperty("profilePicture")) {
       await userService.createJobForOldPicDeletion(oldProfilePic);
     }
-    breakingLiveWebhook(user, req.headers);
+    breakingLiveWebhook(response.data.user, req.headers);
   } else {
     res
       .status(response.status || 400)
