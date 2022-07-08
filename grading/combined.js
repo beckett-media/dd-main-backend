@@ -15,14 +15,14 @@ const combinedGrading = (cardId, imagePath, userId, newApp = false) => {
     },
     formData: newApp
       ? {
-          user_id: userId,
+          user_id: `${userId}`,
           report_id: cardId,
           image_url: `${clientS3Path}${imagePath}`,
           device: "node",
           phrase: gradePhase(),
         }
       : {
-          user_id: userId,
+          user_id: `${userId}`,
           report_id: cardId,
           image: fs.createReadStream(
             path.join(__dirname, "./../public/", imagePath)
