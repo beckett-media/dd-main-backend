@@ -2,6 +2,7 @@ const { User } = require("../models/user");
 const { stringConstants } = require("../utils/constants");
 const { errorObjects } = require("../utils/errorObjects");
 const { PendingDeletion } = require("../models/pendingDeletion");
+const SimpleLogger = require("../utils/simpleLogger");
 
 const isUserNameExist = async (username) => {
   let user = await User.findOne({ username });
