@@ -29,15 +29,6 @@ const updateUser = async (user, updateBody) => {
       };
   }
 
-  if (user.profilePicture === updateBody.profilePicture) {
-    return {
-      isSuccess: false,
-      status: 400,
-      message: stringConstants.OLD_PROFILE_PIC_MATCH,
-      error: errorObjects.OLD_PROFILE_PIC_MATCH,
-    };
-  }
-
   Object.assign(user, updateBody);
   await user.save();
 
