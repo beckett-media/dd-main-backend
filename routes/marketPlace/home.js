@@ -36,6 +36,7 @@ const { Auction } = require("../../models/auction.model");
 router.get("/", [appAuth, publicRouteAuth], async (req, res) => {
   const pageSize = 10;
   const pageNumber = 1;
+  const promises = [];
   const userId = req.user ? req.user._id : "";
   const arivalCondition = {
     $match: {
@@ -47,13 +48,7 @@ router.get("/", [appAuth, publicRouteAuth], async (req, res) => {
     },
   };
 
-  const products = await Product.find();
-  const grade = await Grade.find();
-  const newArrivals = await filterData(arivalCondition, pageSize, pageNumber);
-  const newStores = await filterStoreData(4, pageNumber);
-  const newAuctions = await filterAuctionData();
-
-  const trendingLisitnProduct = await Order.aggregate([
+  const trendingListPromise = Order.aggregate([
     {
       $lookup: {
         from: "listings",
@@ -89,7 +84,38 @@ router.get("/", [appAuth, publicRouteAuth], async (req, res) => {
     { $sort: { _id: -1 } },
     { $limit: 50 },
   ]);
-  let trendingLisitnProductId = trendingLisitnProduct.map((element, idx) => {
+
+  // check order for current user recommendation list
+  let checkCurrentUserOrderPromise = "";
+  if (userId === "") {
+    checkCurrentUserOrderPromise = Order.find().distinct("listing");
+  } else {
+    checkCurrentUserOrderPromise = Order.find({ buyer: userId }).distinct(
+      "listing"
+    );
+  }
+
+  promises.push(
+    Product.find().lean().exec(),
+    Grade.find().lean().exec(),
+    filterData(arivalCondition, pageSize, pageNumber),
+    filterStoreData(4, pageNumber),
+    filterAuctionData(),
+    trendingListPromise,
+    checkCurrentUserOrderPromise
+  );
+
+  const [
+    products,
+    grade,
+    newArrivals,
+    newStores,
+    newAuctions,
+    trendingLisitnProduct,
+    checkCurrentUserOrder,
+  ] = await Promise.all(promises);
+
+  let trendingLisitnProductId = trendingLisitnProduct.map((element) => {
     return element._id;
   });
   let cardCondition = "";
@@ -153,15 +179,6 @@ router.get("/", [appAuth, publicRouteAuth], async (req, res) => {
     pageSize,
     pageNumber
   );
-  // check order for current user recommendation list
-  let checkCurrentUserOrder = "";
-  if (userId === "") {
-    checkCurrentUserOrder = await Order.find().distinct("listing");
-  } else {
-    checkCurrentUserOrder = await Order.find({ buyer: userId }).distinct(
-      "listing"
-    );
-  }
 
   const recommendationListByPrice = await Listing.aggregate([
     {
