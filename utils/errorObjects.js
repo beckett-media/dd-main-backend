@@ -479,4 +479,9 @@ module.exports.errorObjects = {
     ),
     errorMessage: stringConstants.OLD_PROFILE_PIC_MATCH,
   },
+  TWITTER_NO_EMAIL: {
+    errorCode: 144,
+    errorSubCode: getKey(stringConstants, stringConstants.TWITTER_NO_EMAIL),
+    errorMessage: stringConstants.TWITTER_NO_EMAIL,
+  },
 };
