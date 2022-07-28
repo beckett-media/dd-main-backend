@@ -146,7 +146,16 @@ router.post(
       firstSignin = false;
 
     if (!email) {
-      return next(new Error("Twitter sign in email not found in payload"));
+      return res
+        .status(400)
+        .send(
+          createResObject(
+            false,
+            {},
+            stringConstants.TWITTER_NO_EMAIL,
+            errorObjects.TWITTER_NO_EMAIL
+          )
+        );
     }
 
     user = await User.findOne({ email });

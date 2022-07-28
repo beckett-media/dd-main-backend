@@ -128,6 +128,8 @@ module.exports.stringConstants = {
 
   TWITTER_NO_TOKEN: "Token Not found",
 
+  TWITTER_NO_EMAIL: "Email is missing on your twitter account. You must add it on your twitter profile to proceed with twitter sign in on Due Dilly.",
+
   APPLE_ID_DOES_NOT_MATCH_EMAIL:
     "User Identifier does not match the given email",
 
