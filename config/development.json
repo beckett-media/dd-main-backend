@@ -25,5 +25,6 @@
   "s3WebAccessKeyId": "AKIA2UG7D5EPCSPKMPMB",
   "s3WebSecretAccessKey": "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",
   "s3WebSignatureVersion": "v4",
-  "rollBarAcessToken": "23df1b06d5004387894797d8b72b1251"
+  "rollBarAcessToken": "23df1b06d5004387894797d8b72b1251",
+  "hubspotToken": "pat-na1-5e9068e5-d347-435b-a751-48ad3a69361d"
 }

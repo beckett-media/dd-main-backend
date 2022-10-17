@@ -490,4 +490,5 @@ module.exports.stringConstants = {
   CARD_ID_NOT_FOUND_COLLECTION_LIST:
     "CardId not found in user collection sorted list.",
   OLD_PROFILE_PIC_MATCH: "Old and new profile pic url should not be same.",
+  HUBSPOT_TOKEN: "hubspotToken"
 };
