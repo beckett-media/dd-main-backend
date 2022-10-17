@@ -18,14 +18,18 @@ router.post("/hubspot-form-post", async (req, res) => {
         Authorization: `Bearer ${HUBSPOT_TOKEN}`,
       },
     });
-    createResObject(true, {
-      message: "Thanks for submitting the form.",
-    });
+    res.send(
+      createResObject(true, {
+        message: "Thanks for submitting the form.",
+      })
+    );
   } catch (err) {
     console.log(err.message);
-    createResObject(false, {
-      message: "Error.",
-    });
+    res.send(
+      createResObject(false, {
+        message: "Error",
+      })
+    );
   }
 });
 
