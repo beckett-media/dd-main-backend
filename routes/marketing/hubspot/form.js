@@ -18,13 +18,12 @@ router.post("/hubspot-form-post", async (req, res) => {
         Authorization: `Bearer ${HUBSPOT_TOKEN}`,
       },
     });
-    res.status(200).json(data);
     createResObject(true, {
-      message: "Done",
+      message: "Thanks for submitting the form.",
     });
   } catch (err) {
     console.log(err.message);
-    createResObject(true, {
+    createResObject(false, {
       message: "Error.",
     });
   }
