@@ -10,7 +10,7 @@ router.post("/hubspot-form-post", async (req, res) => {
   const { portalId, formId, bodyData } = req.body;
 
   try {
-    const { data } = await axios({
+    await axios({
       method: "post",
       url: `https://api.hsforms.com/submissions/v3/integration/secure/submit/${portalId}/${formId}`,
       data: bodyData,
