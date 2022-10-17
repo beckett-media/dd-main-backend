@@ -37,6 +37,9 @@ const awsS3Routes = require("../routes/awsS3/api");
 const goHighSubscription = require("../routes/marketing/gohigh");
 const contactUs = require("../routes/marketing/contact-us");
 
+// Hubspot routes
+const hubspotForms = require("../routes/marketing/hubspot/form");
+
 const auctionRoutes = require("../routes/auction/auction.routes");
 const promoRoutes = require("../routes/promo/promo.routes");
 
@@ -81,4 +84,5 @@ module.exports = (app) => {
   app.use("/contact-us", contactUs);
   app.use("/auction", auctionRoutes);
   app.use("/promo", promoRoutes);
+  app.use("/marketing-hubspot", hubspotForms);
 };
