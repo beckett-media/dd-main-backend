@@ -34,7 +34,7 @@ const createAuction = async (req, res) => {
       );
   }
 
-  if (listing.user != req.user._id) {
+  if (listing.user.toString() != req.user._id.toString()) {
     return res
       .status(401)
       .send(
