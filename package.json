@@ -51,7 +51,7 @@
     "rimraf": "3.0.2",
     "rollbar": "2.24.1",
     "shortid": "2.2.16",
-    "socket.io": "4.4.1",
+    "socket.io": "4.5.4",
     "stripe": "8.63.0",
     "tweetnacl": "1.0.3",
     "tweetnacl-util": "0.15.1"
