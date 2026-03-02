@@ -49,7 +49,7 @@
     "request": "2.88.2",
     "request-promise": "4.2.6",
     "rimraf": "3.0.2",
-    "rollbar": "2.24.1",
+    "rollbar": "2.26.5",
     "shortid": "2.2.16",
     "socket.io": "4.4.1",
     "stripe": "8.63.0",
